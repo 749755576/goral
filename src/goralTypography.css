@@ -1,0 +1,221 @@
+/* Shared readable type scale. Never overrides xterm's user-controlled font. */
+html,
+body,
+button,
+input,
+select,
+textarea {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body,
+button,
+input,
+select,
+textarea,
+.settings-workspace {
+  font-family: var(--ld-font-ui);
+  font-synthesis: none;
+}
+
+.surface-vault button,
+.surface-terminal button {
+  font-weight: 580;
+}
+
+.surface-vault input,
+.surface-vault select,
+.surface-terminal input,
+.surface-terminal select,
+.surface-terminal textarea {
+  font-weight: 460;
+}
+
+.surface-tab {
+  font-size: var(--ld-text-footnote-size);
+  font-weight: 600;
+  letter-spacing: -.01em;
+}
+
+.vault-toolbar-heading strong {
+  font-size: var(--ld-text-body-size);
+}
+
+.vault-toolbar-heading small,
+.vault-content-breadcrumb,
+.vault-section-heading > span,
+.saved-host-refresh-status {
+  font-size: var(--ld-text-caption1-size);
+}
+
+.surface-vault .vault-section-heading h2 {
+  font-size: var(--ld-text-title3-size);
+}
+
+.surface-vault .workspace-navigation .connection-tabs button {
+  font-size: var(--ld-text-footnote-size);
+}
+
+.surface-vault .vault-onboarding-intro .eyebrow {
+  font-size: var(--ld-text-caption1-size);
+}
+
+.surface-vault .vault-onboarding-intro h3 {
+  font-size: clamp(27px, 2.5vw, 38px);
+}
+
+.surface-vault .vault-onboarding-intro p:last-child {
+  font-size: var(--ld-text-subheadline-size);
+}
+
+.surface-vault .vault-onboarding-path strong,
+.surface-vault .vault-onboarding-paths > .primary-button[data-onboarding-path="primary"] {
+  font-size: var(--ld-text-callout-size);
+}
+
+.surface-vault .vault-onboarding-path small,
+.surface-vault .vault-onboarding-paths > .primary-button[data-onboarding-path="primary"] small {
+  font-size: var(--ld-text-caption1-size);
+}
+
+.surface-vault .vault-onboarding-secondary button {
+  font-size: var(--ld-text-caption1-size);
+}
+
+.surface-vault .saved-host-group-toggle,
+.surface-vault .saved-host-group-label {
+  font-size: var(--ld-text-caption1-size);
+}
+
+.surface-vault .saved-host-summary strong {
+  font-size: var(--ld-text-body-size);
+}
+
+.surface-vault .saved-host-summary small {
+  font-size: var(--ld-text-caption1-size);
+}
+
+.surface-vault .saved-host-credential-state {
+  font-size: var(--ld-text-caption1-size);
+}
+
+.surface-vault .saved-host-actions button {
+  font-size: var(--ld-text-caption1-size);
+}
+
+.surface-vault .quick-connect-form .panel-title h2 {
+  font-size: var(--ld-text-title2-size);
+}
+
+.surface-vault .quick-connect-form label {
+  font-size: var(--ld-text-caption1-size);
+}
+
+.surface-vault .quick-connect-form input,
+.surface-vault .quick-connect-form select,
+.surface-vault .quick-connect-form > .primary-button,
+.surface-vault .quick-connect-form > .danger-button {
+  font-size: var(--ld-text-subheadline-size);
+}
+
+.surface-terminal .terminal-session-summary strong {
+  font-size: var(--ld-text-footnote-size);
+  font-weight: 600;
+}
+
+.surface-terminal .terminal-protocol-badge,
+.surface-terminal .terminal-state-label,
+.surface-terminal .serial-ymodem-status {
+  font-size: var(--ld-text-caption1-size);
+}
+
+.surface-terminal .saved-host-group-toggle,
+.surface-terminal .saved-host-group-label {
+  font-size: var(--ld-text-caption1-size);
+}
+
+.surface-terminal .saved-host-summary strong {
+  font-size: var(--ld-text-footnote-size);
+  font-weight: 600;
+}
+
+.surface-terminal .saved-host-summary small {
+  font-size: var(--ld-text-caption1-size);
+  font-weight: 460;
+}
+
+.surface-terminal .terminal-side-panel-title strong {
+  font-size: var(--ld-text-footnote-size);
+}
+
+.surface-terminal .terminal-side-panel-title small {
+  font-size: var(--ld-text-caption1-size);
+}
+
+.surface-terminal .sftp-list-header {
+  font-size: var(--ld-text-caption1-size);
+  font-weight: 600;
+}
+
+.surface-terminal .sftp-entry {
+  font-size: var(--ld-text-caption1-size);
+  font-weight: 500;
+}
+
+
+.settings-workspace {
+  font-size: var(--ld-text-subheadline-size);
+}
+
+.settings-workspace .settings-titlebar h1 {
+  font-size: var(--ld-text-title3-size);
+}
+
+.settings-workspace .settings-sidebar nav > button {
+  font-size: var(--ld-text-subheadline-size);
+}
+
+.settings-workspace .settings-section-title {
+  font-size: var(--ld-text-body-size);
+}
+
+.settings-workspace .settings-row-label {
+  font-size: var(--ld-text-subheadline-size);
+}
+
+.settings-workspace .settings-row-description {
+  font-size: var(--ld-text-caption1-size);
+}
+
+.settings-workspace .settings-select,
+.settings-workspace .settings-text-input,
+.settings-workspace .settings-number input,
+.settings-workspace .settings-segmented button,
+.settings-workspace .settings-nested-tabs button {
+  font-size: var(--ld-text-footnote-size);
+}
+
+.settings-workspace .settings-ai-profile-title-row strong {
+  font-size: var(--ld-text-headline-size);
+}
+
+.settings-workspace .settings-ai-profile-meta > span,
+.settings-workspace .settings-ai-profile-meta > small,
+.settings-workspace .settings-ai-description,
+.settings-workspace .settings-ai-section-heading small,
+.settings-workspace .settings-ai-field-hint {
+  font-size: var(--ld-text-caption1-size);
+}
+
+.settings-workspace .settings-ai-section-heading strong,
+.settings-workspace .settings-ai-key-heading strong {
+  font-size: var(--ld-text-subheadline-size);
+}
+
+.settings-workspace .settings-ai-field,
+.settings-workspace .settings-ai-field .settings-text-input,
+.settings-workspace .settings-ai-field .settings-select,
+.settings-workspace .settings-ai-key-input-row .settings-text-input {
+  font-size: var(--ld-text-footnote-size);
+}

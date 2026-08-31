@@ -1,0 +1,211 @@
+/*
+ * Remote text editor.
+ *
+ * Tokens only, like every other surface: this follows light and dark mode and
+ * the type scale without carrying a palette of its own.
+ */
+
+.remote-editor {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  flex-direction: column;
+  color: var(--ld-text);
+  background: var(--ld-surface);
+}
+
+.remote-editor-header {
+  display: grid;
+  min-height: 52px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--ld-space-8);
+  padding: var(--ld-space-10) var(--ld-space-12);
+  border-bottom: 1px solid var(--ld-hairline);
+}
+
+.remote-editor-identity {
+  display: grid;
+  min-width: 0;
+  gap: var(--ld-space-2);
+}
+
+.remote-editor-identity strong {
+  overflow: hidden;
+  color: var(--ld-text);
+  font-size: var(--ld-text-subheadline-size);
+  line-height: var(--ld-text-subheadline-line);
+  letter-spacing: var(--ld-text-subheadline-track);
+  font-weight: var(--ld-weight-semibold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Unsaved state is carried by the Save button's enabled state as well, so
+   this dot is a reinforcement rather than the only signal. */
+.remote-editor-dirty {
+  color: var(--ld-accent);
+}
+
+.remote-editor-identity small {
+  overflow: hidden;
+  color: var(--ld-text-secondary);
+  font-family: var(--ld-font-mono);
+  font-size: var(--ld-text-caption1-size);
+  line-height: var(--ld-text-caption1-line);
+  text-overflow: ellipsis;
+  direction: rtl;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.remote-editor-actions {
+  display: flex;
+  gap: var(--ld-space-6);
+}
+
+.remote-editor-actions button {
+  min-height: 30px;
+  border: 1px solid var(--ld-hairline);
+  border-radius: var(--ld-radius-sm);
+  padding: var(--ld-space-4) var(--ld-space-12);
+  color: var(--ld-text);
+  background: var(--ld-surface-raised);
+  font-size: var(--ld-text-caption1-size);
+  font-weight: var(--ld-weight-medium);
+  cursor: pointer;
+}
+
+.remote-editor-actions button:first-child:not(:disabled) {
+  color: var(--ld-accent-contrast);
+  border-color: var(--ld-accent);
+  background: var(--ld-accent);
+}
+
+.remote-editor-actions button:disabled {
+  color: var(--ld-text-muted);
+  cursor: default;
+}
+
+.remote-editor-notice {
+  margin: var(--ld-space-8) var(--ld-space-12) 0;
+  border: 1px solid color-mix(in srgb, var(--ld-warning) 34%, transparent);
+  border-radius: var(--ld-radius-md);
+  padding: var(--ld-space-8) var(--ld-space-10);
+  color: var(--ld-warning);
+  background: var(--ld-warning-soft);
+  font-size: var(--ld-text-caption1-size);
+  line-height: var(--ld-text-caption1-line);
+}
+
+.remote-editor-empty {
+  display: grid;
+  flex: 1 1 auto;
+  place-content: center;
+  gap: var(--ld-space-6);
+  padding: var(--ld-space-24);
+  text-align: center;
+}
+
+.remote-editor-empty h3 {
+  margin: 0;
+  color: var(--ld-text);
+  font-size: var(--ld-text-headline-size);
+  line-height: var(--ld-text-headline-line);
+  letter-spacing: var(--ld-text-headline-track);
+  font-weight: var(--ld-weight-semibold);
+}
+
+.remote-editor-empty p {
+  margin: 0;
+  max-width: 36ch;
+  color: var(--ld-text-secondary);
+  text-wrap: pretty;
+}
+
+.remote-editor-input {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  border: 0;
+  padding: var(--ld-space-12);
+  resize: none;
+  color: var(--ld-text);
+  background: var(--ld-surface);
+  font-family: var(--ld-font-mono);
+  font-size: var(--ld-text-footnote-size);
+  line-height: var(--ld-text-body-line);
+  letter-spacing: 0;
+  tab-size: 4;
+  white-space: pre;
+  overflow: auto;
+}
+
+.remote-editor-input:focus {
+  outline: 0;
+}
+
+.remote-editor-confirm {
+  position: absolute;
+  z-index: 40;
+  display: grid;
+  inset: 0;
+  place-items: center;
+  padding: var(--ld-space-16);
+  background: var(--ld-overlay);
+}
+
+.remote-editor-confirm-card {
+  display: grid;
+  width: min(100%, 360px);
+  gap: var(--ld-space-8);
+  border: 1px solid var(--ld-hairline-strong);
+  border-radius: var(--ld-radius-lg);
+  padding: var(--ld-space-16);
+  background: var(--ld-surface-raised);
+  box-shadow: var(--ld-elevation-4);
+}
+
+.remote-editor-confirm-card h3 {
+  margin: 0;
+  color: var(--ld-text);
+  font-size: var(--ld-text-headline-size);
+  line-height: var(--ld-text-headline-line);
+  letter-spacing: var(--ld-text-headline-track);
+  font-weight: var(--ld-weight-semibold);
+}
+
+.remote-editor-confirm-card p {
+  margin: 0;
+  color: var(--ld-text-secondary);
+  text-wrap: pretty;
+}
+
+.remote-editor-confirm-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--ld-space-8);
+  margin-top: var(--ld-space-4);
+}
+
+.remote-editor-confirm-actions button {
+  min-height: 32px;
+  border: 1px solid var(--ld-hairline);
+  border-radius: var(--ld-radius-sm);
+  padding: var(--ld-space-6) var(--ld-space-12);
+  color: var(--ld-text);
+  background: var(--ld-surface);
+  font-size: var(--ld-text-footnote-size);
+  font-weight: var(--ld-weight-medium);
+  cursor: pointer;
+}
+
+/* Discarding is the only irreversible choice in this dialog, so it is the
+   only one coloured as such. */
+.remote-editor-confirm-actions button.is-destructive {
+  color: var(--ld-danger);
+  border-color: color-mix(in srgb, var(--ld-danger) 28%, transparent);
+}

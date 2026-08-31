@@ -1,0 +1,29 @@
+[package]
+name = "netcatty-ssh"
+version = "0.1.0"
+description = "SSH configuration, validation, and authentication planning for Goral"
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+async-trait = "0.1"
+base64 = "0.22"
+# Keep the compatibility feature set explicit, but do not hard-pin the patch
+# release. Cargo.lock still makes builds reproducible; a reviewed `cargo
+# update -p russh` can now consume security fixes without editing manifests.
+# DES/DSS are retained only for the opt-in legacy-algorithm compatibility path.
+russh = { version = "0.62.7", default-features = false, features = ["des", "dsa", "flate2", "ring", "rsa"] }
+russh-sftp = "=2.4.0"
+serde.workspace = true
+serde_json = "1"
+sha2 = "0.11"
+tokio = { version = "1", features = ["fs", "io-util", "net", "process", "sync", "time"] }
+tokio-util = "0.7"
+uuid = { version = "1", features = ["v4"] }
+zeroize = "1"
+
+[dev-dependencies]
+futures = "0.3"
+rand = "0.10"
+tokio = { version = "1", features = ["io-util", "macros", "net", "rt-multi-thread", "sync", "time"] }

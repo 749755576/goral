@@ -1,0 +1,429 @@
+/*
+ * Goral design tokens — the single source of truth.
+ *
+ * Load order matters: this file must be imported before every other
+ * stylesheet so that later files can only *consume* tokens, never
+ * re-declare raw values. Custom properties resolve at use time, so a
+ * stylesheet imported earlier may still reference these safely.
+ *
+ * Rules for anyone editing UI CSS after this:
+ *   - Never write a raw font-family. Use var(--ld-font-ui) / var(--ld-font-mono).
+ *   - Never write a raw font-size. Use the type scale below.
+ *   - Never write a raw box-shadow. Use the elevation scale.
+ *   - Spacing is a 4px grid. Use var(--ld-space-*).
+ */
+
+:root {
+  /* ---------------------------------------------------------------
+   * Typeface
+   *
+   * Inter Variable carries both a weight axis (100-900) and an optical
+   * size axis, which is what lets small text open up and large text
+   * tighten the way SF does on Apple platforms. `font-optical-sizing:
+   * auto` drives that axis from the computed font-size, so no rule
+   * below ever sets it by hand.
+   *
+   * CJK never comes from Inter: the stack falls through to the platform
+   * Han face so Latin and Han keep their own vertical metrics instead
+   * of one being synthetically scaled to match the other.
+   * ------------------------------------------------------------- */
+  --ld-font-ui:
+    "Inter Variable", "Inter",
+    -apple-system, BlinkMacSystemFont, "SF Pro Text",
+    "PingFang SC", "Microsoft YaHei UI", "Microsoft YaHei",
+    "Segoe UI", system-ui, sans-serif;
+
+  --ld-font-mono:
+    "Cascadia Code", "Cascadia Mono",
+    ui-monospace, SFMono-Regular, Menlo, Consolas,
+    "Liberation Mono", monospace;
+
+  /* ---------------------------------------------------------------
+   * Type scale — Apple's text-style ladder.
+   *
+   * Each step pairs a size with its line-height and the tracking Apple
+   * specifies at that size. Tracking is the part people miss: it goes
+   * positive below ~14px and negative above it. Skipping it is most of
+   * why a Windows UI reads as "not Apple" even with the right metrics.
+   * ------------------------------------------------------------- */
+  --ld-text-caption1-size: 12px;
+  --ld-text-caption1-line: 16px;
+  --ld-text-caption1-track: .004em;
+
+  --ld-text-footnote-size: 13px;
+  --ld-text-footnote-line: 18px;
+  --ld-text-footnote-track: -.003em;
+
+  --ld-text-subheadline-size: 14px;
+  --ld-text-subheadline-line: 19px;
+  --ld-text-subheadline-track: -.006em;
+
+  --ld-text-body-size: 15px;
+  --ld-text-body-line: 20px;
+  --ld-text-body-track: -.011em;
+
+  --ld-text-callout-size: 16px;
+  --ld-text-callout-line: 21px;
+  --ld-text-callout-track: -.014em;
+
+  --ld-text-headline-size: 17px;
+  --ld-text-headline-line: 22px;
+  --ld-text-headline-track: -.02em;
+
+  --ld-text-title3-size: 20px;
+  --ld-text-title3-line: 25px;
+  --ld-text-title3-track: -.02em;
+
+  --ld-text-title2-size: 22px;
+  --ld-text-title2-line: 28px;
+  --ld-text-title2-track: -.024em;
+
+  --ld-text-title1-size: 28px;
+  --ld-text-title1-line: 34px;
+  --ld-text-title1-track: -.028em;
+
+  --ld-text-largetitle-size: 34px;
+  --ld-text-largetitle-line: 41px;
+  --ld-text-largetitle-track: -.03em;
+
+  /* Weights. Only these five. `460`-style one-offs are not a system. */
+  --ld-weight-regular: 400;
+  --ld-weight-medium: 500;
+  --ld-weight-semibold: 600;
+  --ld-weight-bold: 700;
+  /* Small text needs a touch more weight to hold its color against the
+   * background at the same perceived density as body text. */
+  --ld-weight-caption: 450;
+
+  /* ---------------------------------------------------------------
+   * Spacing — strict 4px grid.
+   * ------------------------------------------------------------- */
+  --ld-space-2: 2px;
+  --ld-space-4: 4px;
+  --ld-space-6: 6px;
+  --ld-space-8: 8px;
+  --ld-space-10: 10px;
+  --ld-space-12: 12px;
+  --ld-space-16: 16px;
+  --ld-space-20: 20px;
+  --ld-space-24: 24px;
+  --ld-space-32: 32px;
+  --ld-space-40: 40px;
+  --ld-space-48: 48px;
+
+  /* ---------------------------------------------------------------
+   * Corner radii.
+   *
+   * Nesting rule: an inner radius equals its parent's radius minus the
+   * padding between them. Concentric corners are what make nested cards
+   * look machined rather than stacked.
+   * ------------------------------------------------------------- */
+  --ld-radius-xs: 6px;
+  --ld-radius-sm: 8px;
+  --ld-radius-md: 12px;
+  --ld-radius-lg: 16px;
+  --ld-radius-xl: 20px;
+  --ld-radius-2xl: 28px;
+  --ld-radius-pill: 999px;
+
+  /* ---------------------------------------------------------------
+   * Motion.
+   *
+   * Durations are short because this is a desktop tool, not a phone.
+   * The standard curve is the iOS sheet easing: a fast start that
+   * settles rather than braking hard.
+   * ------------------------------------------------------------- */
+  --ld-motion-instant: 90ms;
+  --ld-motion-fast: 150ms;
+  --ld-motion-base: 250ms;
+  --ld-motion-slow: 350ms;
+
+  --ld-ease: cubic-bezier(.32, .72, 0, 1);
+  --ld-ease-out: cubic-bezier(.16, 1, .3, 1);
+  --ld-ease-in-out: cubic-bezier(.65, 0, .35, 1);
+
+  /* ---------------------------------------------------------------
+   * Elevation — two layers per level.
+   *
+   * A tight, near-opaque contact shadow reads as the object touching the
+   * surface; a wide, very low-alpha ambient shadow reads as the room
+   * light. One-layer shadows always look like a drop shadow filter.
+   * ------------------------------------------------------------- */
+  --ld-elevation-1:
+    0 1px 1px rgba(16, 24, 40, .04),
+    0 2px 8px rgba(16, 24, 40, .05);
+  --ld-elevation-2:
+    0 1px 2px rgba(16, 24, 40, .05),
+    0 6px 18px rgba(16, 24, 40, .07);
+  --ld-elevation-3:
+    0 2px 4px rgba(16, 24, 40, .05),
+    0 14px 38px rgba(16, 24, 40, .10);
+  --ld-elevation-4:
+    0 4px 8px rgba(16, 24, 40, .06),
+    0 28px 72px rgba(16, 24, 40, .16);
+
+  /* A hairline that survives fractional device pixel ratios. */
+  --ld-hairline: rgba(16, 24, 40, .10);
+  --ld-hairline-strong: rgba(16, 24, 40, .16);
+
+  /* Inner top highlight — the 1px light edge Apple puts on raised
+   * controls so they catch the light from above. */
+  --ld-sheen: inset 0 1px 0 rgba(255, 255, 255, .7);
+
+  /* ---------------------------------------------------------------
+   * Materials (glass).
+   *
+   * PERFORMANCE CONTRACT — read before using these.
+   *
+   * `backdrop-filter` is a 2D separable blur on the compositor. It runs
+   * on whatever GPU is present, including every integrated GPU since
+   * ~2012, so it does not require a discrete card. Its cost is
+   *
+   *     blurred area  x  how often the backdrop repaints
+   *
+   * A glass layer over static content is blurred once and cached. A
+   * glass layer over content that repaints every frame re-runs the blur
+   * every frame. That second case is the only one that is ever slow.
+   *
+   * Therefore:
+   *   - Apply glass to chrome only: title bars, sidebars, popovers,
+   *     menus, dialog scrims.
+   *   - NEVER put a glass layer over the xterm canvas while it streams.
+   *   - Never transition or animate the blur radius; animate opacity or
+   *     transform instead, which the compositor can do without re-blurring.
+   *   - Keep the radius at or below --ld-blur-thick. Cost grows with radius.
+   *
+   * `.ld-material-*` below carries the fallback and the user opt-out.
+   * ------------------------------------------------------------- */
+  --ld-blur-thin: 12px;
+  --ld-blur-regular: 20px;
+  --ld-blur-thick: 30px;
+
+  --ld-material-thin: rgba(255, 255, 255, .62);
+  --ld-material-regular: rgba(252, 253, 255, .74);
+  --ld-material-thick: rgba(250, 251, 253, .86);
+  /* The opaque stand-in used when blur is unavailable or switched off.
+   * Deliberately close in value to the material so turning transparency
+   * off changes the texture, not the layout or the contrast. */
+  --ld-material-thin-solid: #f4f6fa;
+  --ld-material-regular-solid: #f7f9fc;
+  --ld-material-thick-solid: #fafbfd;
+}
+
+:root[data-goral-mode="dark"] {
+  --ld-elevation-1:
+    0 1px 1px rgba(0, 0, 0, .24),
+    0 2px 8px rgba(0, 0, 0, .28);
+  --ld-elevation-2:
+    0 1px 2px rgba(0, 0, 0, .28),
+    0 6px 18px rgba(0, 0, 0, .34);
+  --ld-elevation-3:
+    0 2px 4px rgba(0, 0, 0, .30),
+    0 14px 38px rgba(0, 0, 0, .44);
+  --ld-elevation-4:
+    0 4px 8px rgba(0, 0, 0, .34),
+    0 28px 72px rgba(0, 0, 0, .56);
+
+  --ld-hairline: rgba(255, 255, 255, .10);
+  --ld-hairline-strong: rgba(255, 255, 255, .16);
+  --ld-sheen: inset 0 1px 0 rgba(255, 255, 255, .06);
+
+  --ld-material-thin: rgba(28, 34, 44, .60);
+  --ld-material-regular: rgba(24, 30, 39, .74);
+  --ld-material-thick: rgba(20, 26, 34, .86);
+  --ld-material-thin-solid: #1a202a;
+  --ld-material-regular-solid: #171d26;
+  --ld-material-thick-solid: #141a22;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-goral-mode="light"]) {
+    --ld-elevation-1:
+      0 1px 1px rgba(0, 0, 0, .24),
+      0 2px 8px rgba(0, 0, 0, .28);
+    --ld-elevation-2:
+      0 1px 2px rgba(0, 0, 0, .28),
+      0 6px 18px rgba(0, 0, 0, .34);
+    --ld-elevation-3:
+      0 2px 4px rgba(0, 0, 0, .30),
+      0 14px 38px rgba(0, 0, 0, .44);
+    --ld-elevation-4:
+      0 4px 8px rgba(0, 0, 0, .34),
+      0 28px 72px rgba(0, 0, 0, .56);
+
+    --ld-hairline: rgba(255, 255, 255, .10);
+    --ld-hairline-strong: rgba(255, 255, 255, .16);
+    --ld-sheen: inset 0 1px 0 rgba(255, 255, 255, .06);
+
+    --ld-material-thin: rgba(28, 34, 44, .60);
+    --ld-material-regular: rgba(24, 30, 39, .74);
+    --ld-material-thick: rgba(20, 26, 34, .86);
+    --ld-material-thin-solid: #1a202a;
+    --ld-material-regular-solid: #171d26;
+    --ld-material-thick-solid: #141a22;
+  }
+}
+
+/* -----------------------------------------------------------------
+ * Type scale utility classes.
+ *
+ * Applying a step sets size, line-height and tracking together. They
+ * are one unit; a size without its tracking is the bug this file exists
+ * to prevent.
+ * --------------------------------------------------------------- */
+.ld-text-caption1 {
+  font-size: var(--ld-text-caption1-size);
+  line-height: var(--ld-text-caption1-line);
+  letter-spacing: var(--ld-text-caption1-track);
+}
+
+.ld-text-footnote {
+  font-size: var(--ld-text-footnote-size);
+  line-height: var(--ld-text-footnote-line);
+  letter-spacing: var(--ld-text-footnote-track);
+}
+
+.ld-text-subheadline {
+  font-size: var(--ld-text-subheadline-size);
+  line-height: var(--ld-text-subheadline-line);
+  letter-spacing: var(--ld-text-subheadline-track);
+}
+
+.ld-text-body {
+  font-size: var(--ld-text-body-size);
+  line-height: var(--ld-text-body-line);
+  letter-spacing: var(--ld-text-body-track);
+}
+
+.ld-text-callout {
+  font-size: var(--ld-text-callout-size);
+  line-height: var(--ld-text-callout-line);
+  letter-spacing: var(--ld-text-callout-track);
+}
+
+.ld-text-headline {
+  font-size: var(--ld-text-headline-size);
+  line-height: var(--ld-text-headline-line);
+  letter-spacing: var(--ld-text-headline-track);
+  font-weight: var(--ld-weight-semibold);
+}
+
+.ld-text-title3 {
+  font-size: var(--ld-text-title3-size);
+  line-height: var(--ld-text-title3-line);
+  letter-spacing: var(--ld-text-title3-track);
+}
+
+.ld-text-title2 {
+  font-size: var(--ld-text-title2-size);
+  line-height: var(--ld-text-title2-line);
+  letter-spacing: var(--ld-text-title2-track);
+}
+
+.ld-text-title1 {
+  font-size: var(--ld-text-title1-size);
+  line-height: var(--ld-text-title1-line);
+  letter-spacing: var(--ld-text-title1-track);
+}
+
+/* -----------------------------------------------------------------
+ * Material utility classes.
+ *
+ * Each carries three tiers, in order:
+ *   1. blur, when the engine supports backdrop-filter;
+ *   2. an opaque stand-in when it does not;
+ *   3. the same opaque stand-in when the user has switched transparency
+ *      off, which also covers machines forced into software rendering.
+ * --------------------------------------------------------------- */
+.ld-material-thin,
+.ld-material-regular,
+.ld-material-thick {
+  /* Promote to its own layer so the blur is cached rather than recomputed
+   * alongside unrelated repaints in the same stacking context. */
+  will-change: opacity;
+}
+
+.ld-material-thin {
+  background-color: var(--ld-material-thin-solid);
+}
+
+.ld-material-regular {
+  background-color: var(--ld-material-regular-solid);
+}
+
+.ld-material-thick {
+  background-color: var(--ld-material-thick-solid);
+}
+
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+  :root:not([data-ld-reduce-transparency="on"]) .ld-material-thin {
+    background-color: var(--ld-material-thin);
+    -webkit-backdrop-filter: blur(var(--ld-blur-thin)) saturate(180%);
+    backdrop-filter: blur(var(--ld-blur-thin)) saturate(180%);
+  }
+
+  :root:not([data-ld-reduce-transparency="on"]) .ld-material-regular {
+    background-color: var(--ld-material-regular);
+    -webkit-backdrop-filter: blur(var(--ld-blur-regular)) saturate(180%);
+    backdrop-filter: blur(var(--ld-blur-regular)) saturate(180%);
+  }
+
+  :root:not([data-ld-reduce-transparency="on"]) .ld-material-thick {
+    background-color: var(--ld-material-thick);
+    -webkit-backdrop-filter: blur(var(--ld-blur-thick)) saturate(180%);
+    backdrop-filter: blur(var(--ld-blur-thick)) saturate(180%);
+  }
+}
+
+/* -----------------------------------------------------------------
+ * Global typographic baseline.
+ * --------------------------------------------------------------- */
+html,
+body,
+#root,
+button,
+input,
+select,
+textarea,
+optgroup {
+  font-family: var(--ld-font-ui);
+  font-optical-sizing: auto;
+  /* Do not let the engine fake a weight or slant that the variable font
+   * can produce properly, and do not let it fake one the CJK fallback
+   * cannot produce at all. */
+  font-synthesis: none;
+}
+
+html,
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  /* Tabular figures everywhere in chrome: ports, byte counts, timers and
+   * latencies must not reflow as their digits change. */
+  font-variant-numeric: tabular-nums;
+}
+
+body {
+  font-size: var(--ld-text-footnote-size);
+  line-height: var(--ld-text-footnote-line);
+  letter-spacing: var(--ld-text-footnote-track);
+  font-weight: var(--ld-weight-regular);
+}
+
+code,
+kbd,
+samp,
+pre {
+  font-family: var(--ld-font-mono);
+  font-variant-ligatures: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --ld-motion-instant: 0ms;
+    --ld-motion-fast: 0ms;
+    --ld-motion-base: 0ms;
+    --ld-motion-slow: 0ms;
+  }
+}

@@ -1,0 +1,18 @@
+[package]
+name = "netcatty-et"
+version = "0.1.0"
+description = "Bounded native Eternal Terminal client runtime for Goral"
+edition = "2024"
+license = "GPL-3.0-or-later"
+rust-version = "1.88"
+
+[dependencies]
+portable-pty = "0.9"
+serde = { version = "1", features = ["derive"] }
+tokio = { version = "1", features = ["sync"] }
+uuid = { version = "1", features = ["v4"] }
+zeroize = "1"
+
+[dev-dependencies]
+serde_json = "1"
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "time"] }

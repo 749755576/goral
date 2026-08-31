@@ -1,0 +1,530 @@
+/*
+ * System manager panels.
+ *
+ * Appearance only, entirely on the design tokens — no literal colours, no raw
+ * sizes, so these panels follow light and dark mode and the type scale the
+ * same way every other surface does.
+ */
+
+.system-manager-panel {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  flex-direction: column;
+  color: var(--ld-text);
+  background: var(--ld-surface);
+  font-size: var(--ld-text-footnote-size);
+  line-height: var(--ld-text-footnote-line);
+  letter-spacing: var(--ld-text-footnote-track);
+  container-name: system-manager;
+  container-type: inline-size;
+}
+
+.system-manager-header {
+  display: grid;
+  min-height: 52px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--ld-space-8);
+  padding: var(--ld-space-10) var(--ld-space-12);
+  border-bottom: 1px solid var(--ld-hairline);
+}
+
+.system-manager-header h2 {
+  margin: 0;
+  color: var(--ld-text);
+  font-size: var(--ld-text-callout-size);
+  line-height: var(--ld-text-callout-line);
+  letter-spacing: var(--ld-text-callout-track);
+  font-weight: var(--ld-weight-semibold);
+}
+
+.system-manager-header p {
+  margin: var(--ld-space-2) 0 0;
+  color: var(--ld-text-secondary);
+  font-size: var(--ld-text-caption1-size);
+  line-height: var(--ld-text-caption1-line);
+  letter-spacing: var(--ld-text-caption1-track);
+}
+
+.system-manager-refresh {
+  min-height: 28px;
+  border: 1px solid var(--ld-hairline);
+  border-radius: var(--ld-radius-sm);
+  padding: var(--ld-space-4) var(--ld-space-10);
+  color: var(--ld-text);
+  background: var(--ld-surface-raised);
+  font-size: var(--ld-text-caption1-size);
+  font-weight: var(--ld-weight-medium);
+  cursor: pointer;
+}
+
+.system-manager-refresh:hover:not(:disabled) {
+  background: var(--ld-surface-muted);
+}
+
+.system-manager-notice {
+  margin: var(--ld-space-8) var(--ld-space-12) 0;
+  border: 1px solid color-mix(in srgb, var(--ld-danger) 34%, transparent);
+  border-radius: var(--ld-radius-md);
+  padding: var(--ld-space-8) var(--ld-space-10);
+  color: var(--ld-danger);
+  background: var(--ld-danger-soft);
+  font-size: var(--ld-text-caption1-size);
+  line-height: var(--ld-text-caption1-line);
+}
+
+.system-manager-empty {
+  display: grid;
+  flex: 1 1 auto;
+  place-content: center;
+  gap: var(--ld-space-6);
+  padding: var(--ld-space-24);
+  text-align: center;
+}
+
+.system-manager-empty h3 {
+  margin: 0;
+  color: var(--ld-text);
+  font-size: var(--ld-text-headline-size);
+  line-height: var(--ld-text-headline-line);
+  letter-spacing: var(--ld-text-headline-track);
+  font-weight: var(--ld-weight-semibold);
+}
+
+.system-manager-empty p {
+  margin: 0;
+  max-width: 34ch;
+  color: var(--ld-text-secondary);
+  text-wrap: pretty;
+}
+
+.system-manager-list {
+  display: grid;
+  min-height: 0;
+  margin: 0;
+  padding: var(--ld-space-12);
+  gap: var(--ld-space-8);
+  overflow-y: auto;
+  list-style: none;
+}
+
+.system-manager-card {
+  display: grid;
+  gap: var(--ld-space-6);
+  border: 1px solid var(--ld-hairline);
+  border-radius: var(--ld-radius-md);
+  padding: var(--ld-space-10) var(--ld-space-12);
+  background: var(--ld-surface-raised);
+  box-shadow: var(--ld-elevation-1);
+}
+
+.system-manager-card-head {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--ld-space-8);
+}
+
+.system-manager-card-head strong {
+  overflow: hidden;
+  color: var(--ld-text);
+  font-size: var(--ld-text-subheadline-size);
+  line-height: var(--ld-text-subheadline-line);
+  letter-spacing: var(--ld-text-subheadline-track);
+  font-weight: var(--ld-weight-semibold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* State is carried by colour AND by the status text beside it, so the dot is
+   never the only thing distinguishing running from stopped. */
+.system-manager-state {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--ld-radius-pill);
+  background: var(--ld-text-muted);
+}
+
+.system-manager-state.state-running {
+  background: var(--ld-success);
+}
+
+.system-manager-status {
+  color: var(--ld-text-secondary);
+  font-size: var(--ld-text-caption1-size);
+  line-height: var(--ld-text-caption1-line);
+  letter-spacing: var(--ld-text-caption1-track);
+  white-space: nowrap;
+}
+
+.system-manager-meta,
+.system-manager-stats {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  gap: var(--ld-space-4) var(--ld-space-10);
+  color: var(--ld-text-secondary);
+  font-family: var(--ld-font-mono);
+  font-size: var(--ld-text-caption1-size);
+  line-height: var(--ld-text-caption1-line);
+}
+
+.system-manager-meta > span,
+.system-manager-stats > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.system-manager-image-meta > span {
+  display: inline-flex;
+  min-width: 0;
+  gap: var(--ld-space-4);
+}
+
+.system-manager-image-meta b {
+  color: var(--ld-text);
+  font-family: var(--ld-font-ui);
+  font-weight: var(--ld-weight-medium);
+}
+
+.system-manager-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ld-space-6);
+  margin-top: var(--ld-space-2);
+}
+
+.system-manager-actions button {
+  min-height: 28px;
+  border: 1px solid var(--ld-hairline);
+  border-radius: var(--ld-radius-sm);
+  padding: var(--ld-space-4) var(--ld-space-10);
+  color: var(--ld-text);
+  background: var(--ld-surface);
+  font-size: var(--ld-text-caption1-size);
+  font-weight: var(--ld-weight-medium);
+  cursor: pointer;
+}
+
+.system-manager-actions button:hover:not(:disabled) {
+  background: var(--ld-surface-muted);
+}
+
+.system-manager-actions button.is-destructive {
+  color: var(--ld-danger);
+  border-color: color-mix(in srgb, var(--ld-danger) 28%, transparent);
+}
+
+.system-manager-actions button.is-destructive:hover:not(:disabled) {
+  background: var(--ld-danger-soft);
+}
+
+.system-manager-actions button:disabled {
+  color: var(--ld-text-muted);
+  cursor: default;
+}
+
+.system-manager-confirm {
+  position: absolute;
+  z-index: 40;
+  display: grid;
+  inset: 0;
+  place-items: center;
+  padding: var(--ld-space-16);
+  background: var(--ld-overlay);
+}
+
+.system-manager-confirm-card {
+  display: grid;
+  width: min(100%, 320px);
+  gap: var(--ld-space-8);
+  border: 1px solid var(--ld-hairline-strong);
+  border-radius: var(--ld-radius-lg);
+  padding: var(--ld-space-16);
+  background: var(--ld-surface-raised);
+  box-shadow: var(--ld-elevation-4);
+}
+
+.system-manager-confirm-card h3 {
+  margin: 0;
+  color: var(--ld-text);
+  font-size: var(--ld-text-headline-size);
+  line-height: var(--ld-text-headline-line);
+  letter-spacing: var(--ld-text-headline-track);
+  font-weight: var(--ld-weight-semibold);
+}
+
+.system-manager-confirm-card p {
+  margin: 0;
+  color: var(--ld-text-secondary);
+  text-wrap: pretty;
+}
+
+.system-manager-confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--ld-space-8);
+  margin-top: var(--ld-space-4);
+}
+
+.system-manager-confirm-actions button {
+  min-height: 32px;
+  border: 1px solid var(--ld-hairline);
+  border-radius: var(--ld-radius-sm);
+  padding: var(--ld-space-6) var(--ld-space-12);
+  color: var(--ld-text);
+  background: var(--ld-surface);
+  font-size: var(--ld-text-footnote-size);
+  font-weight: var(--ld-weight-medium);
+  cursor: pointer;
+}
+
+.system-manager-confirm-actions button.is-destructive {
+  color: var(--ld-accent-contrast);
+  border-color: var(--ld-danger);
+  background: var(--ld-danger);
+}
+
+.system-manager-inspect-card {
+  width: min(100%, 680px);
+  max-height: calc(100% - var(--ld-space-32));
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+
+.system-manager-inspect-body {
+  min-height: 0;
+  overflow: auto;
+}
+
+.system-manager-inspect-body > p {
+  margin: 0;
+  color: var(--ld-text-secondary);
+}
+
+.system-manager-inspect-body .system-manager-notice {
+  margin: 0;
+}
+
+.system-manager-inspect-body pre {
+  min-width: 0;
+  margin: 0;
+  border: 1px solid var(--ld-hairline);
+  border-radius: var(--ld-radius-sm);
+  padding: var(--ld-space-10);
+  overflow: auto;
+  color: var(--ld-text);
+  background: var(--ld-surface-muted);
+  font-family: var(--ld-font-mono);
+  font-size: var(--ld-text-caption1-size);
+  line-height: var(--ld-text-caption1-line);
+  tab-size: 2;
+  white-space: pre;
+}
+
+/* Tab strip. A segmented control rather than underlined tabs: at panel
+   widths the segments stay legible where underlines and their labels would
+   collide. */
+.system-manager-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--ld-space-2);
+  margin: var(--ld-space-8) var(--ld-space-12) 0;
+  border: 1px solid var(--ld-hairline);
+  border-radius: var(--ld-radius-sm);
+  padding: var(--ld-space-2);
+  background: var(--ld-surface-muted);
+}
+
+.system-manager-tabs button {
+  min-height: 26px;
+  border: 0;
+  border-radius: var(--ld-radius-xs);
+  padding: var(--ld-space-4) var(--ld-space-6);
+  color: var(--ld-text-secondary);
+  background: transparent;
+  font-size: var(--ld-text-caption1-size);
+  line-height: var(--ld-text-caption1-line);
+  letter-spacing: var(--ld-text-caption1-track);
+  font-weight: var(--ld-weight-medium);
+  cursor: pointer;
+  overflow-wrap: anywhere;
+  white-space: normal;
+  transition:
+    color var(--ld-motion-fast) var(--ld-ease-out),
+    background-color var(--ld-motion-fast) var(--ld-ease-out);
+}
+
+.system-manager-tabs button:hover:not(.active) {
+  color: var(--ld-text);
+}
+
+.system-manager-tabs button.active {
+  color: var(--ld-text);
+  background: var(--ld-surface-raised);
+  box-shadow: var(--ld-elevation-1);
+}
+
+@container system-manager (max-width: 340px) {
+  .system-manager-tabs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.system-manager-subheader {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--ld-space-8);
+  padding: var(--ld-space-8) var(--ld-space-12) 0;
+  color: var(--ld-text-secondary);
+  font-size: var(--ld-text-caption1-size);
+  line-height: var(--ld-text-caption1-line);
+  letter-spacing: var(--ld-text-caption1-track);
+}
+
+.system-manager-tmux {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.system-manager-boundary-note {
+  margin: 0 var(--ld-space-12) var(--ld-space-8);
+  border: 1px solid var(--ld-hairline);
+  border-radius: var(--ld-radius-sm);
+  padding: var(--ld-space-8) var(--ld-space-10);
+  color: var(--ld-text-secondary);
+  background: var(--ld-surface-muted);
+  font-size: var(--ld-text-caption1-size);
+  line-height: var(--ld-text-caption1-line);
+}
+
+.system-manager-tmux-create,
+.system-manager-tmux-rename {
+  display: grid;
+  gap: var(--ld-space-6);
+}
+
+.system-manager-tmux-create {
+  margin: 0 var(--ld-space-12) var(--ld-space-8);
+  border: 1px solid var(--ld-hairline);
+  border-radius: var(--ld-radius-md);
+  padding: var(--ld-space-10);
+  background: var(--ld-surface-raised);
+}
+
+.system-manager-tmux-create label,
+.system-manager-tmux-rename label {
+  color: var(--ld-text);
+  font-size: var(--ld-text-footnote-size);
+  line-height: var(--ld-text-footnote-line);
+  font-weight: var(--ld-weight-medium);
+}
+
+.system-manager-tmux-create small {
+  color: var(--ld-text-secondary);
+  font-size: var(--ld-text-caption1-size);
+  line-height: var(--ld-text-caption1-line);
+}
+
+.system-manager-tmux-input-row {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  gap: var(--ld-space-6);
+}
+
+.system-manager-tmux-input-row input {
+  min-width: 0;
+  flex: 1 1 auto;
+  border: 1px solid var(--ld-hairline-strong);
+  border-radius: var(--ld-radius-sm);
+  padding: var(--ld-space-6) var(--ld-space-8);
+  color: var(--ld-text);
+  background: var(--ld-surface);
+  font: inherit;
+}
+
+.system-manager-tmux-input-row button {
+  border: 1px solid var(--ld-hairline-strong);
+  border-radius: var(--ld-radius-sm);
+  padding: var(--ld-space-6) var(--ld-space-10);
+  color: var(--ld-text);
+  background: var(--ld-surface-raised);
+  font: inherit;
+  cursor: pointer;
+}
+
+.system-manager-tmux-input-row button:hover:not(:disabled) {
+  border-color: var(--ld-accent);
+  color: var(--ld-accent);
+}
+
+.system-manager-tmux-input-row button:disabled {
+  cursor: not-allowed;
+  color: var(--ld-text-muted);
+  background: var(--ld-surface-muted);
+}
+
+.system-manager-tmux-rename {
+  border-top: 1px solid var(--ld-hairline);
+  padding-top: var(--ld-space-8);
+}
+
+.system-manager-overview {
+  min-height: 0;
+  padding: var(--ld-space-12);
+  overflow-y: auto;
+}
+
+.system-manager-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0;
+  gap: var(--ld-space-8);
+}
+
+.system-manager-overview-field {
+  display: grid;
+  min-width: 0;
+  gap: var(--ld-space-4);
+  border: 1px solid var(--ld-hairline);
+  border-radius: var(--ld-radius-md);
+  padding: var(--ld-space-10) var(--ld-space-12);
+  background: var(--ld-surface-raised);
+  box-shadow: var(--ld-elevation-1);
+}
+
+.system-manager-overview-field dt {
+  color: var(--ld-text-secondary);
+  font-size: var(--ld-text-caption1-size);
+  line-height: var(--ld-text-caption1-line);
+  letter-spacing: var(--ld-text-caption1-track);
+}
+
+.system-manager-overview-field dd {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  color: var(--ld-text);
+  font-family: var(--ld-font-mono);
+  font-size: var(--ld-text-footnote-size);
+  line-height: var(--ld-text-footnote-line);
+  font-weight: var(--ld-weight-medium);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 620px) {
+  .system-manager-overview-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

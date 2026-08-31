@@ -1,0 +1,1212 @@
+/*
+ * AI panel — appearance layer.
+ *
+ * styles.css owns the panel's structure (flex, grid, sizing). This file
+ * owns how it reads: type roles, rhythm, materials and motion. Keep that
+ * split. Appearance changes belong here, not in a fourth generation of
+ * overrides appended to styles.css.
+ *
+ * Everything below resolves through tokens from goralTokens.css. No raw
+ * font sizes, no hardcoded palette entries, and no opacity standing in
+ * for a text color — text drawn with `color-mix(..., transparent)` has a
+ * contrast ratio that depends on whatever happens to be behind it, which
+ * is how this panel ended up unreadable in light mode.
+ *
+ * One structural fact this file must respect, because styles.css owns it
+ * and fighting it visibly breaks the layout:
+ *   - `.ai-empty-intro` is a `36px minmax(0,1fr)` grid, so `.ai-empty-mark`
+ *     must stay exactly 36px wide.
+ */
+
+/* -----------------------------------------------------------------
+ * Panel shell
+ *
+ * The panel used to take its color from --terminal-resolved-bg, so it
+ * drifted with the terminal theme and never matched the surrounding app
+ * chrome. It is application chrome, so it follows the app surface.
+ * --------------------------------------------------------------- */
+.surface-terminal[data-ai-panel-open="true"] {
+  /* The AI footer contains provider, mode, permission and context controls.
+   * Keep enough horizontal room for their labels; the renderer mirrors this
+   * value in the resize separator's accessible min/max range. */
+  --terminal-side-panel-min-width: 420px;
+}
+
+.surface-terminal .ai-workspace {
+  color: var(--ld-text);
+  background: var(--ld-surface);
+  font-size: var(--ld-text-subheadline-size);
+  line-height: var(--ld-text-subheadline-line);
+  letter-spacing: var(--ld-text-subheadline-track);
+}
+
+/* The desktop shell has a 980px minimum. At that edge, retain the 420px AI
+ * floor by allowing the terminal canvas to absorb the remaining width instead
+ * of letting the two minimum tracks overflow into one another. */
+@media (min-width: 701px) and (max-width: 1080px) {
+  .surface-terminal[data-ai-panel-open="true"] {
+    grid-template-columns:
+      var(--terminal-host-panel-width, 270px)
+      minmax(0, 1fr)
+      minmax(var(--terminal-side-panel-min-width, 420px), var(--terminal-side-panel-width, 420px));
+  }
+}
+
+/* On a phone-sized window the side panel becomes an overlay. Preserve the
+ * readable AI floor when space allows, but cap it to the viewport so opening
+ * the panel never creates an off-screen, unreachable close button. */
+@media (max-width: 700px) {
+  /* mainWorkspaceFrame.css is loaded after the legacy mobile rule and would
+   * otherwise restore its three-column desktop template. AI remains an
+   * overlay on narrow windows, with the terminal canvas occupying the two
+   * visible columns underneath it. */
+  .surface-terminal[data-ai-panel-open="true"] {
+    grid-template-columns: 44px minmax(320px, 1fr);
+  }
+
+  .surface-terminal[data-ai-panel-open="true"] .terminal-side-panel {
+    /* The desktop shell itself retains a 980px document floor. Absolute grid
+     * positioning therefore follows that wider, horizontally scrolled shell
+     * instead of the narrow viewport. Fixed positioning owns the actual
+     * viewport edge, keeping both the panel and its close button reachable. */
+    position: fixed;
+    grid-column: auto;
+    grid-row: auto;
+    top: 46px;
+    right: 0;
+    bottom: 0;
+    left: auto;
+    align-self: stretch;
+    justify-self: end;
+    width: min(
+      max(var(--terminal-side-panel-width, 0px), var(--terminal-side-panel-min-width, 0px)),
+      calc(100% - 44px)
+    );
+    min-width: min(var(--terminal-side-panel-min-width, 0px), calc(100% - 44px));
+    max-width: calc(100% - 44px);
+  }
+}
+
+/* -----------------------------------------------------------------
+ * Header
+ * --------------------------------------------------------------- */
+.surface-terminal .ai-workspace-header {
+  min-height: 52px;
+  gap: var(--ld-space-8);
+  padding: var(--ld-space-10) var(--ld-space-12);
+  border-bottom: 1px solid var(--ld-hairline);
+  background: var(--ld-surface);
+}
+
+.surface-terminal .ai-workspace-header h2 {
+  margin: 0;
+  color: var(--ld-text);
+  font-size: var(--ld-text-callout-size);
+  line-height: var(--ld-text-callout-line);
+  letter-spacing: var(--ld-text-callout-track);
+  font-weight: var(--ld-weight-semibold);
+}
+
+.surface-terminal .ai-workspace-header p {
+  margin: var(--ld-space-2) 0 0;
+  color: var(--ld-text-secondary);
+  font-size: var(--ld-text-caption1-size);
+  line-height: var(--ld-text-caption1-line);
+  letter-spacing: var(--ld-text-caption1-track);
+  font-weight: var(--ld-weight-caption);
+}
+
+.surface-terminal .ai-workspace-actions {
+  gap: var(--ld-space-2);
+}
+
+.surface-terminal .ai-workspace-actions button {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--ld-radius-sm);
+  color: var(--ld-text-secondary);
+  background: transparent;
+}
+
+.surface-terminal .ai-workspace-actions button .ai-glyph {
+  width: 16px;
+  height: 16px;
+}
+
+.surface-terminal .ai-workspace-actions button:hover:not(:disabled) {
+  color: var(--ld-text);
+  background: var(--ld-surface-muted);
+}
+
+/* -----------------------------------------------------------------
+ * Empty state
+ * --------------------------------------------------------------- */
+.surface-terminal .ai-workspace-empty {
+  width: min(100%, 21rem);
+  gap: var(--ld-space-12);
+  padding: var(--ld-space-24) var(--ld-space-4);
+  align-items: stretch;
+}
+
+.surface-terminal .ai-empty-intro {
+  width: 100%;
+  gap: var(--ld-space-12);
+}
+
+/* 36px exactly — styles.css sizes the grid column it sits in. */
+.surface-terminal .ai-empty-mark {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--ld-radius-md);
+  color: #ffffff;
+  background: var(--ld-frame-ai);
+  box-shadow: var(--ld-elevation-2);
+}
+
+.surface-terminal .ai-workspace-empty h3 {
+  margin: 0;
+  color: var(--ld-text);
+  font-size: var(--ld-text-headline-size);
+  line-height: var(--ld-text-headline-line);
+  letter-spacing: var(--ld-text-headline-track);
+  font-weight: var(--ld-weight-semibold);
+}
+
+.surface-terminal .ai-workspace-empty p {
+  margin: var(--ld-space-6) 0 0;
+  color: var(--ld-text-secondary);
+  font-size: var(--ld-text-footnote-size);
+  line-height: var(--ld-text-footnote-line);
+  letter-spacing: var(--ld-text-footnote-track);
+  text-wrap: pretty;
+}
+
+.surface-terminal .ai-empty-suggestions {
+  display: grid;
+  width: 100%;
+  gap: var(--ld-space-6);
+}
+
+.surface-terminal .ai-empty-suggestions > button {
+  min-height: 0 !important;
+  grid-template-columns: calc(var(--ld-space-24) + var(--ld-space-4)) minmax(0, 1fr);
+  gap: var(--ld-space-8);
+  align-items: center;
+  border: 1px solid var(--ld-hairline) !important;
+  border-radius: var(--ld-radius-sm) !important;
+  padding: var(--ld-space-6) var(--ld-space-8) !important;
+  text-align: start;
+  background: var(--ld-surface-raised) !important;
+  box-shadow: var(--ld-elevation-1);
+  transition:
+    transform var(--ld-motion-fast) var(--ld-ease-out),
+    border-color var(--ld-motion-fast) var(--ld-ease-out),
+    box-shadow var(--ld-motion-fast) var(--ld-ease-out);
+}
+
+/* Lift on hover, settle on press. Transform and box-shadow only, so the
+ * compositor handles it without a layout pass. */
+.surface-terminal .ai-empty-suggestions > button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--ld-frame-ai) 40%, transparent) !important;
+  box-shadow: var(--ld-elevation-2);
+}
+
+.surface-terminal .ai-empty-suggestions > button:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: var(--ld-elevation-1);
+}
+
+/* The unconfigured state uses the same hierarchy as the suggestion state.
+ * This is a text action, not the 36px glyph above; the legacy shared selector
+ * clipped the localized label into a tiny square. */
+.surface-terminal .ai-primary-action {
+  width: fit-content;
+  min-width: 0;
+  height: auto;
+  min-height: var(--ld-space-32);
+  margin: 0 0 0 calc(var(--ld-space-32) + var(--ld-space-4) + var(--ld-space-12));
+  border: 1px solid var(--ld-frame-ai) !important;
+  border-radius: var(--ld-radius-sm) !important;
+  padding: var(--ld-space-6) var(--ld-space-12) !important;
+  color: var(--ld-accent-contrast) !important;
+  background: var(--ld-frame-ai) !important;
+  box-shadow: var(--ld-elevation-1);
+  font-size: var(--ld-text-footnote-size);
+  line-height: var(--ld-text-footnote-line);
+  font-weight: var(--ld-weight-semibold);
+  white-space: nowrap;
+}
+
+.surface-terminal .ai-primary-action:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--ld-frame-ai) 86%, black) !important;
+  background: color-mix(in srgb, var(--ld-frame-ai) 86%, black) !important;
+  box-shadow: var(--ld-elevation-2);
+}
+
+/* Concentric corners: a 12px card with 12px padding leaves the icon at 8. */
+.surface-terminal .ai-suggestion-icon {
+  width: calc(var(--ld-space-24) + var(--ld-space-4));
+  height: calc(var(--ld-space-24) + var(--ld-space-4));
+  flex: 0 0 auto;
+  border-radius: var(--ld-radius-sm);
+  color: var(--ld-frame-ai);
+  background: color-mix(in srgb, var(--ld-frame-ai) 20%, transparent);
+}
+
+.surface-terminal .ai-suggestion-copy {
+  display: grid;
+  gap: 0;
+  min-width: 0;
+}
+
+.surface-terminal .ai-suggestion-copy strong {
+  color: var(--ld-text);
+  font-size: var(--ld-text-subheadline-size);
+  line-height: var(--ld-text-subheadline-line);
+  letter-spacing: var(--ld-text-subheadline-track);
+  font-weight: var(--ld-weight-semibold);
+}
+
+.surface-terminal .ai-suggestion-copy small {
+  color: var(--ld-text-secondary);
+  font-size: var(--ld-text-caption1-size);
+  line-height: var(--ld-text-caption1-line);
+  letter-spacing: var(--ld-text-caption1-track);
+  font-weight: var(--ld-weight-caption);
+  text-wrap: pretty;
+}
+
+/* -----------------------------------------------------------------
+ * Messages
+ * --------------------------------------------------------------- */
+.surface-terminal .ai-workspace-messages {
+  padding: var(--ld-space-16) var(--ld-space-12);
+  gap: var(--ld-space-16);
+  scroll-padding-block: var(--ld-space-16);
+}
+
+.surface-terminal .ai-message-body {
+  border: 1px solid var(--ld-hairline) !important;
+  border-radius: var(--ld-radius-md);
+  padding: var(--ld-space-10) var(--ld-space-12);
+  color: var(--ld-text);
+  background: var(--ld-surface-raised) !important;
+  box-shadow: var(--ld-elevation-1);
+  /* Message text is the one thing here people actually read at length,
+   * so it gets the body step rather than a chrome-sized step. */
+  font-size: var(--ld-text-body-size);
+  line-height: var(--ld-text-body-line);
+  letter-spacing: var(--ld-text-body-track);
+}
+
+.surface-terminal .ai-message-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: var(--ld-radius-sm);
+}
+
+.surface-terminal .ai-markdown code,
+.surface-terminal .ai-markdown-code {
+  font-family: var(--ld-font-mono);
+  font-size: var(--ld-text-footnote-size);
+  line-height: var(--ld-text-footnote-line);
+  letter-spacing: 0;
+}
+
+/* Inset to the composer's own margin so it reads as a card in the same
+ * column rather than a strip bolted across the panel. */
+.surface-terminal .ai-workspace-notice {
+  margin: 0 var(--ld-space-12) var(--ld-space-8);
+  border: 1px solid var(--ld-hairline) !important;
+  border-radius: var(--ld-radius-md);
+  padding: var(--ld-space-10) var(--ld-space-12);
+  color: var(--ld-text-secondary);
+  background: var(--ld-surface-raised) !important;
+  font-size: var(--ld-text-footnote-size);
+  line-height: var(--ld-text-footnote-line);
+  letter-spacing: var(--ld-text-footnote-track);
+}
+
+/* -----------------------------------------------------------------
+ * Composer
+ *
+ * Reads as one control: a single bordered field whose footer is an
+ * inset region, rather than a stack of separately-bordered widgets.
+ * --------------------------------------------------------------- */
+.surface-terminal .ai-workspace-composer {
+  position: relative;
+  margin: var(--ld-space-8) var(--ld-space-12) var(--ld-space-12);
+  padding: 0;
+  overflow: visible;
+  border: 1px solid var(--ld-hairline-strong);
+  border-radius: var(--ld-radius-lg);
+  background: var(--ld-surface-raised);
+  box-shadow: var(--ld-elevation-2);
+  transition:
+    border-color var(--ld-motion-fast) var(--ld-ease-out),
+    box-shadow var(--ld-motion-fast) var(--ld-ease-out);
+}
+
+.surface-terminal .ai-workspace-composer:focus-within {
+  border-color: var(--ld-frame-ai);
+  box-shadow:
+    inset 0 0 0 1px var(--ld-frame-ai),
+    var(--ld-elevation-2);
+}
+
+.surface-terminal .ai-workspace-composer textarea {
+  min-height: 64px;
+  padding: var(--ld-space-12);
+  color: var(--ld-text);
+  background: transparent;
+  font-size: var(--ld-text-subheadline-size);
+  line-height: var(--ld-text-subheadline-line);
+  letter-spacing: var(--ld-text-subheadline-track);
+}
+
+.surface-terminal .ai-workspace-composer textarea::placeholder {
+  color: var(--ld-text-muted);
+}
+
+.surface-terminal .ai-composer-context {
+  min-height: 0;
+  padding: var(--ld-space-10) var(--ld-space-12) 0;
+  gap: var(--ld-space-6);
+}
+
+.surface-terminal .ai-composer-context .ai-context-chip-label {
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.surface-terminal .ai-workspace-composer footer {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr) var(--ld-space-32);
+  grid-template-areas: "controls send";
+  flex-direction: row;
+  align-items: end;
+  gap: var(--ld-space-6);
+  border-top: 1px solid var(--ld-hairline);
+  padding: var(--ld-space-8) var(--ld-space-10);
+  background: var(--ld-surface-control);
+  border-end-start-radius: calc(var(--ld-radius-lg) - 1px);
+  border-end-end-radius: calc(var(--ld-radius-lg) - 1px);
+}
+
+/* Chips were 9px. At that size the label is decoration, not information. */
+.surface-terminal .ai-context-chip {
+  min-height: 28px !important;
+  gap: var(--ld-space-6);
+  border-radius: var(--ld-radius-sm) !important;
+  padding: var(--ld-space-4) var(--ld-space-8) !important;
+  color: var(--ld-text-secondary) !important;
+  background: var(--ld-surface-muted) !important;
+  font-size: var(--ld-text-caption1-size) !important;
+  line-height: var(--ld-text-caption1-line);
+  letter-spacing: var(--ld-text-caption1-track);
+  font-weight: var(--ld-weight-medium);
+  white-space: nowrap;
+  transition:
+    color var(--ld-motion-fast) var(--ld-ease-out),
+    background-color var(--ld-motion-fast) var(--ld-ease-out);
+}
+
+.surface-terminal .ai-context-chip:hover:not(:disabled) {
+  color: var(--ld-text) !important;
+  background: var(--ld-surface-muted) !important;
+}
+
+.surface-terminal .ai-context-chip.is-attached {
+  color: var(--ld-frame-ai) !important;
+  background: color-mix(in srgb, var(--ld-frame-ai) 12%, transparent) !important;
+}
+
+.surface-terminal .ai-composer-controls {
+  grid-area: controls;
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: stretch;
+  gap: var(--ld-space-6);
+  overflow: visible;
+}
+
+.surface-terminal .ai-composer-main-controls {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: var(--ld-space-32) minmax(0, 1fr);
+  align-items: center;
+  gap: var(--ld-space-6);
+}
+
+.surface-terminal .ai-composer-routing-controls {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(4.5rem, .8fr) minmax(6.75rem, 1.2fr) auto;
+  align-items: center;
+  gap: var(--ld-space-4);
+}
+
+.surface-terminal .ai-composer-controls .ai-popup-root {
+  position: static;
+}
+
+.surface-terminal .ai-context-menu {
+  width: var(--ld-space-32);
+  flex: 0 0 var(--ld-space-32);
+}
+
+.surface-terminal .ai-context-menu-trigger {
+  display: grid;
+  width: var(--ld-space-32);
+  height: var(--ld-space-32);
+  min-height: var(--ld-space-32) !important;
+  place-items: center;
+  border: 1px solid var(--ld-hairline) !important;
+  border-radius: var(--ld-radius-sm) !important;
+  padding: 0 !important;
+  color: var(--ld-text-secondary) !important;
+  background: var(--ld-surface-raised) !important;
+}
+
+.surface-terminal .ai-context-menu-trigger:hover:not(:disabled),
+.surface-terminal .ai-context-menu-trigger[aria-expanded="true"] {
+  border-color: var(--ld-frame-ai) !important;
+  color: var(--ld-frame-ai) !important;
+  background: color-mix(in srgb, var(--ld-frame-ai) 12%, transparent) !important;
+}
+
+.surface-terminal .ai-context-menu-plus {
+  font-size: var(--ld-text-title3-size);
+  line-height: 1;
+  font-weight: var(--ld-weight-regular);
+}
+
+.surface-terminal .ai-context-menu-icon {
+  display: grid;
+  width: calc(var(--ld-space-24) + var(--ld-space-4));
+  height: calc(var(--ld-space-24) + var(--ld-space-4));
+  flex: 0 0 calc(var(--ld-space-24) + var(--ld-space-4));
+  place-items: center;
+  border-radius: var(--ld-radius-xs);
+  color: var(--ld-frame-ai);
+  background: color-mix(in srgb, var(--ld-frame-ai) 12%, transparent);
+}
+
+.surface-terminal .ai-terminal-status-dot {
+  width: var(--ld-space-8);
+  height: var(--ld-space-8);
+  flex: 0 0 var(--ld-space-8);
+  border-radius: var(--ld-radius-pill);
+  background: var(--ld-success);
+  box-shadow: 0 0 0 var(--ld-space-2) var(--ld-success-soft);
+}
+
+.surface-terminal .ai-terminal-context-chip[data-connected="false"] .ai-terminal-status-dot {
+  background: var(--ld-text-muted);
+  box-shadow: 0 0 0 var(--ld-space-2) var(--ld-surface-muted);
+}
+
+.surface-terminal .ai-context-chip.is-attached > .ai-glyph:last-child {
+  width: var(--ld-space-12);
+  height: var(--ld-space-12);
+  flex: 0 0 var(--ld-space-12);
+}
+
+.surface-terminal .ai-composer-main-controls > .ai-provider-menu {
+  min-width: 0;
+  width: 100%;
+  max-width: none;
+}
+
+.surface-terminal .ai-context-usage-ring {
+  display: inline-flex;
+  width: auto;
+  min-width: calc(var(--ld-space-40) + var(--ld-space-8));
+  height: var(--ld-space-32);
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ld-space-2);
+  border: 1px solid var(--ld-hairline);
+  border-radius: var(--ld-radius-sm);
+  padding: var(--ld-space-4) var(--ld-space-6);
+  color: var(--ld-text-secondary);
+  background: var(--ld-surface-raised);
+  font-size: var(--ld-text-caption1-size);
+  line-height: var(--ld-text-caption1-line);
+  font-weight: var(--ld-weight-medium);
+  place-items: center;
+  cursor: help;
+}
+
+.surface-terminal .ai-context-usage-ring svg {
+  width: var(--ld-space-16);
+  height: var(--ld-space-16);
+  flex: 0 0 var(--ld-space-16);
+  overflow: visible;
+}
+
+.surface-terminal .ai-context-usage-label {
+  white-space: nowrap;
+}
+
+.surface-terminal .ai-context-usage-ring circle {
+  fill: none;
+  stroke-width: var(--ld-space-2);
+}
+
+.surface-terminal .ai-context-usage-track {
+  stroke: var(--ld-hairline-strong);
+}
+
+.surface-terminal .ai-context-usage-value {
+  stroke: var(--ld-success);
+  stroke-linecap: round;
+  transform: rotate(-90deg);
+  transform-origin: center;
+  transition: stroke-dashoffset var(--ld-motion-base) var(--ld-ease-out);
+}
+
+.surface-terminal .ai-context-usage-ring[data-level="warning"] .ai-context-usage-value {
+  stroke: var(--ld-warning);
+}
+
+.surface-terminal .ai-context-usage-ring[data-level="critical"] .ai-context-usage-value {
+  stroke: var(--ld-danger);
+}
+
+.surface-terminal .ai-context-usage-ring[data-level="unknown"] .ai-context-usage-value {
+  stroke: var(--ld-text-muted);
+}
+
+.surface-terminal .ai-provider-menu,
+.surface-terminal .ai-permission-menu,
+.surface-terminal .ai-thinking-menu {
+  width: auto;
+  min-width: 0;
+  max-width: none;
+}
+
+.surface-terminal .ai-composer-routing-controls > select,
+.surface-terminal .ai-provider-menu-trigger,
+.surface-terminal .ai-permission-menu-trigger,
+.surface-terminal .ai-thinking-menu-trigger,
+.surface-terminal .ai-composer-runtime,
+.surface-terminal .ai-composer-read-only {
+  width: 100%;
+  height: var(--ld-space-32);
+  min-height: var(--ld-space-32) !important;
+  border: 1px solid var(--ld-hairline) !important;
+  border-radius: var(--ld-radius-sm) !important;
+  padding: var(--ld-space-4) var(--ld-space-8) !important;
+  color: var(--ld-text) !important;
+  background: var(--ld-surface-raised) !important;
+  font-size: var(--ld-text-caption1-size) !important;
+  line-height: var(--ld-text-caption1-line);
+  font-weight: var(--ld-weight-medium);
+}
+
+.surface-terminal .ai-provider-menu-trigger .ai-provider-menu-mark {
+  width: var(--ld-space-20);
+  height: var(--ld-space-20);
+  flex: 0 0 var(--ld-space-20);
+  border-radius: var(--ld-radius-xs);
+  font-size: var(--ld-text-caption1-size);
+}
+
+.surface-terminal .ai-provider-menu-trigger .ai-popup-trigger-copy > strong {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--ld-text);
+  font-size: var(--ld-text-caption1-size);
+  line-height: var(--ld-text-caption1-line);
+  font-weight: var(--ld-weight-semibold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.surface-terminal .ai-composer-mode-select {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+  padding-inline-end: var(--ld-space-20) !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.surface-terminal .ai-permission-menu {
+  width: 100%;
+  min-width: 0;
+}
+
+.surface-terminal .ai-permission-menu-trigger {
+  display: grid !important;
+  grid-template-columns: var(--ld-space-20) minmax(0, 1fr) var(--ld-space-12);
+  place-items: center start;
+  gap: var(--ld-space-4);
+  padding: var(--ld-space-2) var(--ld-space-6) !important;
+}
+
+.surface-terminal .ai-permission-menu-trigger:has(.ai-permission-icon.is-observer) {
+  border-color: color-mix(in srgb, var(--ld-accent) 32%, var(--ld-hairline)) !important;
+  color: var(--ld-accent) !important;
+  background: var(--ld-accent-soft) !important;
+}
+
+.surface-terminal .ai-permission-menu-trigger:has(.ai-permission-icon.is-confirm) {
+  border-color: color-mix(in srgb, var(--ld-warning) 36%, var(--ld-hairline)) !important;
+  color: var(--ld-warning) !important;
+  background: var(--ld-warning-soft) !important;
+}
+
+.surface-terminal .ai-permission-menu-trigger:has(.ai-permission-icon.is-auto) {
+  border-color: color-mix(in srgb, var(--ld-success) 36%, var(--ld-hairline)) !important;
+  color: var(--ld-success) !important;
+  background: var(--ld-success-soft) !important;
+}
+
+.surface-terminal .ai-permission-menu-trigger .ai-permission-icon {
+  width: var(--ld-space-20);
+  height: var(--ld-space-20);
+  border-radius: var(--ld-radius-xs);
+}
+
+.surface-terminal .ai-permission-trigger-title {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.surface-terminal .ai-permission-menu-trigger .ai-popup-chevron {
+  display: block;
+}
+
+.surface-terminal .ai-thinking-menu {
+  max-width: 6.5rem;
+  flex: 0 1 5.5rem;
+}
+
+.surface-terminal .ai-thinking-menu-trigger {
+  gap: var(--ld-space-6);
+}
+
+.surface-terminal .ai-thinking-mark {
+  width: var(--ld-space-8);
+  height: var(--ld-space-8);
+  flex: 0 0 var(--ld-space-8);
+  border-radius: var(--ld-radius-pill);
+  background: var(--ld-text-muted);
+}
+
+.surface-terminal .ai-provider-thinking {
+  display: grid;
+  gap: var(--ld-space-4);
+  padding: var(--ld-space-6) var(--ld-space-4) var(--ld-space-8);
+}
+
+.surface-terminal .ai-provider-thinking-options {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--ld-space-4);
+}
+
+.surface-terminal .ai-provider-thinking-options > button {
+  display: flex;
+  min-width: 0;
+  min-height: var(--ld-space-32);
+  align-items: center;
+  justify-content: center;
+  gap: var(--ld-space-4);
+  border: 1px solid var(--ld-hairline) !important;
+  border-radius: var(--ld-radius-sm) !important;
+  padding: var(--ld-space-4) var(--ld-space-6) !important;
+  color: var(--ld-text-secondary) !important;
+  background: var(--ld-surface-raised) !important;
+  font-size: var(--ld-text-caption1-size) !important;
+  line-height: var(--ld-text-caption1-line);
+  white-space: nowrap;
+}
+
+.surface-terminal .ai-provider-thinking-options > button[aria-checked="true"] {
+  border-color: var(--ld-frame-ai) !important;
+  color: var(--ld-frame-ai) !important;
+  background: color-mix(in srgb, var(--ld-frame-ai) 12%, transparent) !important;
+}
+
+.surface-terminal .ai-thinking-mark.is-low {
+  background: var(--ld-success);
+}
+
+.surface-terminal .ai-thinking-mark.is-medium {
+  background: var(--ld-warning);
+}
+
+.surface-terminal .ai-thinking-mark.is-high {
+  background: var(--ld-frame-ai);
+}
+
+.surface-terminal .ai-thinking-trigger-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.surface-terminal .ai-composer-runtime,
+.surface-terminal .ai-composer-read-only {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.surface-terminal .ai-send-button {
+  grid-area: send;
+  width: var(--ld-space-32);
+  height: var(--ld-space-32);
+  min-height: var(--ld-space-32) !important;
+  flex: 0 0 auto;
+  align-self: end;
+  border-radius: var(--ld-radius-pill) !important;
+  color: var(--ld-accent-contrast);
+  background: var(--ld-frame-ai);
+  box-shadow: var(--ld-elevation-1);
+  transition:
+    transform var(--ld-motion-instant) var(--ld-ease-out),
+    background-color var(--ld-motion-fast) var(--ld-ease-out),
+    box-shadow var(--ld-motion-fast) var(--ld-ease-out);
+}
+
+.surface-terminal .ai-send-button:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--ld-frame-ai) 86%, black);
+  box-shadow: var(--ld-elevation-2);
+}
+
+.surface-terminal .ai-send-button:active:not(:disabled) {
+  transform: scale(.94);
+}
+
+.surface-terminal .ai-send-button:disabled {
+  color: var(--ld-text-muted);
+  background: var(--ld-surface-muted);
+  box-shadow: none;
+}
+
+/* -----------------------------------------------------------------
+ * Floating menus
+ *
+ * These are the one place in the panel that genuinely overlays other
+ * content, so they are the one place glass belongs. They sit above a
+ * static backdrop, so the blur is computed once and cached; see the
+ * performance contract in goralTokens.css.
+ * --------------------------------------------------------------- */
+.surface-terminal .ai-popup-menu {
+  border: 1px solid var(--ld-hairline-strong) !important;
+  border-radius: var(--ld-radius-md) !important;
+  padding: var(--ld-space-4) !important;
+  background-color: var(--ld-material-thick-solid) !important;
+  box-shadow: var(--ld-elevation-4);
+}
+
+.surface-terminal .ai-composer-controls .ai-popup-menu {
+  right: auto;
+  bottom: calc((var(--ld-space-32) * 2) + var(--ld-space-24));
+  left: var(--ld-space-8);
+  width: min(20rem, calc(100% - var(--ld-space-16)));
+  max-width: calc(100% - var(--ld-space-16));
+}
+
+.surface-terminal .ai-model-search {
+  display: flex;
+  align-items: center;
+  gap: var(--ld-space-6);
+  margin: var(--ld-space-4);
+  border: 1px solid var(--ld-hairline);
+  border-radius: var(--ld-radius-sm);
+  padding: 0 var(--ld-space-8);
+  color: var(--ld-text-muted);
+  background: var(--ld-surface-raised);
+}
+
+.surface-terminal .ai-model-search:focus-within {
+  border-color: var(--ld-frame-ai);
+  box-shadow: inset 0 0 0 1px var(--ld-frame-ai);
+}
+
+.surface-terminal .ai-model-search > svg {
+  width: var(--ld-space-16);
+  height: var(--ld-space-16);
+  flex: 0 0 var(--ld-space-16);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+
+.surface-terminal .ai-model-search > input {
+  width: 100%;
+  min-width: 0;
+  height: var(--ld-space-32);
+  border: 0;
+  padding: 0;
+  color: var(--ld-text);
+  background: transparent;
+  font-size: var(--ld-text-footnote-size);
+  line-height: var(--ld-text-footnote-line);
+}
+
+.surface-terminal .ai-model-search > input:focus {
+  outline: none;
+}
+
+.surface-terminal .ai-model-option-mark {
+  width: var(--ld-space-8);
+  height: var(--ld-space-8);
+  flex: 0 0 var(--ld-space-8);
+  border-radius: var(--ld-radius-pill);
+  background: var(--ld-frame-ai);
+}
+
+.surface-terminal .ai-model-catalog-status,
+.surface-terminal .ai-model-catalog-error {
+  margin: var(--ld-space-4);
+  border-radius: var(--ld-radius-sm);
+  padding: var(--ld-space-8);
+  color: var(--ld-text-muted);
+  background: var(--ld-surface-muted);
+  font-size: var(--ld-text-caption1-size);
+  line-height: var(--ld-text-caption1-line);
+}
+
+.surface-terminal .ai-model-catalog-error {
+  display: flex;
+  align-items: center;
+  gap: var(--ld-space-8);
+  color: var(--ld-danger);
+  background: var(--ld-danger-soft);
+}
+
+.surface-terminal .ai-model-catalog-error > span {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.surface-terminal .ai-model-catalog-error > button {
+  min-height: var(--ld-space-32);
+  flex: 0 0 auto;
+  border: 1px solid currentColor !important;
+  border-radius: var(--ld-radius-xs) !important;
+  padding: var(--ld-space-4) var(--ld-space-8) !important;
+  color: inherit;
+  background: transparent !important;
+  font-size: var(--ld-text-caption1-size);
+  font-weight: var(--ld-weight-semibold);
+}
+
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+  :root:not([data-ld-reduce-transparency="on"]) .surface-terminal .ai-popup-menu {
+    background-color: var(--ld-material-thick) !important;
+    -webkit-backdrop-filter: blur(var(--ld-blur-thick)) saturate(180%);
+    backdrop-filter: blur(var(--ld-blur-thick)) saturate(180%);
+  }
+}
+
+.surface-terminal .ai-popup-group-label {
+  padding: var(--ld-space-6) var(--ld-space-8) var(--ld-space-4);
+  color: var(--ld-text-muted);
+  font-size: var(--ld-text-caption1-size);
+  line-height: var(--ld-text-caption1-line);
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  font-weight: var(--ld-weight-semibold);
+}
+
+.surface-terminal .ai-popup-group > button,
+.surface-terminal .ai-popup-footer > button {
+  gap: var(--ld-space-8);
+  border-radius: var(--ld-radius-xs) !important;
+  padding: var(--ld-space-6) var(--ld-space-8) !important;
+  color: var(--ld-text);
+  font-size: var(--ld-text-footnote-size);
+  line-height: var(--ld-text-footnote-line);
+  letter-spacing: var(--ld-text-footnote-track);
+}
+
+.surface-terminal .ai-popup-group > button:hover:not(:disabled),
+.surface-terminal .ai-popup-footer > button:hover:not(:disabled) {
+  background: var(--ld-surface-muted) !important;
+}
+
+.surface-terminal .ai-popup-group > button[aria-checked="true"] {
+  color: var(--ld-frame-ai);
+  background: color-mix(in srgb, var(--ld-frame-ai) 12%, transparent) !important;
+}
+
+.surface-terminal .ai-popup-item-copy > strong {
+  color: inherit;
+  font-size: var(--ld-text-footnote-size);
+  line-height: var(--ld-text-footnote-line);
+  font-weight: var(--ld-weight-medium);
+}
+
+.surface-terminal .ai-popup-item-copy > small {
+  color: var(--ld-text-muted);
+  font-size: var(--ld-text-caption1-size);
+  line-height: var(--ld-text-caption1-line);
+  letter-spacing: var(--ld-text-caption1-track);
+}
+
+.surface-terminal .ai-popup-status {
+  gap: var(--ld-space-6);
+  padding: var(--ld-space-4) var(--ld-space-8);
+  border-radius: var(--ld-radius-pill);
+  color: var(--ld-text-muted);
+  background: var(--ld-surface-muted);
+  font-size: var(--ld-text-caption1-size);
+  line-height: var(--ld-text-caption1-line);
+  font-weight: var(--ld-weight-medium);
+}
+
+.surface-terminal .ai-popup-status.is-ready {
+  color: var(--ld-success);
+  background: var(--ld-success-soft);
+}
+
+.surface-terminal .ai-popup-footer {
+  margin-top: var(--ld-space-4);
+  padding-top: var(--ld-space-4);
+  border-top: 1px solid var(--ld-hairline);
+}
+
+/* -----------------------------------------------------------------
+ * Focus
+ *
+ * One ring, drawn the same way everywhere, and only for keyboard focus.
+ *
+ * The composer textarea is excluded on purpose. It is a borderless field
+ * filling a bordered container that already signals focus through
+ * `:focus-within`, so an outline here would be a second indicator for the
+ * same focus stop — and because the field spans the container's full inner
+ * width, `outline-offset` drew that second ring straight through the
+ * container's border and out past the panel edge.
+ * --------------------------------------------------------------- */
+.surface-terminal .ai-workspace :is(button, select, input, summary):focus-visible {
+  outline: 2px solid var(--ld-frame-ai);
+  outline-offset: 2px;
+}
+
+.surface-terminal .ai-workspace-composer textarea:focus-visible {
+  outline: none;
+}
+
+/* The default side panel gets two deliberate rows. Nothing is allowed to
+ * wrap itself into an accidental third row, and Send remains its own column. */
+@container ai-workspace (max-width: 439px) {
+  .surface-terminal .ai-workspace-composer footer {
+    gap: var(--ld-space-4);
+    padding-inline: var(--ld-space-8);
+  }
+
+  .surface-terminal .ai-composer-main-controls,
+  .surface-terminal .ai-composer-routing-controls,
+  .surface-terminal .ai-provider-menu-trigger,
+  .surface-terminal .ai-permission-menu-trigger,
+  .surface-terminal .ai-composer-mode-select {
+    min-width: 0;
+  }
+
+}
+
+/* The supported desktop floor is 420px. At that width every primary control
+ * fits on one deliberate row: mode and permission remain readable, while the
+ * context meter becomes the same compact ring used by the reference design.
+ * Viewport-capped overlays below 400px keep the two-row fallback above. */
+@container ai-workspace (min-width: 400px) and (max-width: 519px) {
+  .surface-terminal .ai-composer-controls {
+    grid-template-columns:
+      var(--ld-space-32)
+      minmax(5.5rem, 1fr)
+      4rem
+      4.5rem
+      var(--ld-space-32);
+    align-items: center;
+    gap: var(--ld-space-4);
+  }
+
+  .surface-terminal .ai-composer-main-controls,
+  .surface-terminal .ai-composer-routing-controls {
+    display: contents;
+  }
+
+  .surface-terminal .ai-permission-menu-trigger {
+    grid-template-columns: minmax(0, 1fr) var(--ld-space-12);
+  }
+
+  .surface-terminal .ai-provider-menu-trigger {
+    gap: var(--ld-space-4);
+    padding-inline: var(--ld-space-6) !important;
+  }
+
+  .surface-terminal .ai-provider-menu-trigger .ai-provider-menu-mark {
+    width: var(--ld-space-16);
+    height: var(--ld-space-16);
+    flex-basis: var(--ld-space-16);
+  }
+
+  .surface-terminal .ai-permission-menu-trigger .ai-permission-icon,
+  .surface-terminal .ai-context-usage-label {
+    display: none;
+  }
+
+  .surface-terminal .ai-context-usage-ring {
+    width: var(--ld-space-32);
+    min-width: var(--ld-space-32);
+    padding: var(--ld-space-4);
+  }
+
+  .surface-terminal .ai-composer-controls .ai-popup-menu {
+    bottom: calc(var(--ld-space-32) + var(--ld-space-16));
+  }
+}
+
+/* A genuinely wide side panel can afford the legacy one-line tool strip. */
+@container ai-workspace (min-width: 520px) {
+  .surface-terminal .ai-composer-controls {
+    grid-template-columns:
+      var(--ld-space-32)
+      minmax(9rem, 1fr)
+      minmax(4.25rem, 4.75rem)
+      minmax(6.25rem, 7rem)
+      auto;
+    align-items: center;
+    gap: var(--ld-space-4);
+  }
+
+  .surface-terminal .ai-composer-main-controls,
+  .surface-terminal .ai-composer-routing-controls {
+    display: contents;
+  }
+
+  .surface-terminal .ai-composer-controls .ai-popup-menu {
+    bottom: calc(var(--ld-space-32) + var(--ld-space-16));
+  }
+}
+
+@container ai-workspace (max-width: 319px) {
+  .surface-terminal .ai-workspace-composer {
+    margin-inline: var(--ld-space-8);
+  }
+
+  .surface-terminal .ai-workspace-composer footer {
+    padding-inline: var(--ld-space-6);
+  }
+
+  .surface-terminal .ai-composer-routing-controls {
+    grid-template-columns: minmax(3.75rem, .8fr) minmax(5.5rem, 1.1fr) auto;
+  }
+
+  .surface-terminal .ai-permission-menu-trigger {
+    grid-template-columns: minmax(0, 1fr) var(--ld-space-12);
+  }
+
+  .surface-terminal .ai-permission-menu-trigger .ai-permission-icon {
+    display: none;
+  }
+
+  .surface-terminal .ai-context-usage-ring {
+    min-width: calc(var(--ld-space-40) + var(--ld-space-4));
+    padding-inline: var(--ld-space-4);
+  }
+
+  .surface-terminal .ai-composer-mode-select {
+    padding-inline-start: var(--ld-space-6) !important;
+  }
+
+  .surface-terminal .ai-composer-controls .ai-popup-menu {
+    right: var(--ld-space-8);
+    left: var(--ld-space-8);
+    width: auto;
+    max-width: none;
+  }
+}
+
+/* Native Agent progress: preserve the assistant's plan text, then show every
+ * exact terminal call as a compact, immutable activity row. The command is
+ * intentionally one line in the transcript; its title exposes the complete
+ * text without letting a long shell pipeline consume the whole side panel. */
+.surface-terminal .ai-tool-activity {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--ld-space-8);
+  margin-top: var(--ld-space-8);
+  border: 1px solid var(--ld-border);
+  border-radius: var(--ld-radius-sm);
+  padding: var(--ld-space-8) var(--ld-space-10);
+  color: var(--ld-text-secondary);
+  background: var(--ld-surface-control);
+}
+
+.surface-terminal .ai-tool-activity-icon {
+  display: inline-flex;
+  width: var(--ld-space-20);
+  height: var(--ld-space-20);
+  align-items: center;
+  justify-content: center;
+  color: var(--ld-frame-ai);
+}
+
+.surface-terminal .ai-tool-activity-icon .ai-glyph {
+  width: var(--ld-space-16);
+  height: var(--ld-space-16);
+}
+
+.surface-terminal .ai-tool-activity code {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--ld-text);
+  font-family: var(--ld-font-mono);
+  font-size: var(--ld-text-caption1-size);
+  line-height: var(--ld-text-caption1-line);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.surface-terminal .ai-tool-activity-status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ld-space-4);
+  color: var(--ld-text-muted);
+  font-size: var(--ld-text-caption1-size);
+  line-height: var(--ld-text-caption1-line);
+  font-weight: var(--ld-weight-medium);
+  white-space: nowrap;
+}
+
+.surface-terminal .ai-tool-activity[data-status="running"] .ai-tool-activity-status {
+  color: var(--ld-frame-ai);
+}
+
+.surface-terminal .ai-tool-activity[data-status="completed"] .ai-tool-activity-status {
+  color: var(--ld-success);
+}
+
+.surface-terminal .ai-tool-activity[data-status="timedOut"] .ai-tool-activity-status {
+  color: var(--ld-warning);
+}
+
+.surface-terminal .ai-tool-activity:is([data-status="failed"], [data-status="rejected"]) .ai-tool-activity-status {
+  color: var(--ld-danger);
+}

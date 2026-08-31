@@ -1,0 +1,169 @@
+:root[data-goral-mode="light"] {
+  --ld-bg: #f5f5f7;
+  --ld-surface: #fafafa;
+  --ld-surface-raised: #ffffff;
+  --ld-surface-muted: #e9eaed;
+  --ld-surface-control: #f1f2f4;
+  --ld-text: #15171a;
+  --ld-text-secondary: #545a63;
+  --ld-text-muted: #656a72;
+  --ld-border: rgba(21, 25, 31, .15);
+  --ld-border-strong: rgba(21, 25, 31, .28);
+  --ld-accent: #0066d6;
+  --ld-accent-strong: #0054af;
+  --ld-accent-soft: #dfecfa;
+  --ld-accent-contrast: #ffffff;
+  --ld-purple: #9546bd;
+  --ld-purple-soft: #f1e7f6;
+  --ld-success: #207936;
+  --ld-success-soft: #e1ede4;
+  --ld-warning: #9b5b00;
+  --ld-warning-soft: #f2e9dd;
+  --ld-danger: #c82e26;
+  --ld-danger-soft: #f8e6e5;
+  --ld-sidebar: #e8e9ec;
+  --ld-chrome: rgba(250, 250, 250, .92);
+  --ld-overlay: rgba(245, 245, 247, .82);
+}
+
+:root[data-goral-mode="light"] .workspace-navigation .connection-tabs button.active,
+:root[data-goral-mode="light"] .settings-workspace .settings-sidebar nav > button.active {
+  color: var(--ld-accent);
+  background: var(--ld-accent-soft);
+  border-color: color-mix(in srgb, var(--ld-accent) 34%, transparent);
+}
+
+:root[data-goral-mode="light"] .primary-button,
+:root[data-goral-mode="light"] .vault-new-host,
+:root[data-goral-mode="light"] .vault-connect-action,
+:root[data-goral-mode="light"] .settings-workspace .settings-primary-button {
+  color: #ffffff;
+  background: var(--ld-accent);
+  border-color: var(--ld-accent);
+  box-shadow: var(--ld-elevation-2);
+}
+
+:root[data-goral-mode="light"] .primary-button:hover:not(:disabled),
+:root[data-goral-mode="light"] .vault-new-host:hover:not(:disabled),
+:root[data-goral-mode="light"] .vault-connect-action:hover:not(:disabled),
+:root[data-goral-mode="light"] .settings-workspace .settings-primary-button:hover {
+  color: #ffffff;
+  background: var(--ld-accent-strong);
+  border-color: var(--ld-accent-strong);
+}
+
+/* Reference-inspired dark language: navy-black surfaces, blue focus edges,
+   green health signals, violet intelligence. */
+:root[data-goral-mode="dark"] {
+  --ld-bg: #0b0e16;
+  --ld-surface: #151821;
+  --ld-surface-raised: #1d202b;
+  --ld-surface-muted: #242936;
+  --ld-surface-control: #202530;
+  --ld-surface-terminal: #07090e;
+  --ld-text: #f2f5f8;
+  --ld-text-secondary: #b2bac8;
+  --ld-text-muted: #8790a1;
+  --ld-border: rgba(190, 207, 232, .15);
+  --ld-border-strong: rgba(190, 207, 232, .3);
+  --ld-accent: #2a90ff;
+  --ld-accent-strong: #5fa9ff;
+  --ld-accent-soft: #163c68;
+  --ld-accent-contrast: #ffffff;
+  --ld-purple: #bc6fe3;
+  --ld-purple-soft: #3a245a;
+  --ld-success: #34c759;
+  --ld-success-soft: #174d35;
+  --ld-warning: #ff9500;
+  --ld-warning-soft: #4d3b1b;
+  --ld-danger: #ff5147;
+  --ld-danger-soft: #552630;
+  --ld-sidebar: #111421;
+  --ld-chrome: rgba(18, 21, 32, .92);
+  --ld-overlay: rgba(7, 10, 17, .82);
+  color-scheme: dark;
+}
+
+:root[data-goral-mode="dark"] .workspace-navigation .connection-tabs button.active,
+:root[data-goral-mode="dark"] .settings-workspace .settings-sidebar nav > button.active {
+  color: #e9f3ff;
+  background: #153b68;
+  border-color: #2e8fee;
+}
+
+:root[data-goral-mode="dark"] .primary-button,
+:root[data-goral-mode="dark"] .vault-new-host,
+:root[data-goral-mode="dark"] .vault-connect-action,
+:root[data-goral-mode="dark"] .settings-workspace .settings-primary-button {
+  color: #ffffff;
+  background: var(--ld-accent);
+  border-color: var(--ld-accent-strong);
+  box-shadow: 0 7px 20px rgba(34, 133, 237, .22);
+}
+
+:root[data-goral-mode="dark"] .primary-button:hover:not(:disabled),
+:root[data-goral-mode="dark"] .vault-new-host:hover:not(:disabled),
+:root[data-goral-mode="dark"] .vault-connect-action:hover:not(:disabled),
+:root[data-goral-mode="dark"] .settings-workspace .settings-primary-button:hover {
+  color: #ffffff;
+  background: var(--ld-accent-strong);
+  border-color: var(--ld-accent-strong);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-goral-mode="light"]) {
+    --ld-bg: #0b0e16;
+    --ld-surface: #151821;
+    --ld-surface-raised: #1d202b;
+    --ld-surface-muted: #242936;
+    --ld-surface-control: #202530;
+    --ld-surface-terminal: #07090e;
+    --ld-text: #f2f5f8;
+    --ld-text-secondary: #b2bac8;
+    --ld-text-muted: #8790a1;
+    --ld-border: rgba(190, 207, 232, .15);
+    --ld-border-strong: rgba(190, 207, 232, .3);
+    --ld-accent: #2a90ff;
+    --ld-accent-strong: #5fa9ff;
+    --ld-accent-soft: #163c68;
+    --ld-accent-contrast: #ffffff;
+    --ld-purple: #bc6fe3;
+    --ld-purple-soft: #3a245a;
+    --ld-success: #34c759;
+    --ld-success-soft: #174d35;
+    --ld-warning: #ff9500;
+    --ld-warning-soft: #4d3b1b;
+    --ld-danger: #ff5147;
+    --ld-danger-soft: #552630;
+    --ld-sidebar: #111421;
+    --ld-chrome: rgba(18, 21, 32, .92);
+    --ld-overlay: rgba(7, 10, 17, .82);
+    color-scheme: dark;
+  }
+
+  :root:not([data-goral-mode="light"]) .workspace-navigation .connection-tabs button.active,
+  :root:not([data-goral-mode="light"]) .settings-workspace .settings-sidebar nav > button.active {
+    color: #e9f3ff;
+    background: #153b68;
+    border-color: #2e8fee;
+  }
+
+  :root:not([data-goral-mode="light"]) .primary-button,
+  :root:not([data-goral-mode="light"]) .vault-new-host,
+  :root:not([data-goral-mode="light"]) .vault-connect-action,
+  :root:not([data-goral-mode="light"]) .settings-workspace .settings-primary-button {
+    color: #ffffff;
+    background: #2588ed;
+    border-color: #53a9ff;
+    box-shadow: 0 7px 20px rgba(34, 133, 237, .22);
+  }
+
+  :root:not([data-goral-mode="light"]) .primary-button:hover:not(:disabled),
+  :root:not([data-goral-mode="light"]) .vault-new-host:hover:not(:disabled),
+  :root:not([data-goral-mode="light"]) .vault-connect-action:hover:not(:disabled),
+  :root:not([data-goral-mode="light"]) .settings-workspace .settings-primary-button:hover {
+    color: #ffffff;
+    background: #4aa5ff;
+    border-color: #83c5ff;
+  }
+}

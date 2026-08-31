@@ -1,0 +1,25 @@
+[package]
+name = "netcatty-serial"
+version = "0.1.0"
+description = "Bounded asynchronous serial-port runtime for Goral"
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[features]
+default = []
+# Optional richer Linux USB metadata. Kept opt-in so normal builds do not
+# require a system libudev development package.
+libudev = ["tokio-serial/libudev"]
+
+[dependencies]
+encoding_rs = "0.8"
+serde.workspace = true
+tokio = { version = "1", features = ["io-util", "macros", "rt", "sync", "time"] }
+tokio-serial = "5.4"
+uuid = { version = "1", features = ["v4"] }
+zeroize = "1"
+
+[dev-dependencies]
+serde_json = "1"
+tokio = { version = "1", features = ["io-util", "macros", "rt", "rt-multi-thread", "sync", "time"] }

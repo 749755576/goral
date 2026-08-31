@@ -1,0 +1,2237 @@
+/* A true desktop composition: the app is a window inside a field, not a
+   full-bleed web page. This is intentionally separate from feature CSS. */
+:root {
+  --ld-frame-field: #e7ebf1;
+  --ld-frame-field-glow: rgba(255, 255, 255, .72);
+  --ld-frame-window: #f8f9fb;
+  --ld-frame-window-line: rgba(24, 30, 38, .16);
+  --ld-frame-ink: #15181d;
+  --ld-frame-secondary: #3f4650;
+  --ld-frame-muted: #68717d;
+  --ld-frame-control: #eceef1;
+  --ld-frame-accent: #0066d6;
+  --ld-frame-accent-ink: #ffffff;
+  --ld-frame-success: #207936;
+  --ld-frame-success-ink: #ffffff;
+  --ld-frame-ai: #9546bd;
+}
+
+:root[data-goral-mode="dark"] {
+  --ld-frame-field: #080b16;
+  --ld-frame-field-glow: rgba(71, 44, 126, .42);
+  --ld-frame-window: #121522;
+  --ld-frame-window-line: rgba(203, 219, 244, .18);
+  --ld-frame-ink: #f3f6fb;
+  --ld-frame-secondary: #c7ced9;
+  --ld-frame-muted: #98a3b4;
+  --ld-frame-control: #202531;
+  --ld-frame-accent: #2a90ff;
+  --ld-frame-accent-ink: #ffffff;
+  --ld-frame-success: #34c759;
+  --ld-frame-success-ink: #072414;
+  --ld-frame-ai: #bc6fe3;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-goral-mode="light"]) {
+    --ld-frame-field: #080b16;
+    --ld-frame-field-glow: rgba(71, 44, 126, .42);
+    --ld-frame-window: #121522;
+    --ld-frame-window-line: rgba(203, 219, 244, .18);
+    --ld-frame-ink: #f3f6fb;
+    --ld-frame-secondary: #c7ced9;
+    --ld-frame-muted: #98a3b4;
+    --ld-frame-control: #202531;
+    --ld-frame-accent: #2a90ff;
+    --ld-frame-accent-ink: #ffffff;
+    --ld-frame-success: #34c759;
+    --ld-frame-success-ink: #072414;
+    --ld-frame-ai: #bc6fe3;
+  }
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* No decorative field behind the shell: nothing is ever visible through it,
+   so a gradient here only costs a full-viewport paint on every theme change. */
+body {
+  background: var(--ld-frame-window);
+}
+
+/* The app fills its window. Earlier this drew a smaller rounded "window"
+   inset 14px with its own border and drop shadow, floating on a gradient
+   field — a web page imitating a desktop app. The Tauri window is
+   `decorations: false` but NOT transparent, so that inset revealed no OS
+   shadow and no system corner: it was 28px of opaque padding plus a fake
+   shadow drawn over the real window edge. Native apps own their whole frame. */
+.workbench-shell {
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 0;
+  background: var(--ld-frame-window);
+  box-shadow: none;
+  color: var(--ld-frame-ink);
+}
+
+.workspace-chrome {
+  min-height: 48px;
+  border-bottom-color: var(--ld-frame-window-line);
+  background: color-mix(in srgb, var(--ld-frame-window) 90%, transparent);
+}
+
+.chrome-app-menu {
+  flex-basis: 54px;
+  color: var(--ld-frame-muted);
+}
+
+.surface-tabs {
+  padding-top: 6px;
+}
+
+.surface-tab {
+  min-width: 126px;
+  border-radius: var(--ld-radius-sm) var(--ld-radius-sm) 0 0;
+  color: var(--ld-frame-muted);
+}
+
+.surface-tab.active,
+.local-session-tab.active {
+  color: var(--ld-frame-ink);
+  background: color-mix(in srgb, var(--ld-frame-window) 86%, var(--ld-frame-control));
+  border-color: var(--ld-frame-window-line);
+  box-shadow: 0 -1px 0 rgba(255,255,255,.14);
+}
+
+/* New primary composition: icon rail plus a spacious library canvas. */
+.surface-vault {
+  grid-template-columns: 1fr;
+  background: var(--ld-frame-window);
+}
+
+.surface-vault .connection-panel {
+  grid-template-columns: 74px minmax(0, 1fr);
+  grid-template-rows: 68px minmax(0, 1fr);
+  background: var(--ld-frame-window);
+}
+
+.surface-vault .workspace-navigation {
+  border-right-color: var(--ld-frame-window-line);
+  background: color-mix(in srgb, var(--ld-frame-window) 92%, var(--ld-frame-control));
+}
+
+.surface-vault .vault-brand img {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--ld-radius-md);
+}
+
+.surface-vault .workspace-navigation .connection-tabs button,
+.surface-vault .vault-navigation-footer button {
+  width: 54px;
+  min-height: 46px;
+  border-radius: var(--ld-radius-md);
+}
+
+.surface-vault .workspace-navigation .connection-tabs button.active {
+  color: var(--ld-frame-accent-ink);
+  background: var(--ld-frame-accent);
+  border-color: var(--ld-frame-accent);
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--ld-frame-accent) 22%, transparent);
+}
+
+.surface-vault .workspace-navigation .connection-tabs button::after,
+.surface-vault .vault-navigation-footer button::after {
+  position: absolute;
+  z-index: 120;
+  left: calc(100% + 10px);
+  min-width: max-content;
+  border: 1px solid var(--ld-frame-window-line);
+  border-radius: var(--ld-radius-sm);
+  padding: 6px 8px;
+  color: var(--ld-frame-ink);
+  background: var(--ld-frame-window);
+  box-shadow: var(--ld-elevation-2);
+  content: attr(aria-label);
+  font-size: var(--ld-text-caption1-size);
+  font-weight: 650;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-4px);
+  transition: opacity 120ms ease, transform 120ms ease;
+  white-space: nowrap;
+}
+
+.surface-vault .vault-navigation-footer button::after {
+  content: attr(title);
+}
+
+.surface-vault .workspace-navigation .connection-tabs button:hover::after,
+.surface-vault .workspace-navigation .connection-tabs button:focus-visible::after,
+.surface-vault .vault-navigation-footer button:hover::after,
+.surface-vault .vault-navigation-footer button:focus-visible::after {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.surface-vault .vault-toolbar {
+  min-height: 68px;
+  border-bottom-color: var(--ld-frame-window-line);
+  padding: 14px 28px;
+  background: var(--ld-frame-window);
+}
+
+.surface-vault .vault-host-search input {
+  border-color: var(--ld-frame-window-line);
+  background: var(--ld-frame-control);
+  color: var(--ld-frame-ink);
+}
+
+.surface-vault .vault-actions > button,
+.surface-vault .vault-actions .vault-view-controls > button,
+.surface-vault .vault-actions .vault-view-menu > summary {
+  border-color: var(--ld-frame-window-line);
+  color: var(--ld-frame-secondary);
+  background: var(--ld-frame-window);
+}
+
+.surface-vault .vault-actions .vault-connect-action,
+.surface-vault .vault-actions .vault-new-host,
+.surface-vault .vault-actions .vault-new-host-options {
+  border-color: var(--ld-frame-accent);
+  color: var(--ld-frame-accent-ink);
+  background: var(--ld-frame-accent);
+}
+
+.surface-vault .vault-actions .vault-new-host-options {
+  border-left-color: color-mix(in srgb, var(--ld-frame-accent-ink) 30%, transparent);
+}
+
+.surface-vault .saved-hosts-view,
+.surface-vault .password-identities-view,
+.surface-vault .proxy-profiles-view,
+.surface-vault .port-forwarding-view,
+.surface-vault .notes-scripts-view,
+.surface-vault .known-hosts-view,
+.surface-vault .connection-logs-view,
+.surface-vault .quick-connect-form {
+  display: grid;
+  width: min(760px, calc(100% - 52px));
+  height: fit-content;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 16px 14px;
+  margin: 28px;
+  border: 1px solid var(--ld-frame-window-line);
+  border-radius: var(--ld-radius-lg);
+  padding: 26px;
+  background: var(--ld-frame-window);
+  box-shadow: var(--ld-elevation-3);
+}
+
+.surface-vault .quick-connect-form .panel-title,
+.surface-vault .quick-connect-form > label:first-of-type,
+.surface-vault .quick-connect-form > label:nth-of-type(2),
+.surface-vault .quick-connect-form > label:last-of-type,
+.surface-vault .quick-connect-form > .connection-error,
+.surface-vault .quick-connect-form > .primary-button,
+.surface-vault .quick-connect-form > .danger-button,
+.surface-vault .quick-connect-form > .security-note {
+  grid-column: 1 / -1;
+}
+
+.surface-vault .quick-connect-form .panel-title {
+  margin-bottom: 4px;
+}
+
+.surface-vault .quick-connect-form .panel-title h2 {
+  color: var(--ld-frame-ink);
+  font-size: var(--ld-text-title2-size);
+  font-weight: 760;
+  letter-spacing: -.035em;
+}
+
+.surface-vault .quick-connect-form label {
+  display: grid;
+  gap: 8px;
+  color: var(--ld-frame-secondary);
+  font-size: var(--ld-text-caption1-size);
+  font-weight: 650;
+}
+
+.surface-vault .quick-connect-form input,
+.surface-vault .quick-connect-form select {
+  min-height: 42px;
+  border: 1px solid var(--ld-frame-window-line);
+  border-radius: var(--ld-radius-sm);
+  color: var(--ld-frame-ink);
+  background: var(--ld-frame-control);
+  font-size: var(--ld-text-footnote-size);
+}
+
+.surface-vault .quick-connect-form input:focus,
+.surface-vault .quick-connect-form select:focus {
+  border-color: var(--ld-frame-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ld-frame-accent) 14%, transparent);
+}
+
+.surface-vault .quick-connect-form .field-row {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: minmax(120px, .45fr) minmax(0, 1fr);
+  gap: 14px;
+}
+
+.surface-vault .quick-connect-form > .primary-button,
+.surface-vault .quick-connect-form > .danger-button {
+  min-height: 44px;
+  border-radius: var(--ld-radius-md);
+  font-size: var(--ld-text-footnote-size);
+  font-weight: 720;
+}
+
+.surface-vault .quick-connect-form .security-note {
+  margin: 0;
+  border: 0;
+  padding: 0;
+  color: var(--ld-frame-muted);
+  background: transparent;
+  font-size: var(--ld-text-caption1-size);
+  line-height: 1.5;
+}
+
+.surface-vault .saved-hosts-view,
+.surface-vault .password-identities-view,
+.surface-vault .proxy-profiles-view,
+.surface-vault .port-forwarding-view,
+.surface-vault .notes-scripts-view,
+.surface-vault .known-hosts-view,
+.surface-vault .connection-logs-view {
+  width: auto;
+  padding: 30px 38px 44px;
+}
+
+.surface-vault .saved-hosts-view {
+  display: block;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.workbench-shell.surface-vault[data-vault-empty="true"] .hosts-heading {
+  display: none;
+}
+
+.surface-vault .saved-host-list {
+  width: 100%;
+}
+
+.surface-vault .vault-empty-state[data-onboarding="true"] {
+  width: 100%;
+  min-height: 580px;
+  padding: 0;
+}
+
+.surface-vault .vault-section-heading h2 {
+  color: var(--ld-frame-ink);
+  font-size: var(--ld-text-headline-size);
+  letter-spacing: -.03em;
+}
+
+.surface-vault .vault-section-heading > span,
+.surface-vault .vault-content-breadcrumb,
+.surface-vault .saved-host-refresh-status {
+  color: var(--ld-frame-muted);
+}
+
+.surface-vault .vault-group-card,
+.surface-vault .saved-host-card {
+  border-color: var(--ld-frame-window-line);
+  background: color-mix(in srgb, var(--ld-frame-window) 86%, var(--ld-frame-control));
+  box-shadow: none;
+}
+
+.surface-vault .vault-group-card:hover,
+.surface-vault .saved-host-card:hover {
+  border-color: color-mix(in srgb, var(--ld-frame-accent) 40%, var(--ld-frame-window-line));
+  background: var(--ld-frame-window);
+  box-shadow: var(--ld-frame-shadow, 0 12px 30px rgba(20, 25, 31, .1));
+}
+
+.surface-vault .vault-empty-state {
+  min-height: 320px;
+  align-items: flex-start;
+  justify-content: center;
+  border: 0;
+  border-radius: 0;
+  padding: 48px clamp(22px, 8vw, 140px);
+  color: var(--ld-frame-secondary);
+  background: transparent;
+  box-shadow: none;
+  text-align: left;
+}
+
+.surface-vault .vault-empty-state > * {
+  align-self: flex-start;
+}
+
+.surface-vault .vault-empty-icon {
+  margin-bottom: 18px;
+}
+
+.surface-vault .vault-empty-state h3 {
+  font-size: var(--ld-text-title3-size);
+}
+
+.surface-vault .vault-empty-state p {
+  max-width: 48ch;
+  font-size: var(--ld-text-footnote-size);
+}
+
+.surface-vault .vault-empty-actions {
+  justify-content: flex-start;
+}
+
+.surface-vault .vault-empty-actions .primary-button {
+  border-color: var(--ld-frame-accent);
+  color: var(--ld-frame-accent-ink);
+  background: var(--ld-frame-accent);
+}
+
+.surface-vault .vault-empty-actions .primary-button:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+/* Host library: compact records with an explicit connect affordance. */
+.surface-vault .saved-host-group-tree {
+  display: grid;
+  gap: 18px;
+}
+
+.surface-vault .saved-host-group {
+  display: grid;
+  gap: 8px;
+}
+
+.surface-vault .saved-host-group-toggle,
+.surface-vault .saved-host-group-label {
+  min-height: 32px;
+  border: 0;
+  border-radius: var(--ld-radius-sm);
+  padding: 0 8px;
+  color: var(--ld-frame-secondary);
+  background: transparent;
+  font-size: var(--ld-text-caption1-size);
+  font-weight: 680;
+}
+
+.surface-vault .saved-host-group-toggle:hover:not(:disabled) {
+  color: var(--ld-frame-ink);
+  background: var(--ld-frame-control);
+}
+
+.surface-vault .saved-host-group-count {
+  display: inline-grid;
+  min-width: 22px;
+  height: 20px;
+  place-items: center;
+  border-radius: var(--ld-radius-pill);
+  color: var(--ld-frame-muted);
+  background: var(--ld-frame-control);
+  font-size: var(--ld-text-caption1-size);
+}
+
+.surface-vault .host-layout-grid .saved-host-group-contents,
+.surface-vault .host-layout-grid .saved-host-group-contents > .saved-host-group {
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: 12px;
+}
+
+.surface-vault .saved-host-card {
+  position: relative;
+  display: grid;
+  min-height: 86px;
+  grid-template-columns: 46px minmax(0, 1fr) auto;
+  grid-template-rows: auto auto;
+  align-items: center;
+  gap: 6px 12px;
+  border: 1px solid var(--ld-hairline);
+  border-radius: var(--ld-radius-md);
+  padding: 14px 14px 14px 14px;
+  color: var(--ld-frame-ink);
+  background: color-mix(in srgb, var(--ld-frame-window) 89%, var(--ld-frame-control));
+  /* A resting elevation makes this read as a card lying on the surface.
+   * With box-shadow:none it read as a heavy outline instead. */
+  box-shadow: var(--ld-elevation-1);
+  cursor: default;
+}
+
+.surface-vault .saved-host-card::after {
+  position: absolute;
+  top: 14px;
+  bottom: 14px;
+  left: 0;
+  width: 3px;
+  border-radius: 0 var(--ld-radius-xs) var(--ld-radius-xs) 0;
+  background: var(--ld-frame-success);
+  content: "";
+  opacity: .72;
+}
+
+.surface-vault .saved-host-card[data-credential-state="credential-missing"]::after {
+  background: var(--ld-warning);
+}
+
+.surface-vault .saved-host-card:hover,
+.surface-vault .saved-host-card.active {
+  border-color: color-mix(in srgb, var(--ld-frame-accent) 42%, var(--ld-frame-window-line));
+  background: var(--ld-frame-window);
+  box-shadow: var(--ld-elevation-3);
+  cursor: pointer;
+  transform: translateY(-2px);
+}
+
+.surface-vault .saved-host-card.active {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--ld-frame-accent) 14%, transparent), 0 12px 28px rgba(17,22,31,.08);
+}
+
+.surface-vault .saved-host-avatar {
+  grid-column: 1;
+  grid-row: 1 / -1;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--ld-radius-md);
+  box-shadow: none;
+}
+
+.surface-vault .saved-host-summary {
+  display: grid;
+  grid-column: 2;
+  grid-row: 1 / -1;
+  min-width: 0;
+  align-content: center;
+  gap: 4px;
+}
+
+.surface-vault .saved-host-summary strong {
+  color: var(--ld-frame-ink);
+  font-size: var(--ld-text-subheadline-size);
+  font-weight: 720;
+  letter-spacing: -.015em;
+}
+
+.surface-vault .saved-host-summary small {
+  color: var(--ld-frame-secondary);
+  font-family: var(--ld-font-mono);
+  font-size: var(--ld-text-caption1-size);
+}
+
+.surface-vault .saved-host-summary .saved-host-secondary-meta {
+  color: var(--ld-frame-muted);
+  font-family: inherit;
+}
+
+.surface-vault .saved-host-credential-state {
+  display: inline-flex;
+  width: fit-content;
+  min-height: 20px;
+  align-items: center;
+  border-radius: var(--ld-radius-pill);
+  padding: 2px 8px;
+  color: var(--ld-frame-success-ink);
+  background: color-mix(in srgb, var(--ld-frame-success) 28%, transparent);
+  font-size: var(--ld-text-caption1-size);
+  font-weight: 680;
+}
+
+.surface-vault .saved-host-credential-state.credential-missing {
+  color: var(--ld-warning);
+  background: color-mix(in srgb, var(--ld-warning) 16%, transparent);
+}
+
+.surface-vault .saved-host-connect-indicator {
+  display: grid;
+  grid-column: 3;
+  grid-row: 1;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border: 1px solid var(--ld-frame-window-line);
+  border-radius: var(--ld-radius-sm);
+  color: var(--ld-frame-secondary);
+  background: var(--ld-frame-window);
+  font-size: var(--ld-text-footnote-size);
+  transition: border-color 150ms ease, color 150ms ease, background-color 150ms ease, transform 150ms ease;
+}
+
+.surface-vault .saved-host-card:hover .saved-host-connect-indicator {
+  border-color: var(--ld-frame-accent);
+  color: var(--ld-frame-accent-ink);
+  background: var(--ld-frame-accent);
+  transform: translate(1px, -1px);
+}
+
+.surface-vault .saved-host-actions {
+  display: flex;
+  grid-column: 3;
+  grid-row: 2;
+  align-self: end;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 130ms ease;
+}
+
+.surface-vault .saved-host-card:hover .saved-host-actions,
+.surface-vault .saved-host-card:focus-within .saved-host-actions {
+  opacity: 1;
+}
+
+.surface-vault .saved-host-actions button {
+  min-height: 24px;
+  border: 0;
+  border-radius: var(--ld-radius-xs);
+  padding: 0 6px;
+  color: var(--ld-frame-muted);
+  background: transparent;
+  font-size: var(--ld-text-caption1-size);
+  font-weight: 650;
+}
+
+.surface-vault .saved-host-actions button:hover:not(:disabled) {
+  color: var(--ld-frame-ink);
+  background: var(--ld-frame-control);
+}
+
+.surface-vault .saved-host-actions .saved-host-delete:hover:not(:disabled) {
+  color: var(--ld-danger);
+  background: color-mix(in srgb, var(--ld-danger) 12%, transparent);
+}
+
+.surface-vault .host-layout-list .saved-host-group-contents,
+.surface-vault .host-layout-tree .saved-host-group-contents {
+  grid-template-columns: 1fr;
+}
+
+.surface-vault .host-layout-list .saved-host-card,
+.surface-vault .host-layout-tree .saved-host-card {
+  min-height: 66px;
+  grid-template-columns: 38px minmax(0, 1fr) auto auto;
+  border: 0;
+  border-bottom: 1px solid var(--ld-frame-window-line);
+  border-radius: 0;
+  padding: 10px 10px;
+  background: transparent;
+  box-shadow: none;
+  transform: none;
+}
+
+.surface-vault .host-layout-list .saved-host-card:hover,
+.surface-vault .host-layout-tree .saved-host-card:hover {
+  border-bottom-color: var(--ld-frame-window-line);
+  background: var(--ld-frame-control);
+  box-shadow: none;
+  transform: none;
+}
+
+.surface-vault .host-layout-list .saved-host-avatar,
+.surface-vault .host-layout-tree .saved-host-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--ld-radius-sm);
+}
+
+.surface-vault .host-layout-list .saved-host-connect-indicator,
+.surface-vault .host-layout-tree .saved-host-connect-indicator {
+  grid-column: 3;
+  grid-row: 1 / -1;
+  align-self: center;
+}
+
+.surface-vault .host-layout-list .saved-host-actions,
+.surface-vault .host-layout-tree .saved-host-actions {
+  grid-column: 4;
+  grid-row: 1 / -1;
+  align-self: center;
+  opacity: 1;
+}
+
+/* Terminal keeps the same composition but makes the output unmistakably
+   primary and the utility controls deliberately quiet. */
+.surface-terminal .saved-host-list {
+  display: grid;
+  gap: 4px;
+  padding: 8px 8px 14px;
+}
+
+.surface-terminal .saved-host-group-toggle,
+.surface-terminal .saved-host-group-label {
+  min-height: 28px;
+  border: 0;
+  border-radius: var(--ld-radius-xs);
+  padding: 0 8px;
+  color: color-mix(in srgb, var(--terminal-resolved-fg, #f2f5f8) 58%, transparent);
+  background: transparent;
+  font-size: var(--ld-text-caption1-size);
+  font-weight: 680;
+}
+
+.surface-terminal .saved-host-card {
+  display: grid;
+  min-height: 52px;
+  grid-template-columns: 34px minmax(0, 1fr) 26px;
+  grid-template-rows: 1fr;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid transparent;
+  border-radius: var(--ld-radius-sm);
+  padding: 8px;
+  background: transparent;
+  box-shadow: none;
+}
+
+.surface-terminal .saved-host-card:hover,
+.surface-terminal .saved-host-card.active {
+  border-color: color-mix(in srgb, var(--terminal-resolved-fg, #f2f5f8) 15%, transparent);
+  background: color-mix(in srgb, var(--terminal-resolved-bg, #07090e) 82%, var(--terminal-resolved-fg, #f2f5f8) 18%);
+  box-shadow: none;
+  transform: none;
+}
+
+.surface-terminal .saved-host-card.active {
+  border-color: var(--ld-frame-accent);
+  box-shadow: inset 3px 0 0 var(--ld-frame-accent);
+}
+
+.surface-terminal .saved-host-card::after,
+.surface-terminal .saved-host-credential-state,
+.surface-terminal .saved-host-secondary-meta,
+.surface-terminal .saved-host-actions {
+  display: none;
+}
+
+.surface-terminal .saved-host-avatar {
+  grid-column: 1;
+  grid-row: 1;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--ld-radius-sm);
+}
+
+.surface-terminal .saved-host-summary {
+  grid-column: 2;
+  grid-row: 1;
+  gap: 2px;
+}
+
+.surface-terminal .saved-host-summary strong {
+  color: var(--terminal-resolved-fg, #f2f5f8);
+  font-size: var(--ld-text-caption1-size);
+  font-weight: 680;
+}
+
+.surface-terminal .saved-host-summary small {
+  color: color-mix(in srgb, var(--terminal-resolved-fg, #f2f5f8) 48%, transparent);
+  font-size: var(--ld-text-caption1-size);
+}
+
+.surface-terminal .saved-host-connect-indicator {
+  grid-column: 3;
+  grid-row: 1;
+  width: 26px;
+  height: 26px;
+  border-color: color-mix(in srgb, var(--terminal-resolved-fg, #f2f5f8) 15%, transparent);
+  color: color-mix(in srgb, var(--terminal-resolved-fg, #f2f5f8) 52%, transparent);
+  background: transparent;
+}
+
+.surface-terminal .saved-host-card:hover .saved-host-connect-indicator {
+  border-color: var(--ld-frame-accent);
+  color: var(--ld-frame-accent-ink);
+  background: var(--ld-frame-accent);
+}
+
+:root[data-goral-mode="light"] .surface-terminal .connection-panel {
+  border-right-color: rgba(28,35,45,.2);
+  background: #eef0f3;
+}
+
+:root[data-goral-mode="light"] .surface-terminal .workspace-navigation {
+  border-right-color: rgba(28,35,45,.16);
+  background: #e5e8ec;
+}
+
+:root[data-goral-mode="light"] .surface-terminal .saved-hosts-view {
+  color: #17202d;
+  background: #f1f3f6;
+}
+
+:root[data-goral-mode="light"] .surface-terminal .saved-host-group-toggle,
+:root[data-goral-mode="light"] .surface-terminal .saved-host-group-label {
+  color: #4d5866;
+}
+
+:root[data-goral-mode="light"] .surface-terminal .saved-host-summary small {
+  color: #556170;
+}
+
+:root[data-goral-mode="light"] .surface-terminal .saved-hosts-toolbar {
+  border-bottom-color: rgba(28,35,45,.16);
+  background: #e8ebef;
+}
+
+:root[data-goral-mode="light"] .surface-terminal .saved-host-card.active {
+  border-color: rgba(46,141,245,.42);
+  background: #dfeaf6;
+  box-shadow: inset 3px 0 0 #2e8df5;
+}
+
+:root[data-goral-mode="light"] .surface-terminal .saved-host-card.active .saved-host-summary strong {
+  color: #113c68;
+}
+
+:root[data-goral-mode="light"] .surface-terminal .saved-host-search input {
+  border: 1px solid rgba(28,35,45,.18);
+  color: #182231;
+  background: #f8f9fb;
+}
+
+:root[data-goral-mode="light"] .surface-terminal .terminal-toolbar {
+  border-bottom-color: rgba(28,35,45,.18);
+  background: #f3f5f7;
+}
+
+:root[data-goral-mode="light"] .surface-terminal .terminal-tool-button {
+  border-color: rgba(28,35,45,.16);
+  color: #586473;
+  background: #ffffff;
+}
+
+:root[data-goral-mode="light"] .surface-terminal .terminal-tool-button:hover:not(:disabled) {
+  border-color: #2e8df5;
+  color: #155fae;
+  background: #e6f1fd;
+}
+
+:root[data-goral-mode="light"] .surface-terminal .terminal-tool-button.active {
+  border-color: #2e8df5;
+  color: #ffffff;
+  background: #2e8df5;
+}
+
+:root[data-goral-mode="light"] .surface-terminal .terminal-ai-button.active {
+  border-color: #925be0;
+  color: #ffffff;
+  background: #925be0;
+}
+
+:root[data-goral-mode="light"] .surface-terminal .terminal-side-panel {
+  border-left-color: rgba(28,35,45,.2);
+  background: #f3f5f8;
+}
+
+:root[data-goral-mode="light"] .surface-terminal .terminal-side-panel-header {
+  border-bottom-color: rgba(28,35,45,.16);
+  background: #e9edf2;
+}
+
+
+:root[data-goral-mode="light"] .surface-terminal .terminal-side-panel {
+  border-left-color: #c9c1d7;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* AI popup menus use opaque, readable catalog surfaces. */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.surface-terminal .sftp-panel {
+  display: grid;
+  height: 100%;
+  grid-template-rows: auto 32px minmax(0, 1fr) auto;
+  color: var(--terminal-resolved-fg, #f3f6fb);
+  background: transparent;
+}
+
+.surface-terminal .sftp-toolbar {
+  display: flex;
+  min-width: 0;
+  min-height: 48px;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid color-mix(in srgb, var(--terminal-resolved-fg, #f3f6fb) 14%, transparent);
+  padding: 8px 10px;
+  background: transparent;
+}
+
+.surface-terminal .sftp-path-row {
+  display: flex;
+  min-width: 0;
+  min-height: 30px;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  background: transparent;
+}
+
+.surface-terminal .sftp-breadcrumbs {
+  display: flex;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.surface-terminal .sftp-breadcrumbs button {
+  overflow: hidden;
+  max-width: 140px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.surface-terminal .sftp-action-row {
+  display: flex;
+  min-height: 30px;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  background: transparent;
+}
+
+.surface-terminal .sftp-icon-button,
+.surface-terminal .sftp-entry-actions button {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--terminal-resolved-fg, #f3f6fb) 15%, transparent);
+  border-radius: var(--ld-radius-sm);
+  padding: 0;
+  color: color-mix(in srgb, var(--terminal-resolved-fg, #f3f6fb) 62%, transparent);
+  background: transparent;
+}
+
+.surface-terminal .sftp-icon-button:hover:not(:disabled),
+.surface-terminal .sftp-entry-actions button:hover:not(:disabled) {
+  border-color: var(--ld-frame-accent);
+  color: var(--ld-frame-accent);
+  background: color-mix(in srgb, var(--ld-frame-accent) 12%, transparent);
+}
+
+.surface-terminal .sftp-list-header,
+.surface-terminal .sftp-entry {
+  grid-template-columns: 24px minmax(0, 1fr) 62px 76px;
+  gap: 8px;
+}
+
+.surface-terminal .sftp-list-header {
+  min-height: 32px;
+  align-items: center;
+  border-bottom: 1px solid color-mix(in srgb, var(--terminal-resolved-fg, #f3f6fb) 13%, transparent);
+  padding: 0 10px;
+  color: color-mix(in srgb, var(--terminal-resolved-fg, #f3f6fb) 45%, transparent);
+  background: color-mix(in srgb, var(--terminal-resolved-bg, #07090e) 91%, var(--terminal-resolved-fg, #f3f6fb) 9%);
+  font-size: var(--ld-text-caption1-size);
+  font-weight: 680;
+}
+
+.surface-terminal .sftp-list {
+  padding: 4px 6px 12px;
+}
+
+.surface-terminal .sftp-entry {
+  min-height: 35px;
+  align-items: center;
+  border: 1px solid transparent;
+  border-radius: var(--ld-radius-sm);
+  padding: 0 4px;
+  color: color-mix(in srgb, var(--terminal-resolved-fg, #f3f6fb) 78%, transparent);
+  font-size: var(--ld-text-caption1-size);
+}
+
+.surface-terminal .sftp-entry:hover,
+.surface-terminal .sftp-entry:focus-visible {
+  border-color: color-mix(in srgb, var(--terminal-resolved-fg, #f3f6fb) 13%, transparent);
+  background: color-mix(in srgb, var(--terminal-resolved-bg, #07090e) 84%, var(--terminal-resolved-fg, #f3f6fb) 16%);
+  outline: none;
+}
+
+.surface-terminal .sftp-entry-kind {
+  color: var(--ld-frame-accent);
+}
+
+.surface-terminal .sftp-entry-actions,
+.surface-terminal .sftp-entry.directory-entry .sftp-entry-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+
+.surface-terminal .sftp-entry:hover .sftp-entry-actions,
+.surface-terminal .sftp-entry:focus-within .sftp-entry-actions {
+  opacity: 1;
+}
+
+:root[data-goral-mode="light"] .surface-terminal .sftp-panel {
+  color: #17202d;
+  background: #f3f5f8;
+}
+
+:root[data-goral-mode="light"] .surface-terminal .sftp-toolbar,
+:root[data-goral-mode="light"] .surface-terminal .sftp-list-header {
+  border-color: rgba(28,35,45,.14);
+  background: #e9edf2;
+}
+
+:root[data-goral-mode="light"] .surface-terminal .sftp-icon-button,
+:root[data-goral-mode="light"] .surface-terminal .sftp-entry-actions button {
+  border-color: rgba(28,35,45,.14);
+  color: #687485;
+}
+
+:root[data-goral-mode="light"] .surface-terminal .sftp-entry {
+  color: #1f2b39;
+}
+
+:root[data-goral-mode="light"] .surface-terminal .sftp-list-header {
+  color: #596574;
+}
+
+:root[data-goral-mode="light"] .surface-terminal .sftp-entry:hover,
+:root[data-goral-mode="light"] .surface-terminal .sftp-entry:focus-visible {
+  border-color: rgba(46,141,245,.25);
+  background: #e8f2fd;
+}
+
+.surface-terminal {
+  grid-template-columns: minmax(270px, 294px) minmax(360px, 1fr) minmax(var(--terminal-side-panel-min-width, 0px), var(--terminal-side-panel-width, 0px));
+  grid-template-rows: 46px minmax(0, 1fr);
+  background: var(--terminal-resolved-bg, #07090e);
+}
+
+.surface-terminal .terminal-panel {
+  background: var(--terminal-resolved-bg, #07090e);
+}
+
+.surface-terminal .terminal-toolbar {
+  background: color-mix(in srgb, var(--terminal-resolved-bg, #07090e) 88%, #ffffff 12%);
+}
+
+.surface-terminal .terminal-tool-button {
+  border-color: color-mix(in srgb, var(--terminal-resolved-fg, #f3f6fb) 20%, transparent);
+  background: color-mix(in srgb, var(--terminal-resolved-bg, #07090e) 82%, #ffffff 18%);
+}
+
+.surface-terminal .terminal-tool-button.active {
+  border-color: var(--ld-frame-accent);
+  color: var(--ld-frame-accent);
+  background: color-mix(in srgb, var(--ld-frame-accent) 16%, var(--terminal-resolved-bg, #07090e));
+}
+
+.surface-terminal .terminal-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.surface-terminal .terminal-split-button:first-of-type,
+.surface-terminal .terminal-context-button:first-of-type,
+.surface-terminal .terminal-disconnect-button {
+  margin-left: 8px;
+}
+
+.surface-terminal .terminal-ai-button.active {
+  border-color: var(--ld-frame-ai);
+  color: var(--ld-frame-ai);
+  background: color-mix(in srgb, var(--ld-frame-ai) 17%, var(--terminal-resolved-bg, #07090e));
+}
+
+/* State badge. This rule sits on `.surface-terminal` and so outranks the
+   base one in goralSkin.css; it previously painted every state in
+   success-green, which meant a closed session announced itself in the
+   colour reserved for a healthy one. The dot beside it was already
+   state-aware, so the two disagreed. */
+.surface-terminal .terminal-state-label {
+  border-color: color-mix(in srgb, var(--ld-frame-muted) 34%, transparent);
+  color: var(--ld-frame-muted);
+  background: color-mix(in srgb, var(--ld-frame-muted) 12%, var(--terminal-resolved-bg, #07090e));
+}
+
+.surface-terminal .terminal-state-label.state-connected {
+  border-color: color-mix(in srgb, var(--ld-frame-success) 34%, transparent);
+  color: var(--ld-frame-success);
+  background: color-mix(in srgb, var(--ld-frame-success) 12%, var(--terminal-resolved-bg, #07090e));
+}
+
+.surface-terminal .terminal-state-label.state-connecting,
+.surface-terminal .terminal-state-label.state-closing {
+  border-color: color-mix(in srgb, var(--ld-warning) 34%, transparent);
+  color: var(--ld-warning);
+  background: color-mix(in srgb, var(--ld-warning) 12%, var(--terminal-resolved-bg, #07090e));
+}
+
+.surface-terminal .terminal-protocol-badge {
+  color: color-mix(in srgb, var(--terminal-resolved-fg, #f3f6fb) 68%, transparent);
+  background: transparent;
+}
+
+.surface-terminal .terminal-side-panel {
+  box-shadow: -20px 0 50px rgba(0,0,0,.14);
+}
+
+.surface-terminal .terminal-side-panel[data-ai-panel-open="true"] {
+  min-width: var(--terminal-side-panel-min-width, 420px);
+}
+
+.surface-terminal .terminal-side-panel-header {
+  padding: 0 14px;
+}
+
+.surface-terminal .terminal-side-panel-title strong {
+  color: var(--terminal-resolved-fg, #f3f6fb);
+  font-size: var(--ld-text-caption1-size);
+  font-weight: 720;
+}
+
+.surface-terminal .terminal-side-panel-title small {
+  color: color-mix(in srgb, var(--terminal-resolved-fg, #f3f6fb) 48%, transparent);
+  font-size: var(--ld-text-caption1-size);
+}
+
+
+
+
+
+/* Empty-library onboarding is a task chooser, not an empty database card. */
+.workbench-shell.surface-vault[data-vault-empty="true"] .vault-actions {
+  display: none;
+}
+
+.surface-vault .vault-toolbar-heading {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.surface-vault .vault-toolbar-heading strong {
+  color: var(--ld-frame-ink);
+  font-size: var(--ld-text-subheadline-size);
+  font-weight: 720;
+  letter-spacing: -.015em;
+}
+
+.surface-vault .vault-toolbar-heading small {
+  overflow: hidden;
+  color: var(--ld-frame-muted);
+  font-size: var(--ld-text-caption1-size);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+:root[data-goral-mode="dark"] .surface-vault .vault-empty-state {
+  color: var(--ld-frame-secondary);
+  background: transparent;
+  border-color: transparent;
+}
+
+:root[data-goral-mode="dark"] .surface-vault .vault-empty-state[data-onboarding="true"] h3 {
+  color: var(--ld-frame-ink);
+}
+
+:root[data-goral-mode="dark"] .surface-vault .vault-empty-state[data-onboarding="true"] p {
+  color: var(--ld-frame-secondary);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-goral-mode="light"]) .surface-vault .vault-empty-state {
+    color: var(--ld-frame-secondary);
+    background: transparent;
+    border-color: transparent;
+  }
+}
+
+.surface-vault .vault-onboarding {
+  display: grid;
+  grid-template-columns: minmax(220px, .78fr) minmax(420px, 1.45fr);
+  grid-template-rows: auto auto;
+  align-content: center;
+  align-items: start;
+  gap: 30px 54px;
+  width: min(100%, 1040px);
+  min-height: 520px;
+  margin: 0 auto;
+  padding: 48px 18px;
+}
+
+.surface-vault .vault-onboarding > * {
+  align-self: auto;
+}
+
+.surface-vault .vault-onboarding-intro {
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  text-align: left;
+}
+
+.surface-vault .vault-onboarding-intro .vault-empty-icon {
+  margin: 0 0 20px;
+}
+
+.surface-vault .vault-onboarding-intro .eyebrow {
+  margin: 0 0 8px;
+  color: var(--ld-frame-muted);
+  font-size: var(--ld-text-caption1-size);
+  font-weight: 720;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+}
+
+.surface-vault .vault-onboarding-intro h3 {
+  margin: 0 0 10px;
+  color: var(--ld-frame-ink);
+  font-size: clamp(24px, 2.5vw, 34px);
+  font-weight: 760;
+  letter-spacing: -.045em;
+  line-height: 1.08;
+}
+
+.surface-vault .vault-onboarding-intro p:last-child {
+  max-width: 36ch;
+  margin: 0;
+  color: var(--ld-frame-secondary);
+  font-size: var(--ld-text-footnote-size);
+  line-height: 1.65;
+}
+
+.surface-vault .vault-onboarding-paths {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.surface-vault .vault-onboarding-path,
+.surface-vault .vault-onboarding-paths > .primary-button[data-onboarding-path="primary"] {
+  display: grid;
+  min-width: 0;
+  min-height: 188px;
+  align-content: space-between;
+  justify-items: start;
+  gap: 10px;
+  border: 1px solid var(--ld-frame-window-line);
+  border-radius: var(--ld-radius-lg);
+  padding: 18px;
+  color: var(--ld-frame-ink);
+  background: color-mix(in srgb, var(--ld-frame-window) 88%, var(--ld-frame-control));
+  box-shadow: none;
+  text-align: left;
+  transition: transform 170ms ease, border-color 150ms ease, box-shadow 180ms ease, background-color 150ms ease;
+}
+
+.surface-vault .vault-onboarding-path:hover:not(:disabled),
+.surface-vault .vault-onboarding-paths > .primary-button[data-onboarding-path="primary"]:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--ld-frame-accent) 48%, var(--ld-frame-window-line));
+  background: var(--ld-frame-window);
+  box-shadow: var(--ld-elevation-3);
+  transform: translateY(-3px);
+}
+
+.surface-vault .vault-onboarding-path > span,
+.surface-vault .vault-onboarding-paths > .primary-button[data-onboarding-path="primary"] > span {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border-radius: var(--ld-radius-md);
+  color: var(--ld-frame-ink);
+  background: var(--ld-frame-control);
+}
+
+.surface-vault .vault-onboarding-paths > .primary-button[data-onboarding-path="primary"] > span {
+  color: var(--ld-frame-accent-ink);
+  background: color-mix(in srgb, var(--ld-frame-accent-ink) 16%, transparent);
+}
+
+.surface-vault .vault-onboarding-paths > .primary-button[data-onboarding-path="primary"] > span > .vault-glyph {
+  width: 20px;
+  height: 20px;
+}
+
+.surface-vault .vault-onboarding-path strong,
+.surface-vault .vault-onboarding-paths > .primary-button[data-onboarding-path="primary"] strong {
+  align-self: end;
+  color: var(--ld-frame-ink);
+  font-size: var(--ld-text-body-size);
+  font-weight: 720;
+}
+
+.surface-vault .vault-onboarding-path small,
+.surface-vault .vault-onboarding-paths > .primary-button[data-onboarding-path="primary"] small {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--ld-frame-muted);
+  font-size: var(--ld-text-caption1-size);
+  font-weight: 520;
+  line-height: 1.5;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.surface-vault .vault-onboarding-paths > .primary-button[data-onboarding-path="primary"] {
+  border-color: var(--ld-frame-accent);
+  color: var(--ld-frame-accent-ink);
+  background: var(--ld-frame-accent);
+  box-shadow: none;
+  font-size: var(--ld-text-body-size);
+  font-weight: 720;
+  text-align: left;
+}
+
+.surface-vault .vault-onboarding-paths > .primary-button[data-onboarding-path="primary"] small {
+  color: var(--ld-frame-accent-ink);
+  opacity: .72;
+}
+
+.surface-vault .vault-onboarding-paths > .primary-button[data-onboarding-path="primary"] strong {
+  color: var(--ld-frame-accent-ink);
+}
+
+.surface-vault .vault-empty-actions[data-onboarding-secondary="true"] {
+  display: flex;
+  grid-column: 2;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.surface-vault .vault-empty-actions[data-onboarding-secondary="true"] button {
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  border-radius: var(--ld-radius-sm);
+  padding: 0 10px;
+  color: var(--ld-frame-secondary);
+  background: transparent;
+  font-size: var(--ld-text-caption1-size);
+  font-weight: 650;
+}
+
+.surface-vault .vault-empty-actions[data-onboarding-secondary="true"] button:hover:not(:disabled) {
+  color: var(--ld-frame-ink);
+  background: var(--ld-frame-control);
+}
+
+@media (max-width: 1100px) {
+  .surface-vault .vault-onboarding {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .surface-vault .vault-empty-actions[data-onboarding-secondary="true"] {
+    grid-column: 1;
+  }
+}
+
+/* Port forwarding keeps its operational density while using the shared canvas. */
+.workbench-shell.surface-vault .port-forwarding-view .port-forward-catalog {
+  width: 100%;
+  min-width: 0;
+  color: var(--ld-frame-ink);
+  background: transparent;
+}
+
+.workbench-shell.surface-vault .port-forwarding-view .port-forward-page-heading {
+  display: grid;
+  grid-template-columns: auto minmax(260px, 420px) auto;
+  gap: 12px;
+  align-items: center;
+  border-bottom: 1px solid var(--ld-frame-window-line);
+  padding-bottom: 14px;
+}
+
+.workbench-shell.surface-vault .port-forwarding-view .port-forward-page-heading .primary-button {
+  min-height: 40px;
+  border-color: var(--ld-frame-accent);
+  border-radius: var(--ld-radius-sm);
+  color: var(--ld-frame-accent-ink);
+  background: var(--ld-frame-accent);
+  font-size: var(--ld-text-footnote-size);
+  font-weight: 580;
+}
+
+.workbench-shell.surface-vault .port-forwarding-view .port-forward-quick-types,
+.workbench-shell.surface-vault .port-forwarding-view .port-forward-filter-bar {
+  border-color: var(--ld-frame-window-line);
+  background: var(--ld-frame-control);
+}
+
+.workbench-shell.surface-vault .port-forwarding-view .port-forward-search input {
+  min-height: 40px;
+  border-color: var(--ld-frame-window-line);
+  border-radius: var(--ld-radius-sm);
+  color: var(--ld-frame-ink);
+  background: var(--ld-frame-control);
+  font-size: var(--ld-text-footnote-size);
+}
+
+.workbench-shell.surface-vault .port-forwarding-view .port-forward-refresh,
+.workbench-shell.surface-vault .port-forwarding-view .port-forward-filter-bar button,
+.workbench-shell.surface-vault .port-forwarding-view .port-forward-quick-types button {
+  color: var(--ld-frame-secondary);
+  font-size: var(--ld-text-caption1-size);
+  font-weight: 520;
+}
+
+.workbench-shell.surface-vault .port-forwarding-view .port-forward-filter-bar button.active {
+  color: var(--ld-frame-ink);
+  background: var(--ld-frame-window);
+}
+
+.workbench-shell.surface-vault .port-forwarding-view .port-forward-empty {
+  min-height: 380px;
+  padding-inline: 9vw;
+}
+
+.workbench-shell.surface-vault .port-forwarding-view .port-forward-empty h3 {
+  color: var(--ld-frame-ink);
+  font-size: var(--ld-text-title2-size);
+  font-weight: 620;
+}
+
+.workbench-shell.surface-vault .port-forwarding-view .port-forward-empty p {
+  color: var(--ld-frame-secondary);
+  font-size: var(--ld-text-footnote-size);
+}
+
+/* Browser/desktop availability placeholders remain part of the canvas. */
+.workbench-shell.surface-vault .runtime-preview-placeholder {
+  display: grid;
+  width: 100%;
+  min-height: 380px;
+  place-content: center;
+  justify-items: center;
+  border: 0;
+  border-radius: 0;
+  padding: 48px;
+  color: var(--ld-frame-secondary);
+  background: transparent;
+  box-shadow: none;
+  text-align: center;
+}
+
+.workbench-shell.surface-vault .runtime-preview-placeholder > span {
+  width: 58px;
+  height: 58px;
+  border-radius: var(--ld-radius-lg);
+  color: var(--ld-frame-ink);
+  background: var(--ld-frame-control);
+}
+
+.workbench-shell.surface-vault .runtime-preview-placeholder h2 {
+  margin: 16px 0 8px;
+  color: var(--ld-frame-ink);
+  font-size: var(--ld-text-title2-size);
+  font-weight: 620;
+  letter-spacing: -.035em;
+}
+
+.workbench-shell.surface-vault .runtime-preview-placeholder p {
+  max-width: 52ch;
+  margin: 0;
+  color: var(--ld-frame-secondary);
+  font-size: var(--ld-text-footnote-size);
+  line-height: 1.65;
+}
+
+/* Catalog workspaces share one readable management language. */
+.surface-vault .managed-keys-view,
+.surface-vault .password-identities-view,
+.surface-vault .proxy-profiles-view,
+.surface-vault .port-forwarding-view {
+  display: grid;
+  width: auto;
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-content: start;
+  gap: 16px;
+}
+
+.surface-vault .managed-keys-view > .panel-title,
+.surface-vault .password-identities-view > .panel-title,
+.surface-vault .proxy-profiles-view > .panel-title {
+  grid-column: 1;
+}
+
+.surface-vault .managed-keys-view > .managed-keys-toolbar {
+  grid-column: 2;
+}
+
+.surface-vault .managed-keys-view > .connection-error,
+.surface-vault .managed-keys-view > .saved-host-success,
+.surface-vault .managed-keys-view > .managed-key-list,
+.surface-vault .managed-keys-view > .security-note,
+.surface-vault .password-identities-view > *,
+.surface-vault .proxy-profiles-view > *,
+.surface-vault .port-forwarding-view > * {
+  grid-column: 1 / -1;
+}
+
+.surface-vault .managed-keys-view .panel-title,
+.surface-vault .password-identities-view .panel-title,
+.surface-vault .proxy-profiles-view .panel-title {
+  min-height: 54px;
+  align-items: flex-start;
+  margin: 0;
+}
+
+.surface-vault .managed-keys-view .panel-title h2,
+.surface-vault .password-identities-view .panel-title h2,
+.surface-vault .proxy-profiles-view .panel-title h2 {
+  margin: 4px 0 0;
+  color: var(--ld-frame-ink);
+  font-size: var(--ld-text-title2-size);
+  font-weight: 760;
+  letter-spacing: -.04em;
+}
+
+.surface-vault .managed-keys-view .eyebrow,
+.surface-vault .password-identities-view .eyebrow,
+.surface-vault .proxy-profiles-view .eyebrow {
+  color: var(--ld-frame-muted);
+  font-size: var(--ld-text-caption1-size);
+  font-weight: 720;
+  letter-spacing: .12em;
+}
+
+.surface-vault .managed-keys-toolbar {
+  display: flex;
+  min-height: 42px;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.surface-vault .managed-keys-toolbar button {
+  min-height: 38px;
+  border: 1px solid var(--ld-frame-window-line);
+  border-radius: var(--ld-radius-sm);
+  padding: 0 12px;
+  color: var(--ld-frame-secondary);
+  background: var(--ld-frame-window);
+  font-size: var(--ld-text-caption1-size);
+  font-weight: 680;
+}
+
+.surface-vault .managed-keys-toolbar button:hover:not(:disabled) {
+  border-color: var(--ld-frame-window-line-strong, var(--ld-frame-window-line));
+  color: var(--ld-frame-ink);
+  background: var(--ld-frame-control);
+}
+
+.surface-vault .managed-keys-toolbar .primary-button {
+  color: var(--ld-frame-accent-ink);
+  border-color: var(--ld-frame-accent);
+  background: var(--ld-frame-accent);
+}
+
+.surface-vault .managed-key-list {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 12px;
+}
+
+.surface-vault .managed-key-card {
+  min-height: 112px;
+  border: 1px solid var(--ld-frame-window-line);
+  border-radius: var(--ld-radius-md);
+  padding: 16px;
+  background: var(--ld-frame-window);
+}
+
+.surface-vault .saved-host-empty {
+  display: grid;
+  width: 100%;
+  min-height: 230px;
+  place-content: center;
+  border: 1px dashed var(--ld-frame-window-line);
+  border-radius: var(--ld-radius-lg);
+  margin: 0;
+  padding: 30px;
+  color: var(--ld-frame-secondary);
+  background: color-mix(in srgb, var(--ld-frame-window) 82%, var(--ld-frame-control));
+  font-size: var(--ld-text-subheadline-size);
+  line-height: 1.6;
+  text-align: center;
+}
+
+.surface-vault .managed-keys-view > .security-note {
+  max-width: none;
+  margin: 0;
+  border: 0;
+  padding: 0;
+  color: var(--ld-frame-muted);
+  background: transparent;
+  font-size: var(--ld-text-caption1-size);
+}
+
+.surface-vault .password-identity-catalog,
+.surface-vault .proxy-profile-catalog,
+.surface-vault .port-forward-catalog {
+  width: 100%;
+  min-width: 0;
+  color: var(--ld-frame-ink);
+  background: transparent;
+}
+
+/* Notes and Scripts share an editor workspace, not a beige nested application. */
+.workbench-shell.surface-vault .notes-scripts-view {
+  border: 0;
+  border-radius: 0;
+  padding: 26px 32px 40px;
+  background: var(--ld-frame-window);
+  box-shadow: none;
+}
+
+.workbench-shell.surface-vault .notes-scripts-view .notes-scripts-workspace {
+  display: grid;
+  width: 100%;
+  min-height: 100%;
+  grid-template-rows: auto minmax(0, 1fr);
+  border: 0;
+  border-radius: 0;
+  color: var(--ld-frame-ink);
+  background: transparent;
+  box-shadow: none;
+}
+
+.workbench-shell.surface-vault .notes-scripts-view .notes-scripts-header {
+  min-height: 68px;
+  border-bottom: 1px solid var(--ld-frame-window-line);
+  padding: 0 0 14px;
+  background: transparent;
+}
+
+.workbench-shell.surface-vault .notes-scripts-view .notes-scripts-title strong,
+.workbench-shell.surface-vault .notes-scripts-view .notes-scripts-title h2 {
+  color: var(--ld-frame-ink);
+  font-size: var(--ld-text-title2-size);
+  font-weight: 640;
+  letter-spacing: -.035em;
+}
+
+.workbench-shell.surface-vault .notes-scripts-view .notes-scripts-title small {
+  color: var(--ld-frame-muted);
+  font-size: var(--ld-text-caption1-size);
+}
+
+.workbench-shell.surface-vault .notes-scripts-view .notes-scripts-search input {
+  min-height: 40px;
+  border-color: var(--ld-frame-window-line);
+  border-radius: var(--ld-radius-sm);
+  color: var(--ld-frame-ink);
+  background: var(--ld-frame-control);
+  font-size: var(--ld-text-footnote-size);
+}
+
+.workbench-shell.surface-vault .notes-scripts-view .notes-scripts-primary-button {
+  min-height: 38px;
+  border-color: var(--ld-frame-accent);
+  border-radius: var(--ld-radius-sm);
+  color: var(--ld-frame-accent-ink);
+  background: var(--ld-frame-accent);
+  font-size: var(--ld-text-footnote-size);
+  font-weight: 580;
+}
+
+.workbench-shell.surface-vault .notes-scripts-view .notes-scripts-layout {
+  min-height: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.workbench-shell.surface-vault .notes-scripts-view .notes-scripts-list-panel {
+  border-right: 1px solid var(--ld-frame-window-line);
+  background: color-mix(in srgb, var(--ld-frame-window) 90%, var(--ld-frame-control));
+}
+
+.workbench-shell.surface-vault .notes-scripts-view .notes-scripts-detail-panel {
+  background: var(--ld-frame-window);
+}
+
+.workbench-shell.surface-vault .notes-scripts-view .notes-scripts-list-empty,
+.workbench-shell.surface-vault .notes-scripts-view .notes-scripts-empty-state {
+  color: var(--ld-frame-secondary);
+  background: transparent;
+}
+
+.workbench-shell.surface-vault .notes-scripts-view .notes-scripts-empty-state strong,
+.workbench-shell.surface-vault .notes-scripts-view .notes-scripts-empty-state h3 {
+  color: var(--ld-frame-ink);
+  font-size: var(--ld-text-title3-size);
+  font-weight: 620;
+}
+
+.workbench-shell.surface-vault .notes-scripts-view .notes-scripts-empty-state p {
+  color: var(--ld-frame-secondary);
+  font-size: var(--ld-text-footnote-size);
+  line-height: 1.65;
+}
+
+/* Known Hosts uses the same catalog canvas and task-first empty state. */
+.workbench-shell.surface-vault .known-hosts-view {
+  border: 0;
+  border-radius: 0;
+  padding: 26px 32px 40px;
+  background: var(--ld-frame-window);
+  box-shadow: none;
+}
+
+.workbench-shell.surface-vault .known-hosts-view .known-hosts-workspace {
+  display: grid;
+  width: 100%;
+  min-height: 100%;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  border: 0;
+  border-radius: 0;
+  color: var(--ld-frame-ink);
+  background: transparent;
+  box-shadow: none;
+}
+
+.workbench-shell.surface-vault .known-hosts-view .known-hosts-header {
+  min-height: 62px;
+  border-bottom: 1px solid var(--ld-frame-window-line);
+  padding: 0 0 14px;
+  background: transparent;
+}
+
+.workbench-shell.surface-vault .known-hosts-view .known-hosts-search input {
+  min-height: 40px;
+  border-color: var(--ld-frame-window-line);
+  border-radius: var(--ld-radius-sm);
+  color: var(--ld-frame-ink);
+  background: var(--ld-frame-control);
+  font-size: var(--ld-text-footnote-size);
+}
+
+.workbench-shell.surface-vault .known-hosts-view .known-hosts-header button,
+.workbench-shell.surface-vault .known-hosts-view .known-hosts-header summary {
+  min-height: 36px;
+  border-color: var(--ld-frame-window-line);
+  border-radius: var(--ld-radius-sm);
+  color: var(--ld-frame-secondary);
+  background: var(--ld-frame-window);
+  font-size: var(--ld-text-caption1-size);
+  font-weight: 560;
+}
+
+.workbench-shell.surface-vault .known-hosts-view .known-hosts-empty-state {
+  min-height: 380px;
+  border: 0;
+  padding: 52px;
+  color: var(--ld-frame-secondary);
+  background: transparent;
+}
+
+.workbench-shell.surface-vault .known-hosts-view .known-hosts-empty-state strong {
+  color: var(--ld-frame-ink);
+  font-size: var(--ld-text-title3-size);
+  font-weight: 620;
+}
+
+.workbench-shell.surface-vault .known-hosts-view .known-hosts-empty-state p {
+  max-width: 48ch;
+  color: var(--ld-frame-secondary);
+  font-size: var(--ld-text-footnote-size);
+  line-height: 1.65;
+}
+
+.workbench-shell.surface-vault .known-hosts-view .known-hosts-items {
+  padding-top: 14px;
+}
+
+.workbench-shell.surface-vault .known-hosts-view .known-hosts-item {
+  border-color: var(--ld-frame-window-line);
+  color: var(--ld-frame-ink);
+  background: var(--ld-frame-window);
+}
+
+/* Logs become a full catalog canvas rather than a beige legacy card. */
+.workbench-shell.surface-vault .connection-logs-view {
+  border: 0;
+  border-radius: 0;
+  padding: 26px 32px 40px;
+  background: var(--ld-frame-window);
+  box-shadow: none;
+}
+
+.workbench-shell.surface-vault .connection-logs-view .connection-logs-workspace {
+  display: grid;
+  width: 100%;
+  min-height: 100%;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  border: 0;
+  border-radius: 0;
+  color: var(--ld-frame-ink);
+  background: transparent;
+  box-shadow: none;
+}
+
+.workbench-shell.surface-vault .connection-logs-view .connection-logs-toolbar {
+  min-height: 64px;
+  border-bottom: 1px solid var(--ld-frame-window-line);
+  padding: 0 0 14px;
+  background: transparent;
+}
+
+.workbench-shell.surface-vault .connection-logs-view .connection-logs-toolbar strong,
+.workbench-shell.surface-vault .connection-logs-view .connection-logs-toolbar h2 {
+  color: var(--ld-frame-ink);
+  font-size: var(--ld-text-title2-size);
+  font-weight: 640;
+  letter-spacing: -.035em;
+}
+
+.workbench-shell.surface-vault .connection-logs-view .connection-logs-toolbar small {
+  color: var(--ld-frame-muted);
+  font-size: var(--ld-text-caption1-size);
+}
+
+.workbench-shell.surface-vault .connection-logs-view .connection-logs-toolbar button {
+  min-height: 36px;
+  border: 1px solid var(--ld-frame-window-line);
+  border-radius: var(--ld-radius-sm);
+  color: var(--ld-frame-secondary);
+  background: var(--ld-frame-window);
+  font-size: var(--ld-text-caption1-size);
+  font-weight: 560;
+}
+
+.workbench-shell.surface-vault .connection-logs-view .connection-logs-empty-state {
+  min-height: 360px;
+  border: 0;
+  padding: 48px;
+  color: var(--ld-frame-secondary);
+  background: transparent;
+}
+
+.workbench-shell.surface-vault .connection-logs-view .connection-logs-empty-state strong {
+  color: var(--ld-frame-ink);
+  font-size: var(--ld-text-title3-size);
+  font-weight: 620;
+}
+
+.workbench-shell.surface-vault .connection-logs-view .connection-logs-empty-state span {
+  color: var(--ld-frame-secondary);
+  font-size: var(--ld-text-footnote-size);
+}
+
+.workbench-shell.surface-vault .connection-logs-view .connection-logs-table-header,
+.workbench-shell.surface-vault .connection-logs-view .connection-log-row {
+  color: var(--ld-frame-secondary);
+  border-color: var(--ld-frame-window-line);
+  background: transparent;
+}
+
+.workbench-shell.surface-vault .connection-logs-view .connection-log-row:hover {
+  background: var(--ld-frame-control);
+}
+
+/* Session restore is a deliberate startup decision, not a warning dump. */
+.session-restore-backdrop {
+  display: grid;
+  place-items: center;
+  padding: 28px;
+  background: rgba(12,16,23,.36);
+  backdrop-filter: blur(10px);
+}
+
+.session-restore-dialog {
+  width: min(720px, calc(100vw - 56px));
+  max-height: min(760px, calc(100vh - 56px));
+  border: 1px solid var(--ld-frame-window-line);
+  border-radius: var(--ld-radius-xl);
+  padding: 26px;
+  color: var(--ld-frame-ink);
+  background: var(--ld-frame-window);
+  box-shadow: var(--ld-elevation-4);
+}
+
+.session-restore-dialog > .eyebrow {
+  color: var(--ld-frame-muted);
+  font-size: var(--ld-text-caption1-size);
+  font-weight: 560;
+  letter-spacing: .11em;
+}
+
+.session-restore-dialog h2 {
+  margin: 6px 0 12px;
+  color: var(--ld-frame-ink);
+  font-size: var(--ld-text-title1-size);
+  font-weight: 640;
+  letter-spacing: -.04em;
+}
+
+.session-restore-dialog .security-note {
+  border: 0;
+  padding: 0;
+  color: var(--ld-frame-secondary);
+  background: transparent;
+  font-size: var(--ld-text-footnote-size);
+  line-height: 1.65;
+}
+
+.session-restore-list {
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.session-restore-list li {
+  min-height: 64px;
+  border-color: var(--ld-frame-window-line);
+  border-radius: var(--ld-radius-md);
+  padding: 12px 14px;
+  background: color-mix(in srgb, var(--ld-frame-window) 86%, var(--ld-frame-control));
+}
+
+.session-restore-list strong {
+  color: var(--ld-frame-ink);
+  font-size: var(--ld-text-subheadline-size);
+  font-weight: 600;
+}
+
+.session-restore-list span {
+  color: var(--ld-frame-secondary);
+  font-size: var(--ld-text-caption1-size);
+}
+
+.session-restore-dialog .dialog-actions {
+  margin-top: 20px;
+}
+
+.session-restore-dialog .dialog-actions button {
+  min-height: 42px;
+  border-radius: var(--ld-radius-md);
+  font-size: var(--ld-text-footnote-size);
+  font-weight: 580;
+}
+
+/* New/Edit Host is a focused workspace, not a narrow legacy drawer. */
+.saved-host-editor-backdrop {
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 28px;
+  background: rgba(12, 16, 23, .34);
+  backdrop-filter: blur(10px);
+}
+
+.saved-host-details-panel {
+  display: grid;
+  width: min(920px, calc(100vw - 56px));
+  height: min(760px, calc(100vh - 56px));
+  max-height: calc(100vh - 56px);
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  border: 1px solid var(--ld-frame-window-line);
+  border-radius: var(--ld-radius-xl);
+  color: var(--ld-frame-ink);
+  background: var(--ld-frame-window);
+  box-shadow: var(--ld-elevation-4);
+  overflow: hidden;
+  animation: none;
+}
+
+.saved-host-details-header {
+  min-height: 72px;
+  border-bottom: 1px solid var(--ld-frame-window-line);
+  padding: 14px 18px 14px 24px;
+  background: var(--ld-frame-window);
+}
+
+.saved-host-details-header h2 {
+  margin: 4px 0 0;
+  color: var(--ld-frame-ink);
+  font-size: var(--ld-text-title2-size);
+  font-weight: 760;
+  letter-spacing: -.035em;
+}
+
+.saved-host-details-kicker {
+  color: var(--ld-frame-muted);
+  font-size: var(--ld-text-caption1-size);
+  font-weight: 720;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+}
+
+.saved-host-details-header-actions .saved-host-header-save {
+  display: none;
+}
+
+.saved-host-details-header-actions .saved-host-header-close {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--ld-radius-md);
+  color: var(--ld-frame-secondary);
+  background: var(--ld-frame-control);
+  font-size: var(--ld-text-headline-size);
+}
+
+.saved-host-details-scroll {
+  padding: 24px 26px 30px;
+  background: color-mix(in srgb, var(--ld-frame-window) 86%, var(--ld-frame-control));
+  scrollbar-color: var(--ld-frame-window-line) transparent;
+}
+
+.saved-host-details-panel .saved-host-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 18px;
+}
+
+.saved-host-details-panel .host-editor-section-title,
+.saved-host-details-panel .field-row,
+.saved-host-details-panel .remove-credential-option,
+.saved-host-details-panel .host-chain-editor,
+.saved-host-details-panel .security-note {
+  grid-column: 1 / -1;
+}
+
+.saved-host-details-panel .host-editor-section-title {
+  gap: 10px;
+  margin: 18px 0 1px;
+  color: var(--ld-frame-ink);
+  font-size: var(--ld-text-footnote-size);
+  font-weight: 720;
+  letter-spacing: -.01em;
+}
+
+.saved-host-details-panel .host-editor-section-title:first-child {
+  margin-top: 0;
+}
+
+.saved-host-details-panel .host-editor-section-title::after {
+  background: var(--ld-frame-window-line);
+}
+
+.saved-host-details-panel .saved-host-fields label {
+  gap: 8px;
+  color: var(--ld-frame-secondary);
+  font-size: var(--ld-text-caption1-size);
+  font-weight: 650;
+}
+
+.saved-host-details-panel .saved-host-fields input,
+.saved-host-details-panel .saved-host-fields select,
+.saved-host-details-panel .saved-host-fields textarea {
+  min-height: 42px;
+  border: 1px solid var(--ld-frame-window-line);
+  border-radius: var(--ld-radius-sm);
+  padding: 10px 12px;
+  color: var(--ld-frame-ink);
+  background: var(--ld-frame-window);
+  font-size: var(--ld-text-footnote-size);
+}
+
+.saved-host-details-panel .saved-host-fields input:focus,
+.saved-host-details-panel .saved-host-fields select:focus,
+.saved-host-details-panel .saved-host-fields textarea:focus {
+  border-color: var(--ld-frame-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ld-frame-accent) 13%, transparent);
+}
+
+.saved-host-details-panel .host-editor-field-hint {
+  color: var(--ld-frame-muted);
+  font-size: var(--ld-text-caption1-size);
+}
+
+.saved-host-details-panel .dialog-actions {
+  min-height: 70px;
+  gap: 10px;
+  border-top: 1px solid var(--ld-frame-window-line);
+  padding: 12px 20px;
+  background: var(--ld-frame-window);
+}
+
+.saved-host-details-panel .dialog-actions button {
+  min-width: 120px;
+  min-height: 42px;
+  border-radius: var(--ld-radius-md);
+  font-size: var(--ld-text-footnote-size);
+  font-weight: 720;
+}
+
+.saved-host-details-panel .dialog-actions .primary-button {
+  color: var(--ld-frame-accent-ink);
+  background: var(--ld-frame-accent);
+  border-color: var(--ld-frame-accent);
+}
+
+@media (max-width: 900px) {
+  .workbench-shell {
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .saved-host-editor-backdrop {
+    padding: 0;
+  }
+
+  .saved-host-details-panel {
+    width: 100vw;
+    height: 100vh;
+    max-height: none;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .saved-host-details-panel .saved-host-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .saved-host-details-panel .saved-host-fields > * {
+    grid-column: 1;
+  }
+
+  .surface-vault .saved-hosts-view,
+  .surface-vault .password-identities-view,
+  .surface-vault .proxy-profiles-view,
+  .surface-vault .port-forwarding-view,
+  .surface-vault .notes-scripts-view,
+  .surface-vault .known-hosts-view,
+  .surface-vault .connection-logs-view {
+    padding: 22px 18px 32px;
+  }
+}
+
+/* -----------------------------------------------------------------
+ * Icon rail
+ *
+ * The two surfaces had drifted apart: the Vault rail filled its active
+ * item with solid accent, while the Terminal rail used a tinted fill plus
+ * a 3px inset bar. Same control, same meaning, two different answers — so
+ * switching surfaces made the app look like two applications.
+ *
+ * One treatment for both, in the platform sidebar idiom: a tinted pill
+ * with the accent carried by the icon rather than a saturated block. A
+ * solid fill at this size reads as a button that is stuck down, not as a
+ * selected section.
+ * --------------------------------------------------------------- */
+.surface-vault .workspace-navigation .connection-tabs button,
+.surface-terminal .workspace-navigation .connection-tabs button,
+.surface-vault .vault-navigation-footer button {
+  position: relative;
+  border-radius: var(--ld-radius-md);
+  color: var(--ld-frame-muted);
+  background: transparent;
+  transition:
+    color var(--ld-motion-fast) var(--ld-ease-out),
+    background-color var(--ld-motion-fast) var(--ld-ease-out);
+}
+
+.surface-vault .workspace-navigation .connection-tabs button:hover:not(:disabled),
+.surface-terminal .workspace-navigation .connection-tabs button:hover:not(:disabled),
+.surface-vault .vault-navigation-footer button:hover:not(:disabled) {
+  color: var(--ld-frame-ink);
+  background: color-mix(in srgb, var(--ld-frame-ink) 7%, transparent);
+}
+
+.surface-vault .workspace-navigation .connection-tabs button.active,
+.surface-terminal .workspace-navigation .connection-tabs button.active {
+  color: var(--ld-frame-accent);
+  background: color-mix(in srgb, var(--ld-frame-accent) 13%, transparent);
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.surface-vault .workspace-navigation .connection-tabs button.active:hover,
+.surface-terminal .workspace-navigation .connection-tabs button.active:hover {
+  background: color-mix(in srgb, var(--ld-frame-accent) 18%, transparent);
+}
+
+/* A single hairline marks where navigation ends and app-level controls
+   begin, so the rail reads as two groups instead of one long column. */
+.surface-vault .vault-navigation-footer {
+  margin-top: auto;
+  padding-top: var(--ld-space-8);
+  border-top: 1px solid var(--ld-frame-window-line);
+}

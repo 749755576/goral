@@ -1,0 +1,784 @@
+:root {
+  /* Legacy aliases. The elevation scale in goralTokens.css is the real
+   * definition and already redefines itself per color mode, so these
+   * need no dark-mode counterpart. */
+  --ld-shadow-sm: var(--ld-elevation-1);
+  --ld-shadow-md: var(--ld-elevation-3);
+  --ld-shadow-lg: var(--ld-elevation-4);
+  --ld-bg: #eef2f7;
+  --ld-surface: #f9fbfd;
+  --ld-surface-raised: #ffffff;
+  --ld-surface-muted: #e8edf4;
+  --ld-surface-control: #f1f4f8;
+  --ld-surface-terminal: #151b24;
+  --ld-text: #1f2937;
+  --ld-text-secondary: #5d6a7c;
+  --ld-text-muted: #666f7e;
+  --ld-border: rgba(93, 111, 138, .18);
+  --ld-border-strong: rgba(76, 98, 132, .28);
+  --ld-accent: #3978d4;
+  --ld-accent-strong: #2365c2;
+  --ld-accent-soft: #dceaff;
+  --ld-accent-contrast: #ffffff;
+  --ld-purple: #8256d7;
+  --ld-purple-soft: #efe6ff;
+  --ld-success: #22a66f;
+  --ld-success-soft: #ddf6ea;
+  --ld-warning: #b77a18;
+  --ld-warning-soft: #fff0c9;
+  --ld-danger: #c3434c;
+  --ld-danger-soft: #ffe4e5;
+  --ld-chrome: rgba(249, 251, 253, .86);
+  --ld-sidebar: rgba(234, 239, 247, .9);
+  --ld-overlay: rgba(238, 242, 247, .72);
+}
+
+:root[data-goral-mode="dark"] {
+  --ld-bg: #0d1118;
+  --ld-surface: #151a22;
+  --ld-surface-raised: #1b212b;
+  --ld-surface-muted: #202733;
+  --ld-surface-control: #202630;
+  --ld-surface-terminal: #080b10;
+  --ld-text: #e9eef7;
+  --ld-text-secondary: #aab5c6;
+  --ld-text-muted: #8792a4;
+  --ld-border: rgba(185, 207, 237, .14);
+  --ld-border-strong: rgba(185, 207, 237, .24);
+  --ld-accent: #69a4ff;
+  --ld-accent-strong: #8ab7ff;
+  --ld-accent-soft: #263e63;
+  --ld-accent-contrast: #0d1624;
+  --ld-purple: #b184ff;
+  --ld-purple-soft: #382452;
+  --ld-success: #53d29b;
+  --ld-success-soft: #1c4439;
+  --ld-warning: #f0c56d;
+  --ld-warning-soft: #47391b;
+  --ld-danger: #ff7f86;
+  --ld-danger-soft: #502629;
+  --ld-chrome: rgba(24, 30, 40, .86);
+  --ld-sidebar: rgba(20, 25, 34, .88);
+  --ld-overlay: rgba(10, 14, 22, .72);
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-goral-mode="light"]) {
+    --ld-bg: #0d1118;
+    --ld-surface: #151a22;
+    --ld-surface-raised: #1b212b;
+    --ld-surface-muted: #202733;
+    --ld-surface-control: #202630;
+    --ld-surface-terminal: #080b10;
+    --ld-text: #e9eef7;
+    --ld-text-secondary: #aab5c6;
+    --ld-text-muted: #8792a4;
+    --ld-border: rgba(185, 207, 237, .14);
+    --ld-border-strong: rgba(185, 207, 237, .24);
+    --ld-accent: #69a4ff;
+    --ld-accent-strong: #8ab7ff;
+    --ld-accent-soft: #263e63;
+    --ld-accent-contrast: #0d1624;
+    --ld-purple: #b184ff;
+    --ld-purple-soft: #382452;
+    --ld-success: #53d29b;
+    --ld-success-soft: #1c4439;
+    --ld-warning: #f0c56d;
+    --ld-warning-soft: #47391b;
+    --ld-danger: #ff7f86;
+    --ld-danger-soft: #502629;
+    --ld-chrome: rgba(24, 30, 40, .86);
+    --ld-sidebar: rgba(20, 25, 34, .88);
+    --ld-overlay: rgba(10, 14, 22, .72);
+    color-scheme: dark;
+  }
+}
+
+html,
+body,
+#root {
+  font-family: var(--ld-font-ui);
+}
+
+body {
+  background: var(--ld-bg);
+  color: var(--ld-text);
+  transition: background-color var(--ld-motion-base) var(--ld-ease), color var(--ld-motion-base) var(--ld-ease);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  transition: color var(--ld-motion-fast) var(--ld-ease), background-color var(--ld-motion-fast) var(--ld-ease), border-color var(--ld-motion-fast) var(--ld-ease), box-shadow var(--ld-motion-fast) var(--ld-ease), transform var(--ld-motion-fast) var(--ld-ease);
+}
+
+button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--ld-accent) 72%, transparent);
+  outline-offset: 2px;
+}
+
+.workbench-shell {
+  color: var(--ld-text);
+  background: var(--ld-bg);
+  grid-template-rows: 42px minmax(0, 1fr);
+  transition: background-color var(--ld-motion-base) var(--ld-ease), color var(--ld-motion-base) var(--ld-ease);
+}
+
+.workspace-chrome {
+  border-bottom: 1px solid var(--ld-border);
+  color: var(--ld-text-secondary);
+  background: var(--ld-chrome);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .18);
+}
+
+@supports (backdrop-filter: blur(1px)) {
+  .workspace-chrome,
+  .terminal-side-panel,
+  .dialog-backdrop,
+  .connection-logs-dialog-backdrop,
+  .known-hosts-dialog-backdrop,
+  .group-config-backdrop,
+  .ai-command-confirm-backdrop {
+    backdrop-filter: blur(14px) saturate(116%);
+  }
+}
+
+.surface-tabs {
+  gap: 2px;
+  padding: 4px 6px 0;
+}
+
+.surface-tab {
+  min-width: 120px;
+  height: 38px;
+  border: 1px solid transparent;
+  border-radius: var(--ld-radius-sm) var(--ld-radius-sm) 0 0;
+  padding: 0 14px;
+  color: var(--ld-text-muted);
+  background: transparent;
+  font-size: var(--ld-text-caption1-size);
+  font-weight: 600;
+}
+
+.surface-tab:hover:not(:disabled) {
+  color: var(--ld-text-secondary);
+  background: color-mix(in srgb, var(--ld-surface-raised) 62%, transparent);
+}
+
+.surface-tab.active,
+.local-session-tab.active {
+  border-color: var(--ld-border);
+  border-bottom-color: transparent;
+  color: var(--ld-text);
+  background: var(--ld-surface);
+  box-shadow: 0 -1px 0 rgba(255,255,255,.16), var(--ld-shadow-sm);
+}
+
+.local-session-tab {
+  height: 38px;
+  border-right: 0;
+}
+
+.local-session-tab .surface-tab {
+  height: 38px;
+}
+
+.local-session-tab-close {
+  height: 38px;
+  color: var(--ld-text-muted);
+}
+
+.local-session-tab-close:hover:not(:disabled) {
+  color: var(--ld-danger);
+  background: var(--ld-danger-soft);
+}
+
+.chrome-app-menu,
+.window-controls button {
+  color: var(--ld-text-muted);
+}
+
+.window-controls button:hover:not(:disabled) {
+  color: var(--ld-text);
+  background: color-mix(in srgb, var(--ld-surface-raised) 72%, transparent);
+}
+
+.window-controls .window-close:hover:not(:disabled) {
+  color: #fff;
+  background: var(--ld-danger);
+}
+
+.surface-vault,
+.surface-vault .connection-panel,
+.workspace-navigation {
+  color: var(--ld-text);
+  background: var(--ld-bg);
+}
+
+.surface-vault .connection-panel {
+  grid-template-columns: 196px minmax(0, 1fr);
+}
+
+.workspace-navigation {
+  border-right: 1px solid var(--ld-border);
+  background: var(--ld-sidebar);
+  box-shadow: inset -1px 0 0 rgba(255,255,255,.08);
+}
+
+.vault-brand {
+  min-height: 76px;
+  gap: 10px;
+  padding: 18px 16px 20px;
+}
+
+.vault-brand img {
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--ld-border);
+  border-radius: var(--ld-radius-md);
+  box-shadow: var(--ld-shadow-sm);
+}
+
+.vault-brand strong {
+  color: var(--ld-text);
+  font-size: var(--ld-text-headline-size);
+  font-style: normal;
+  letter-spacing: -.035em;
+}
+
+.vault-wordmark small {
+  color: var(--ld-text-muted);
+}
+
+.workspace-navigation .connection-tabs {
+  gap: 6px;
+  padding: 0 12px;
+  border: 0;
+  background: transparent;
+}
+
+.workspace-navigation .connection-tabs button {
+  grid-template-columns: 25px 1fr auto;
+  min-height: 40px;
+  border: 1px solid transparent;
+  border-radius: var(--ld-radius-sm);
+  padding: 0 10px;
+  color: var(--ld-text-secondary);
+  background: transparent;
+  font-size: var(--ld-text-caption1-size);
+  font-weight: 600;
+  text-align: left;
+}
+
+.workspace-navigation .connection-tabs button:hover:not(:disabled) {
+  color: var(--ld-text);
+  background: color-mix(in srgb, var(--ld-surface-raised) 45%, transparent);
+}
+
+.workspace-navigation .connection-tabs button.active {
+  border-color: color-mix(in srgb, var(--ld-accent) 16%, transparent);
+  color: var(--ld-accent-strong);
+  background: var(--ld-accent-soft);
+  box-shadow: none;
+}
+
+.workspace-navigation .nav-icon {
+  color: inherit;
+}
+
+.workspace-navigation .nav-count {
+  min-width: 20px;
+  border-radius: var(--ld-radius-pill);
+  padding: 2px 6px;
+  color: var(--ld-text-muted);
+  background: var(--ld-surface-muted);
+  font-size: var(--ld-text-caption1-size);
+  text-align: center;
+}
+
+.vault-navigation-footer {
+  border-top: 1px solid var(--ld-border);
+  padding: 12px 12px 16px;
+}
+
+.vault-navigation-footer button {
+  min-height: 36px;
+  border: 0;
+  border-radius: var(--ld-radius-sm);
+  color: var(--ld-text-secondary);
+  background: transparent;
+}
+
+.vault-navigation-footer button:hover:not(:disabled) {
+  color: var(--ld-text);
+  background: color-mix(in srgb, var(--ld-surface-raised) 45%, transparent);
+}
+
+.vault-toolbar,
+.saved-hosts-toolbar,
+.terminal-toolbar {
+  border-color: var(--ld-border);
+  background: var(--ld-surface);
+}
+
+.vault-toolbar {
+  min-height: 58px;
+  padding: 10px 18px;
+}
+
+.vault-content-breadcrumb,
+.vault-breadcrumb {
+  color: var(--ld-text-muted);
+  font-size: var(--ld-text-caption1-size);
+}
+
+.vault-section-heading h2,
+.panel-title h2,
+.saved-hosts-heading h2 {
+  color: var(--ld-text);
+  letter-spacing: -.018em;
+}
+
+.vault-section-heading .eyebrow,
+.panel-title .eyebrow,
+.saved-hosts-heading .eyebrow,
+.eyebrow,
+.kicker {
+  color: var(--ld-text-muted);
+  font-size: var(--ld-text-caption1-size);
+  letter-spacing: .12em;
+}
+
+.vault-host-search input,
+.saved-host-search input,
+.connection-panel input,
+.connection-panel select,
+.connection-panel textarea,
+.settings-workspace input,
+.settings-workspace select,
+.settings-workspace textarea {
+  border: 1px solid var(--ld-border);
+  border-radius: var(--ld-radius-sm);
+  color: var(--ld-text);
+  background: var(--ld-surface-control);
+  box-shadow: inset 0 1px 1px rgba(37, 52, 74, .03);
+}
+
+.vault-host-search input:focus,
+.saved-host-search input:focus,
+.connection-panel input:focus,
+.connection-panel select:focus,
+.connection-panel textarea:focus {
+  border-color: color-mix(in srgb, var(--ld-accent) 56%, var(--ld-border));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ld-accent) 14%, transparent);
+}
+
+.vault-actions button,
+.vault-view-controls button,
+.saved-host-toolbar-action,
+.terminal-tool-button,
+.terminal-actions button,
+.vault-session-action {
+  min-height: 34px;
+  border: 1px solid var(--ld-border);
+  border-radius: var(--ld-radius-sm);
+  color: var(--ld-text-secondary);
+  background: var(--ld-surface-raised);
+  box-shadow: none;
+}
+
+.vault-actions button:hover:not(:disabled),
+.vault-view-controls button:hover:not(:disabled),
+.saved-host-toolbar-action:hover:not(:disabled),
+.terminal-tool-button:hover:not(:disabled),
+.terminal-actions button:hover:not(:disabled),
+.vault-session-action:hover:not(:disabled) {
+  border-color: var(--ld-border-strong);
+  color: var(--ld-text);
+  background: var(--ld-surface-muted);
+  box-shadow: var(--ld-shadow-sm);
+}
+
+.primary-button,
+.vault-new-host,
+.vault-connect-action {
+  border-color: var(--ld-accent);
+  border-radius: var(--ld-radius-sm);
+  color: var(--ld-accent-contrast);
+  background: var(--ld-accent);
+  box-shadow: 0 5px 14px color-mix(in srgb, var(--ld-accent) 22%, transparent);
+  font-weight: 650;
+}
+
+.primary-button:hover:not(:disabled),
+.vault-new-host:hover:not(:disabled),
+.vault-connect-action:hover:not(:disabled) {
+  border-color: var(--ld-accent-strong);
+  background: var(--ld-accent-strong);
+  box-shadow: 0 7px 18px color-mix(in srgb, var(--ld-accent) 28%, transparent);
+}
+
+.danger-button {
+  border-color: color-mix(in srgb, var(--ld-danger) 38%, var(--ld-border));
+  border-radius: var(--ld-radius-sm);
+  color: var(--ld-danger);
+  background: var(--ld-danger-soft);
+}
+
+.security-note,
+.saved-host-success,
+.connection-error {
+  border-radius: var(--ld-radius-sm);
+  border-width: 1px;
+  box-shadow: none;
+}
+
+.security-note {
+  border-color: color-mix(in srgb, var(--ld-accent) 20%, var(--ld-border));
+  color: var(--ld-text-secondary);
+  background: color-mix(in srgb, var(--ld-accent-soft) 62%, var(--ld-surface));
+}
+
+.saved-host-success {
+  border-color: color-mix(in srgb, var(--ld-success) 28%, var(--ld-border));
+  color: var(--ld-success);
+  background: var(--ld-success-soft);
+}
+
+.connection-error {
+  border-color: color-mix(in srgb, var(--ld-danger) 32%, var(--ld-border));
+  color: var(--ld-danger);
+  background: var(--ld-danger-soft);
+}
+
+.saved-host-list,
+.vault-group-strip,
+.managed-key-list {
+  gap: 10px;
+}
+
+.saved-host-card,
+.vault-group-card,
+.saved-host-empty,
+.vault-empty-state,
+.runtime-preview-placeholder {
+  border: 1px solid var(--ld-border);
+  border-radius: var(--ld-radius-md);
+  color: var(--ld-text);
+  background: var(--ld-surface-raised);
+  box-shadow: var(--ld-shadow-sm);
+  transition: transform var(--ld-motion-base) var(--ld-ease), border-color var(--ld-motion-fast) var(--ld-ease), box-shadow var(--ld-motion-base) var(--ld-ease), background-color var(--ld-motion-base) var(--ld-ease);
+}
+
+.saved-host-card:hover,
+.vault-group-card:hover {
+  border-color: color-mix(in srgb, var(--ld-accent) 32%, var(--ld-border));
+  box-shadow: var(--ld-shadow-md);
+  transform: translateY(-1px);
+}
+
+.saved-host-card.selected,
+.vault-group-card.active {
+  border-color: color-mix(in srgb, var(--ld-accent) 50%, var(--ld-border));
+  background: color-mix(in srgb, var(--ld-accent-soft) 44%, var(--ld-surface-raised));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ld-accent) 11%, transparent), var(--ld-shadow-sm);
+}
+
+.saved-host-summary strong,
+.vault-group-card strong {
+  color: var(--ld-text);
+}
+
+.saved-host-summary small,
+.saved-host-card small,
+.vault-group-card small,
+.saved-host-refresh-status {
+  color: var(--ld-text-muted);
+}
+
+.connection-dot.state-connected {
+  background: var(--ld-success);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ld-success) 14%, transparent);
+}
+
+.connection-dot.state-connecting,
+.connection-dot.state-closing {
+  background: var(--ld-warning);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ld-warning) 14%, transparent);
+}
+
+.terminal-panel {
+  color: var(--ld-text);
+  background: var(--ld-surface);
+  border-left: 1px solid var(--ld-border);
+}
+
+.terminal-toolbar {
+  min-height: 52px;
+  border-bottom: 1px solid var(--ld-border);
+  padding: 0 16px;
+  background: var(--ld-surface);
+}
+
+.terminal-session-summary strong {
+  color: var(--ld-text);
+  font-weight: 650;
+}
+
+.terminal-protocol-badge,
+.terminal-state-label,
+.serial-ymodem-status {
+  border: 1px solid var(--ld-border);
+  border-radius: var(--ld-radius-pill);
+  padding: 4px 8px;
+  color: var(--ld-text-secondary);
+  background: var(--ld-surface-muted);
+  font-size: var(--ld-text-caption1-size);
+}
+
+/* The state badge was unconditionally success-green, so a closed session
+   still announced itself in the colour reserved for a healthy one — while
+   the dot right next to it was already state-aware. Colour is the whole
+   point of this badge; it has to track the state it names. */
+.terminal-state-label {
+  color: var(--ld-text-secondary);
+  background: var(--ld-surface-muted);
+  border-color: var(--ld-border);
+}
+
+.terminal-state-label.state-connected {
+  color: var(--ld-success);
+  background: var(--ld-success-soft);
+  border-color: color-mix(in srgb, var(--ld-success) 22%, var(--ld-border));
+}
+
+.terminal-state-label.state-connecting,
+.terminal-state-label.state-closing {
+  color: var(--ld-warning);
+  background: var(--ld-warning-soft);
+  border-color: color-mix(in srgb, var(--ld-warning) 22%, var(--ld-border));
+}
+
+.terminal-container,
+.terminal-pane-viewport,
+.terminal-pane-stage,
+.terminal-pane-layer {
+  background: var(--ld-surface-terminal);
+}
+
+.terminal-container {
+  border: 0;
+}
+
+.terminal-pane-resizer::after {
+  background: color-mix(in srgb, var(--ld-accent) 38%, var(--ld-border));
+  border-radius: var(--ld-radius-pill);
+}
+
+.terminal-side-panel {
+  border-left: 1px solid var(--ld-border);
+  background: var(--ld-surface);
+  box-shadow: var(--ld-shadow-lg);
+}
+
+.terminal-side-panel-header {
+  min-height: 52px;
+  border-bottom: 1px solid var(--ld-border);
+  background: var(--ld-chrome);
+}
+
+.terminal-side-panel-title strong,
+.terminal-side-panel-title h2 {
+  color: var(--ld-text);
+}
+
+.terminal-side-panel-close {
+  border: 0;
+  border-radius: var(--ld-radius-xs);
+  color: var(--ld-text-muted);
+  background: transparent;
+}
+
+.terminal-side-panel-close:hover:not(:disabled) {
+  color: var(--ld-danger);
+  background: var(--ld-danger-soft);
+}
+
+.dialog-backdrop,
+.connection-logs-dialog-backdrop,
+.known-hosts-dialog-backdrop,
+.group-config-backdrop,
+.ai-command-confirm-backdrop {
+  background: var(--ld-overlay);
+}
+
+.dialog,
+.connection-logs-dialog,
+.known-hosts-dialog,
+.group-config-dialog,
+.saved-host-editor,
+.ai-command-confirm {
+  border: 1px solid var(--ld-border-strong);
+  border-radius: var(--ld-radius-lg);
+  color: var(--ld-text);
+  background: var(--ld-surface-raised);
+  box-shadow: var(--ld-shadow-lg);
+}
+
+.dialog-actions button,
+.settings-actions button {
+  border-radius: var(--ld-radius-sm);
+}
+
+[data-goral-reduced-transparency="true"] .workspace-chrome,
+[data-goral-reduced-transparency="true"] .terminal-side-panel,
+[data-goral-reduced-transparency="true"] .dialog-backdrop,
+[data-goral-reduced-transparency="true"] .connection-logs-dialog-backdrop,
+[data-goral-reduced-transparency="true"] .known-hosts-dialog-backdrop,
+[data-goral-reduced-transparency="true"] .group-config-backdrop,
+[data-goral-reduced-transparency="true"] .ai-command-confirm-backdrop {
+  backdrop-filter: none;
+  background: var(--ld-surface);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.001ms !important;
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+  }
+
+  button:active:not(:disabled),
+  .saved-host-card:hover,
+  .vault-group-card:hover {
+    transform: none;
+  }
+}
+
+@media (max-width: 1180px) {
+  .surface-vault .connection-panel {
+    grid-template-columns: 176px minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .surface-vault .connection-panel {
+    grid-template-columns: 52px minmax(0, 1fr);
+  }
+
+  .surface-vault .workspace-navigation {
+    padding: 8px 6px;
+  }
+
+  .surface-vault .vault-brand {
+    justify-content: center;
+    padding: 8px 0 14px;
+  }
+
+  .surface-vault .vault-brand strong,
+  .surface-vault .vault-wordmark small,
+  .surface-vault .workspace-navigation .nav-label,
+  .surface-vault .workspace-navigation .connection-tabs small,
+  .surface-vault .vault-navigation-footer span:last-child {
+    display: none;
+  }
+
+  .surface-vault .workspace-navigation .connection-tabs button {
+    grid-template-columns: 1fr;
+    width: 40px;
+    place-items: center;
+    padding: 0;
+  }
+}
+
+
+/* Explicit dark-surface reconciliation: legacy Vault rules set opaque light
+   backgrounds later in the original stylesheet. Keep the skin authoritative. */
+:root[data-goral-mode="dark"] .surface-vault,
+:root[data-goral-mode="dark"] .surface-vault .connection-panel,
+:root[data-goral-mode="dark"] .surface-vault .quick-connect-form,
+:root[data-goral-mode="dark"] .surface-vault .saved-hosts-view,
+:root[data-goral-mode="dark"] .surface-vault .password-identities-view,
+:root[data-goral-mode="dark"] .surface-vault .proxy-profiles-view,
+:root[data-goral-mode="dark"] .surface-vault .port-forwarding-view,
+:root[data-goral-mode="dark"] .surface-vault .notes-scripts-view,
+:root[data-goral-mode="dark"] .surface-vault .known-hosts-view,
+:root[data-goral-mode="dark"] .surface-vault .connection-logs-view {
+  color: var(--ld-text);
+  background: var(--ld-bg) !important;
+}
+
+:root[data-goral-mode="dark"] .surface-vault .vault-toolbar,
+:root[data-goral-mode="dark"] .surface-vault .saved-hosts-toolbar,
+:root[data-goral-mode="dark"] .surface-vault .vault-content,
+:root[data-goral-mode="dark"] .surface-vault .vault-section-heading,
+:root[data-goral-mode="dark"] .surface-vault .vault-section-heading h2,
+:root[data-goral-mode="dark"] .surface-vault .panel-title h2,
+:root[data-goral-mode="dark"] .surface-vault .saved-hosts-heading h2 {
+  color: var(--ld-text);
+  background: var(--ld-surface);
+}
+
+:root[data-goral-mode="dark"] .surface-vault .connection-panel input,
+:root[data-goral-mode="dark"] .surface-vault .connection-panel select,
+:root[data-goral-mode="dark"] .surface-vault .connection-panel textarea,
+:root[data-goral-mode="dark"] .surface-vault .vault-host-search input,
+:root[data-goral-mode="dark"] .surface-vault .saved-host-search input {
+  color: var(--ld-text);
+  border-color: var(--ld-border);
+  background: var(--ld-surface-control);
+}
+
+:root[data-goral-mode="dark"] .surface-vault .vault-content-breadcrumb,
+:root[data-goral-mode="dark"] .surface-vault .vault-content-breadcrumb button,
+:root[data-goral-mode="dark"] .surface-vault .saved-host-summary small,
+:root[data-goral-mode="dark"] .surface-vault .saved-host-refresh-status {
+  color: var(--ld-text-muted);
+}
+
+:root[data-goral-mode="dark"] .surface-vault .vault-empty-state,
+:root[data-goral-mode="dark"] .surface-vault .saved-host-empty,
+:root[data-goral-mode="dark"] .surface-vault .runtime-preview-placeholder {
+  color: var(--ld-text);
+  background: var(--ld-surface-raised);
+  border-color: var(--ld-border);
+}
+
+
+:root[data-goral-mode="dark"] .surface-vault {
+  color-scheme: dark;
+}
+
+:root[data-goral-mode="dark"] .surface-vault .vault-empty-state,
+:root[data-goral-mode="dark"] .surface-vault .vault-loading-state {
+  color: var(--ld-text-secondary);
+}
+
+:root[data-goral-mode="dark"] .surface-vault .vault-empty-icon {
+  border-color: var(--ld-border);
+  color: var(--ld-accent-strong);
+  background: var(--ld-surface-muted);
+}
+
+:root[data-goral-mode="dark"] .surface-vault .vault-empty-state h3,
+:root[data-goral-mode="dark"] .surface-vault .vault-empty-state p,
+:root[data-goral-mode="dark"] .surface-vault .vault-empty-state > small {
+  color: var(--ld-text-secondary);
+}

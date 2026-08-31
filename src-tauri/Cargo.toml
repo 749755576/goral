@@ -1,0 +1,58 @@
+[package]
+name = "goral-desktop"
+version = "0.1.0"
+description = "Goral desktop application powered by Rust and Tauri"
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[lib]
+name = "goral_desktop_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2.5.6", features = [] }
+
+[dependencies]
+async-trait = "0.1"
+base64 = "0.22"
+cap-std = "3"
+chrono = { version = "0.4", default-features = false, features = ["clock", "std"] }
+fs2 = "0.4"
+hmac = "0.12"
+netcatty-core = { path = "../crates/netcatty-core" }
+netcatty-ai = { path = "../crates/netcatty-ai" }
+netcatty-credentials = { path = "../crates/netcatty-credentials" }
+netcatty-et = { path = "../crates/netcatty-et" }
+netcatty-local-pty = { path = "../crates/netcatty-local-pty" }
+netcatty-log-export = { path = "../crates/netcatty-log-export" }
+netcatty-migration = { path = "../crates/netcatty-migration" }
+netcatty-mosh = { path = "../crates/netcatty-mosh" }
+netcatty-replay-store = { path = "../crates/netcatty-replay-store" }
+netcatty-secret-store = { path = "../crates/netcatty-secret-store" }
+netcatty-serial = { path = "../crates/netcatty-serial" }
+netcatty-ssh = { path = "../crates/netcatty-ssh" }
+netcatty-sysmanager = { path = "../crates/netcatty-sysmanager" }
+netcatty-telnet = { path = "../crates/netcatty-telnet" }
+netcatty-vault = { path = "../crates/netcatty-vault" }
+portable-pty = "0.9"
+serde.workspace = true
+serde_json = "1"
+sha2 = "0.10"
+subtle = "2.6"
+tauri = { version = "2.11.5", features = ["image-png", "tray-icon"] }
+tauri-plugin-dialog = "2"
+tokio = { version = "1", features = ["fs", "io-util", "process", "rt", "sync", "time"] }
+zeroize = "1"
+uuid = { version = "1", features = ["v4"] }
+
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.61", features = ["Win32_Foundation", "Win32_Globalization", "Win32_Security", "Win32_Security_Authorization", "Win32_Storage_FileSystem"] }
+
+[dev-dependencies]
+netcatty-credentials = { path = "../crates/netcatty-credentials", features = ["test-support"] }
+tempfile = "3"
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "sync", "time"] }

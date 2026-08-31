@@ -1,0 +1,11 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "settings-window-title",
+  "description": "Allow the frameless Settings window to localize its native title and drive its own title bar",
+  "windows": ["settings"],
+  "permissions": [
+    "core:window:allow-set-title",
+    "core:window:allow-start-dragging",
+    "core:window:allow-toggle-maximize"
+  ]
+}

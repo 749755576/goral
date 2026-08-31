@@ -1,0 +1,19 @@
+[package]
+name = "netcatty-replay-store"
+version = "0.1.0"
+description = "Encrypted, bounded connection-log replay custody for Goral"
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+netcatty-credentials = { path = "../netcatty-credentials" }
+netcatty-secret-store = { path = "../netcatty-secret-store" }
+netcatty-vault = { path = "../netcatty-vault" }
+sha2 = "0.10"
+subtle = "2.6"
+uuid = { version = "1", features = ["v4"] }
+
+[dev-dependencies]
+netcatty-credentials = { path = "../netcatty-credentials", features = ["test-support"] }
+tempfile = "3"

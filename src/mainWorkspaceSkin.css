@@ -1,0 +1,558 @@
+/* Goral main workbench: hierarchy first, decoration second. */
+.workbench-shell {
+  --ld-workspace-gap: 0;
+  grid-template-rows: 46px minmax(0, 1fr);
+  gap: var(--ld-workspace-gap);
+  background: var(--ld-bg);
+}
+
+.workspace-chrome {
+  min-height: 46px;
+  border-bottom-color: var(--ld-border);
+  background: var(--ld-chrome);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .12);
+}
+
+.chrome-app-menu {
+  flex-basis: 44px;
+  color: var(--ld-text-muted);
+}
+
+.surface-tabs {
+  gap: 4px;
+  padding: 6px 6px 0;
+}
+
+.surface-tab {
+  min-width: 128px;
+  height: 40px;
+  border: 1px solid transparent;
+  border-radius: var(--ld-radius-md) var(--ld-radius-md) 0 0;
+  padding: 0 14px;
+  color: var(--ld-text-muted);
+  font-size: var(--ld-text-caption1-size);
+  font-weight: 650;
+}
+
+.surface-tab:hover:not(:disabled) {
+  color: var(--ld-text);
+  background: color-mix(in srgb, var(--ld-surface-raised) 70%, transparent);
+}
+
+.surface-tab.active,
+.local-session-tab.active {
+  border-color: var(--ld-border);
+  border-bottom-color: transparent;
+  color: var(--ld-text);
+  background: var(--ld-surface);
+  box-shadow: 0 -1px 0 rgba(255,255,255,.2), 0 5px 14px rgba(20, 28, 40, .07);
+}
+
+.surface-tab:focus-visible,
+.local-session-tab-close:focus-visible {
+  outline: 2px solid var(--ld-accent);
+  outline-offset: -2px;
+}
+
+.window-controls button {
+  width: 44px;
+  height: 45px;
+  color: var(--ld-text-muted);
+}
+
+.window-controls button:hover:not(:disabled) {
+  color: var(--ld-text);
+  background: var(--ld-surface-muted);
+}
+
+/* Vault surface ------------------------------------------------------------ */
+.surface-vault {
+  grid-template-columns: minmax(220px, 236px) minmax(0, 1fr);
+  color: var(--ld-text);
+  background: var(--ld-bg);
+}
+
+.surface-vault .connection-panel {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  grid-template-columns: minmax(220px, 236px) minmax(0, 1fr);
+  grid-template-rows: 64px minmax(0, 1fr);
+  border: 0;
+  background: var(--ld-surface);
+}
+
+.surface-vault .workspace-navigation {
+  grid-column: 1;
+  grid-row: 1 / -1;
+  border-right-color: var(--ld-border);
+  padding: 14px 10px 12px;
+  background: var(--ld-sidebar);
+}
+
+.surface-vault .vault-brand {
+  min-height: 70px;
+  padding: 10px 12px 18px;
+}
+
+.surface-vault .vault-brand img {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--ld-radius-md);
+}
+
+.surface-vault .vault-brand strong {
+  font-size: var(--ld-text-headline-size);
+  font-weight: 720;
+}
+
+.surface-vault .workspace-navigation .connection-tabs {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  gap: 4px;
+  padding: 0 2px;
+}
+
+.surface-vault .workspace-navigation .connection-tabs button {
+  grid-template-columns: 25px minmax(0, 1fr) auto;
+  min-height: 40px;
+  border: 1px solid transparent;
+  border-radius: var(--ld-radius-sm);
+  padding: 0 12px;
+  color: var(--ld-text-secondary);
+  font-size: var(--ld-text-footnote-size);
+  font-weight: 620;
+}
+
+.surface-vault .workspace-navigation .connection-tabs button:hover:not(:disabled) {
+  color: var(--ld-text);
+  background: color-mix(in srgb, var(--ld-surface-raised) 58%, transparent);
+}
+
+.surface-vault .workspace-navigation .connection-tabs button.active {
+  border-color: color-mix(in srgb, var(--ld-accent) 22%, var(--ld-border));
+  color: var(--ld-text);
+  background: var(--ld-accent-soft);
+  box-shadow: inset 3px 0 0 var(--ld-accent);
+}
+
+.surface-vault .vault-navigation-footer {
+  margin-top: auto;
+  border-top-color: var(--ld-border);
+  padding: 12px 2px 0;
+}
+
+.surface-vault .vault-navigation-footer button {
+  width: 100%;
+  min-height: 40px;
+  justify-content: flex-start;
+  border-radius: var(--ld-radius-sm);
+  padding: 0 12px;
+  color: var(--ld-text-secondary);
+}
+
+.surface-vault .vault-navigation-footer button:hover:not(:disabled) {
+  color: var(--ld-text);
+  background: color-mix(in srgb, var(--ld-surface-raised) 58%, transparent);
+}
+
+.surface-vault .vault-toolbar {
+  grid-column: 2;
+  grid-row: 1;
+  min-height: 64px;
+  gap: 12px;
+  border-bottom: 1px solid var(--ld-border);
+  padding: 12px 22px;
+  background: var(--ld-surface);
+}
+
+.surface-vault .vault-host-search {
+  flex: 1 1 340px;
+  min-width: 220px;
+  max-width: 560px;
+}
+
+.surface-vault .vault-host-search input {
+  height: 40px;
+  border-color: var(--ld-border);
+  border-radius: var(--ld-radius-md);
+  color: var(--ld-text);
+  background: var(--ld-surface-control);
+  font-size: var(--ld-text-footnote-size);
+}
+
+.surface-vault .vault-actions {
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.surface-vault .vault-actions > button,
+.surface-vault .vault-actions .vault-view-controls > button,
+.surface-vault .vault-actions .vault-view-menu > summary {
+  min-height: 36px;
+  border: 1px solid var(--ld-border);
+  border-radius: var(--ld-radius-sm);
+  padding: 0 12px;
+  color: var(--ld-text-secondary);
+  background: var(--ld-surface-raised);
+  font-size: var(--ld-text-caption1-size);
+  font-weight: 650;
+}
+
+.surface-vault .vault-actions > button:hover:not(:disabled),
+.surface-vault .vault-actions .vault-view-controls > button:hover:not(:disabled),
+.surface-vault .vault-actions .vault-view-menu > summary:hover {
+  border-color: var(--ld-border-strong);
+  color: var(--ld-text);
+  background: var(--ld-surface-muted);
+  box-shadow: var(--ld-shadow-sm);
+}
+
+.surface-vault .vault-actions .vault-connect-action,
+.surface-vault .vault-actions .vault-new-host {
+  border-color: var(--ld-accent);
+  color: var(--ld-accent-contrast);
+  background: var(--ld-accent);
+  box-shadow: 0 5px 14px color-mix(in srgb, var(--ld-accent) 18%, transparent);
+}
+
+.surface-vault .vault-actions .vault-connect-action:hover:not(:disabled),
+.surface-vault .vault-actions .vault-new-host:hover:not(:disabled) {
+  border-color: var(--ld-accent-strong);
+  color: var(--ld-accent-contrast);
+  background: var(--ld-accent-strong);
+}
+
+.surface-vault .vault-actions .vault-view-controls {
+  gap: 6px;
+}
+
+.surface-vault .vault-actions .vault-new-host-split {
+  gap: 0;
+}
+
+.surface-vault .vault-actions .vault-new-host-split .vault-new-host {
+  border-radius: var(--ld-radius-sm) 0 0 var(--ld-radius-sm);
+}
+
+.surface-vault .vault-actions .vault-new-host-options {
+  min-width: 34px;
+  padding: 0 8px;
+  border-left-color: color-mix(in srgb, var(--ld-accent-contrast) 30%, transparent);
+  border-radius: 0;
+  color: var(--ld-accent-contrast);
+  background: var(--ld-accent);
+}
+
+.surface-vault .vault-actions .vault-new-host-options:last-child {
+  border-radius: 0 var(--ld-radius-sm) var(--ld-radius-sm) 0;
+}
+
+.surface-vault .saved-hosts-view,
+.surface-vault .password-identities-view,
+.surface-vault .proxy-profiles-view,
+.surface-vault .port-forwarding-view,
+.surface-vault .notes-scripts-view,
+.surface-vault .known-hosts-view,
+.surface-vault .connection-logs-view,
+.surface-vault .quick-connect-form {
+  grid-column: 2;
+  grid-row: 2;
+  min-width: 0;
+  min-height: 0;
+  padding: 24px 26px 36px;
+  color: var(--ld-text);
+  background: var(--ld-surface);
+}
+
+.surface-vault .quick-connect-form {
+  width: min(680px, calc(100% - 48px));
+  height: fit-content;
+  margin: 26px;
+  border: 1px solid var(--ld-border);
+  border-radius: var(--ld-radius-lg);
+  padding: 24px;
+  background: var(--ld-surface-raised);
+  box-shadow: var(--ld-shadow-md);
+}
+
+.surface-vault .saved-host-list {
+  min-width: 0;
+  padding: 0 2px 12px;
+}
+
+.surface-vault .vault-section-heading {
+  min-height: 34px;
+  margin: 8px 0 10px;
+  color: var(--ld-text-secondary);
+}
+
+.surface-vault .vault-section-heading h2 {
+  color: var(--ld-text);
+  font-size: var(--ld-text-callout-size);
+  font-weight: 700;
+  letter-spacing: -.02em;
+}
+
+.surface-vault .vault-section-heading > span {
+  color: var(--ld-text-muted);
+  font-size: var(--ld-text-caption1-size);
+}
+
+.surface-vault .vault-group-strip {
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.surface-vault .vault-group-card,
+.surface-vault .saved-host-card {
+  border: 1px solid var(--ld-border);
+  border-radius: var(--ld-radius-md);
+  color: var(--ld-text);
+  background: var(--ld-surface-raised);
+  box-shadow: var(--ld-shadow-sm);
+  transition: border-color var(--ld-motion-fast) var(--ld-ease), box-shadow var(--ld-motion-base) var(--ld-ease), transform var(--ld-motion-base) var(--ld-ease);
+}
+
+.surface-vault .vault-group-card {
+  min-height: 76px;
+  padding: 14px;
+}
+
+.surface-vault .vault-group-card:hover,
+.surface-vault .saved-host-card:hover {
+  border-color: color-mix(in srgb, var(--ld-accent) 38%, var(--ld-border));
+  box-shadow: var(--ld-shadow-md);
+  transform: translateY(-1px);
+}
+
+.surface-vault .vault-group-icon {
+  width: 38px;
+  height: 38px;
+  flex-basis: 38px;
+  border-radius: var(--ld-radius-md);
+  color: var(--ld-accent);
+  background: var(--ld-accent-soft);
+}
+
+.surface-vault .vault-empty-state {
+  min-height: 270px;
+  border: 0;
+  border-radius: 0;
+  padding: 38px 20px;
+  color: var(--ld-text-secondary);
+  background: transparent;
+  box-shadow: none;
+}
+
+.surface-vault .vault-empty-icon {
+  width: 58px;
+  height: 58px;
+  margin-bottom: 16px;
+  border: 1px solid var(--ld-border);
+  border-radius: var(--ld-radius-lg);
+  color: var(--ld-accent);
+  background: var(--ld-surface-muted);
+}
+
+.surface-vault .vault-empty-state h3 {
+  color: var(--ld-text);
+  font-size: var(--ld-text-callout-size);
+  font-weight: 700;
+}
+
+.surface-vault .vault-empty-state p {
+  color: var(--ld-text-secondary);
+  font-size: var(--ld-text-caption1-size);
+}
+
+.surface-vault .vault-empty-actions button {
+  min-height: 38px;
+  border-radius: var(--ld-radius-sm);
+  font-size: var(--ld-text-caption1-size);
+}
+
+/* Terminal surface --------------------------------------------------------- */
+.surface-terminal {
+  grid-template-columns: minmax(270px, 294px) minmax(360px, 1fr) minmax(0, var(--terminal-side-panel-width, 0px));
+  grid-template-rows: 46px minmax(0, 1fr);
+  background: var(--terminal-resolved-bg, var(--ld-bg));
+}
+
+.surface-terminal .workspace-chrome {
+  grid-column: 1 / -1;
+  grid-row: 1;
+}
+
+.surface-terminal .connection-panel {
+  grid-column: 1;
+  grid-row: 2;
+  grid-template-columns: 58px minmax(0, 1fr);
+  border-right-color: color-mix(in srgb, var(--terminal-resolved-fg, var(--ld-text)) 16%, transparent);
+}
+
+.surface-terminal .workspace-navigation {
+  padding: 10px 8px;
+}
+
+.surface-terminal .workspace-navigation .connection-tabs button {
+  width: 42px;
+  min-height: 40px;
+  border-radius: var(--ld-radius-md);
+}
+
+.surface-terminal .workspace-navigation .connection-tabs button.active {
+  color: var(--ld-accent-strong);
+  background: color-mix(in srgb, var(--ld-accent) 16%, var(--terminal-resolved-bg, var(--ld-bg)));
+  box-shadow: inset 3px 0 0 var(--ld-accent);
+}
+
+.surface-terminal .saved-hosts-view {
+  grid-column: 2;
+  grid-row: 1;
+  padding: 0;
+  background: color-mix(in srgb, var(--terminal-resolved-bg, var(--ld-bg)) 96%, var(--terminal-resolved-fg, var(--ld-text)) 4%);
+}
+
+.surface-terminal .saved-hosts-toolbar {
+  min-height: 48px;
+  border-bottom-color: color-mix(in srgb, var(--terminal-resolved-fg, var(--ld-text)) 14%, transparent);
+  padding: 8px;
+  background: color-mix(in srgb, var(--terminal-resolved-bg, var(--ld-bg)) 90%, var(--terminal-resolved-fg, var(--ld-text)) 10%);
+}
+
+.surface-terminal .saved-host-search input {
+  height: 32px;
+  border-radius: var(--ld-radius-sm);
+  color: var(--terminal-resolved-fg, var(--ld-text));
+  background: color-mix(in srgb, var(--terminal-resolved-bg, var(--ld-bg)) 78%, var(--terminal-resolved-fg, var(--ld-text)) 22%);
+}
+
+.surface-terminal .terminal-panel {
+  grid-column: 2;
+  grid-row: 2;
+  min-width: 0;
+  min-height: 0;
+  border-left: 1px solid color-mix(in srgb, var(--terminal-resolved-fg, var(--ld-text)) 16%, transparent);
+  background: var(--terminal-resolved-bg, var(--ld-surface-terminal));
+}
+
+.surface-terminal .terminal-toolbar {
+  min-height: 52px;
+  border-bottom-color: color-mix(in srgb, var(--terminal-resolved-fg, var(--ld-text)) 17%, transparent);
+  padding: 0 14px;
+  background: color-mix(in srgb, var(--terminal-resolved-bg, var(--ld-bg)) 89%, var(--terminal-resolved-fg, var(--ld-text)) 11%);
+}
+
+.surface-terminal .terminal-session-summary {
+  min-width: 0;
+  gap: 8px;
+}
+
+.surface-terminal .terminal-session-summary strong {
+  color: var(--terminal-resolved-fg, var(--ld-text));
+  font-size: var(--ld-text-footnote-size);
+}
+
+.surface-terminal .terminal-tool-button {
+  width: 34px;
+  min-height: 34px;
+  border-color: color-mix(in srgb, var(--terminal-resolved-fg, var(--ld-text)) 20%, transparent);
+  border-radius: var(--ld-radius-sm);
+  color: color-mix(in srgb, var(--terminal-resolved-fg, var(--ld-text)) 74%, transparent);
+  background: color-mix(in srgb, var(--terminal-resolved-bg, var(--ld-bg)) 76%, var(--terminal-resolved-fg, var(--ld-text)) 24%);
+}
+
+.surface-terminal .terminal-tool-button:hover:not(:disabled) {
+  border-color: var(--ld-accent);
+  color: var(--terminal-resolved-fg, var(--ld-text));
+  background: color-mix(in srgb, var(--ld-accent) 20%, var(--terminal-resolved-bg, var(--ld-bg)));
+}
+
+.surface-terminal .terminal-tool-button.active {
+  border-color: var(--ld-accent);
+  color: var(--ld-accent-strong);
+  background: color-mix(in srgb, var(--ld-accent) 18%, var(--terminal-resolved-bg, var(--ld-bg)));
+}
+
+.surface-terminal .terminal-disconnect-button {
+  border-color: color-mix(in srgb, var(--ld-danger) 42%, transparent);
+  color: var(--ld-danger);
+  background: color-mix(in srgb, var(--ld-danger) 13%, var(--terminal-resolved-bg, var(--ld-bg)));
+}
+
+.surface-terminal .terminal-side-panel {
+  grid-column: 3;
+  grid-row: 2;
+  min-width: 0;
+  min-height: 0;
+  border-left-color: color-mix(in srgb, var(--terminal-resolved-fg, var(--ld-text)) 17%, transparent);
+  background: color-mix(in srgb, var(--terminal-resolved-bg, var(--ld-bg)) 94%, var(--terminal-resolved-fg, var(--ld-text)) 6%);
+}
+
+.surface-terminal .terminal-side-panel-header {
+  min-height: 52px;
+  border-bottom-color: color-mix(in srgb, var(--terminal-resolved-fg, var(--ld-text)) 17%, transparent);
+  background: color-mix(in srgb, var(--terminal-resolved-bg, var(--ld-bg)) 88%, var(--terminal-resolved-fg, var(--ld-text)) 12%);
+}
+
+@media (max-width: 1180px) {
+  .surface-vault .connection-panel {
+    grid-template-columns: 210px minmax(0, 1fr);
+  }
+
+  .surface-vault .vault-toolbar {
+    padding-inline: 16px;
+  }
+
+  .surface-vault .vault-actions > .vault-session-action {
+    width: 36px;
+    overflow: hidden;
+    padding-inline: 10px;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 900px) {
+  .surface-vault .connection-panel {
+    grid-template-columns: 58px minmax(0, 1fr);
+  }
+
+  .surface-vault .workspace-navigation {
+    padding: 10px 8px;
+  }
+
+  .surface-vault .vault-brand {
+    justify-content: center;
+    padding: 8px 0 14px;
+  }
+
+  .surface-vault .vault-brand strong,
+  .surface-vault .vault-wordmark small,
+  .surface-vault .workspace-navigation .nav-label,
+  .surface-vault .workspace-navigation .nav-count,
+  .surface-vault .vault-navigation-footer span:last-child {
+    display: none;
+  }
+
+  .surface-vault .workspace-navigation .connection-tabs button {
+    grid-template-columns: 1fr;
+    width: 42px;
+    place-items: center;
+    padding: 0;
+  }
+
+  .surface-vault .vault-toolbar {
+    grid-column: 2;
+    flex-wrap: wrap;
+    min-height: 72px;
+  }
+
+  .surface-vault .vault-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}

@@ -1,0 +1,744 @@
+.surface-vault .connection-panel > .connection-logs-view {
+  display: block;
+  grid-column: 2;
+  grid-row: 1 / -1;
+  min-width: 0;
+  min-height: 0;
+  margin: 0 8px 8px 0;
+  border: 1px solid var(--ld-border);
+  border-radius: var(--ld-radius-md);
+  overflow: hidden;
+  background: var(--ld-surface);
+}
+
+.surface-vault .connection-logs-view > .connection-logs-workspace {
+  height: 100%;
+}
+
+.connection-logs-workspace {
+  --logs-ink: var(--ld-text);
+  --logs-muted: var(--ld-text-secondary);
+  --logs-accent: var(--ld-accent);
+  --logs-border: var(--ld-border);
+  --logs-surface: var(--ld-surface-raised);
+  --logs-panel: var(--ld-surface);
+  --logs-secondary: var(--ld-surface-muted);
+  position: relative;
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+  color: var(--logs-ink);
+  background: var(--logs-panel);
+  font-family: var(--ld-font-ui);
+}
+
+.connection-logs-workspace *,
+.connection-logs-workspace *::before,
+.connection-logs-workspace *::after {
+  box-sizing: border-box;
+}
+
+.connection-logs-workspace button {
+  font: inherit;
+}
+
+.connection-logs-workspace button:focus-visible,
+.connection-log-row:focus-visible {
+  outline: 2px solid rgba(66, 100, 107, 0.42);
+  outline-offset: -2px;
+}
+
+.connection-log-glyph {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+}
+
+.connection-logs-toolbar {
+  display: flex;
+  min-height: 56px;
+  flex: 0 0 56px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 1px solid var(--logs-border);
+  padding: 8px 14px 8px 16px;
+  background: var(--logs-surface);
+}
+
+.connection-logs-toolbar > div {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 10px;
+}
+
+.connection-logs-toolbar > div:first-child > span:last-child {
+  display: grid;
+  min-width: 0;
+  gap: 1px;
+}
+
+.connection-logs-toolbar strong {
+  color: var(--ld-text);
+  font-size: var(--ld-text-subheadline-size);
+  line-height: 18px;
+}
+
+.connection-logs-toolbar small {
+  color: var(--logs-muted);
+  font-size: var(--ld-text-caption1-size);
+  line-height: 14px;
+}
+
+.connection-logs-toolbar-icon {
+  display: inline-flex;
+  width: 34px;
+  height: 34px;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--ld-radius-sm);
+  color: var(--ld-text);
+  background: var(--ld-surface-muted);
+}
+
+.connection-logs-toolbar-icon .connection-log-glyph {
+  width: 18px;
+  height: 18px;
+}
+
+.connection-logs-toolbar button,
+.connection-log-actions button,
+.connection-log-replay-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  color: var(--ld-text);
+  background: transparent;
+  cursor: pointer;
+}
+
+.connection-logs-toolbar button:disabled,
+.connection-log-actions button:disabled,
+.connection-log-replay-actions button:disabled,
+.connection-logs-dialog button:disabled {
+  cursor: not-allowed;
+  opacity: 0.52;
+}
+
+.connection-logs-refresh-button {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--ld-radius-xs) !important;
+  padding: 0 !important;
+}
+
+.connection-logs-refresh-button:not(:disabled):hover {
+  background: var(--ld-surface-muted);
+}
+
+.connection-logs-clear-button {
+  height: 38px;
+  gap: 8px;
+  border: 1px solid var(--ld-border) !important;
+  border-radius: var(--ld-radius-sm) !important;
+  padding: 0 12px !important;
+  background: var(--logs-secondary) !important;
+  font-size: var(--ld-text-caption1-size) !important;
+  font-weight: 650 !important;
+}
+
+.connection-logs-clear-button:not(:disabled):hover {
+  border-color: var(--ld-border) !important;
+  background: var(--ld-surface-muted) !important;
+}
+
+.connection-logs-message {
+  flex: 0 0 auto;
+  border-bottom: 1px solid;
+  padding: 8px 14px;
+  font-size: var(--ld-text-caption1-size);
+}
+
+.connection-logs-message.error {
+  border-color: var(--ld-border);
+  color: var(--ld-danger);
+  background: var(--ld-surface-muted);
+}
+
+.connection-logs-message.notice {
+  border-color: var(--ld-border);
+  color: var(--ld-accent);
+  background: var(--ld-surface);
+}
+
+.connection-logs-message.replay-message {
+  position: absolute;
+  top: 44px;
+  right: 12px;
+  z-index: 10;
+  width: min(380px, calc(100% - 24px));
+  border: 1px solid var(--ld-border);
+  border-radius: var(--ld-radius-xs);
+  box-shadow: var(--ld-elevation-2);
+}
+
+.connection-logs-table-header,
+.connection-log-row {
+  display: grid;
+  grid-template-columns: 128px 224px minmax(190px, 1fr) 80px;
+  align-items: center;
+  gap: 16px;
+}
+
+.connection-logs-table-header {
+  min-height: 34px;
+  flex: 0 0 34px;
+  border-bottom: 1px solid rgba(211, 209, 202, 0.8);
+  padding: 0 16px;
+  color: var(--logs-muted);
+  background: rgba(232, 232, 225, 0.58);
+  font-size: var(--ld-text-caption1-size);
+  font-weight: 700;
+}
+
+.connection-logs-table-header > span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.connection-logs-table-header .connection-log-glyph {
+  width: 12px;
+  height: 12px;
+}
+
+.connection-logs-scroll-region {
+  min-width: 0;
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow: auto;
+  scrollbar-color: #c4c5bf transparent;
+  scrollbar-width: thin;
+}
+
+.connection-logs-table {
+  min-width: 680px;
+}
+
+.connection-log-row {
+  min-height: 64px;
+  border-bottom: 1px solid rgba(211, 209, 202, 0.56);
+  padding: 10px 16px;
+  background: transparent;
+  cursor: pointer;
+  transition: background 120ms ease;
+}
+
+.connection-log-row:last-of-type {
+  border-bottom: 0;
+}
+
+.connection-log-row:hover,
+.connection-log-row:focus-visible {
+  background: rgba(226, 226, 219, 0.72);
+}
+
+.connection-log-date,
+.connection-log-user,
+.connection-log-host,
+.connection-log-actions {
+  min-width: 0;
+}
+
+.connection-log-date,
+.connection-log-user p,
+.connection-log-host p {
+  display: grid;
+  margin: 0;
+  gap: 2px;
+}
+
+.connection-log-date strong,
+.connection-log-user strong,
+.connection-log-host strong {
+  overflow: hidden;
+  color: var(--ld-text);
+  font-size: var(--ld-text-footnote-size);
+  font-weight: 650;
+  line-height: 18px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.connection-log-date small,
+.connection-log-user small,
+.connection-log-host small {
+  overflow: hidden;
+  color: var(--logs-muted);
+  font-size: var(--ld-text-caption1-size);
+  line-height: 15px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.connection-log-user,
+.connection-log-host {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.connection-log-user > span,
+.connection-log-target-icon {
+  display: inline-flex;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--ld-radius-md);
+}
+
+.connection-log-user > span {
+  color: white;
+  background: var(--ld-accent);
+}
+
+.connection-log-user > span .connection-log-glyph,
+.connection-log-target-icon .connection-log-glyph {
+  width: 18px;
+  height: 18px;
+}
+
+.connection-log-user p,
+.connection-log-host p {
+  min-width: 0;
+}
+
+.connection-log-target-icon.host {
+  color: white;
+  background: var(--ld-accent);
+}
+
+.connection-log-target-icon.host.snapshot {
+  color: white;
+  background: var(--connection-log-icon-color, var(--ld-accent));
+}
+
+.connection-log-target-icon.host.distro {
+  border: 1px solid rgba(65, 95, 100, 0.18);
+  color: var(--ld-text);
+  background: var(--ld-surface-muted);
+  font-size: var(--ld-text-caption1-size);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.connection-log-target-icon.local {
+  color: white;
+  background: var(--ld-accent);
+}
+
+.connection-log-target-icon.serial {
+  color: white;
+  background: var(--ld-danger);
+}
+
+.connection-log-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.connection-log-actions button {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--ld-radius-xs);
+  padding: 0;
+  color: var(--ld-text);
+}
+
+.connection-log-actions button:not(:disabled):hover,
+.connection-log-actions button.saved {
+  color: var(--ld-text);
+  background: rgba(66, 100, 107, 0.12);
+}
+
+.connection-log-actions button.saved .connection-log-glyph {
+  fill: currentColor;
+}
+
+.connection-log-actions button.delete {
+  opacity: 0;
+}
+
+.connection-log-row:hover .connection-log-actions button.delete,
+.connection-log-row:focus-within .connection-log-actions button.delete {
+  opacity: 1;
+}
+
+.connection-log-actions button.delete:not(:disabled):hover {
+  color: var(--ld-danger);
+  background: rgba(160, 71, 66, 0.1);
+}
+
+.connection-logs-load-more {
+  display: block;
+  width: 100%;
+  min-height: 42px;
+  border: 0;
+  border-top: 1px solid rgba(211, 209, 202, 0.56);
+  border-radius: 0;
+  padding: 8px;
+  color: var(--ld-text);
+  background: transparent;
+  cursor: pointer;
+  font-size: var(--ld-text-caption1-size);
+  font-weight: 650;
+}
+
+.connection-logs-load-more:hover {
+  background: rgba(226, 226, 219, 0.72);
+}
+
+.connection-logs-loading,
+.connection-logs-empty-state {
+  display: flex;
+  min-height: 340px;
+  align-items: center;
+  justify-content: center;
+  color: var(--logs-muted);
+}
+
+.connection-logs-loading {
+  font-size: var(--ld-text-footnote-size);
+}
+
+.connection-logs-empty-state {
+  flex-direction: column;
+  padding: 48px 24px 72px;
+  text-align: center;
+}
+
+.connection-logs-empty-state > span {
+  display: inline-flex;
+  width: 64px;
+  height: 64px;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  border-radius: var(--ld-radius-lg);
+  color: var(--ld-text);
+  background: var(--ld-surface-muted);
+}
+
+.connection-logs-empty-state > span .connection-log-glyph {
+  width: 31px;
+  height: 31px;
+  opacity: 0.76;
+}
+
+.connection-logs-empty-state h2 {
+  margin: 0 0 8px;
+  color: var(--ld-text);
+  font-size: var(--ld-text-headline-size);
+  font-weight: 700;
+}
+
+.connection-logs-empty-state p {
+  max-width: 390px;
+  margin: 0;
+  font-size: var(--ld-text-footnote-size);
+  line-height: 1.55;
+}
+
+.connection-log-replay {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  background: var(--ld-accent);
+}
+
+.connection-log-replay-header {
+  display: flex;
+  min-height: 42px;
+  flex: 0 0 42px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid var(--ld-border);
+  padding: 6px 8px 6px 10px;
+  color: var(--ld-text);
+  background: var(--ld-surface-raised);
+}
+
+.connection-log-replay-title,
+.connection-log-replay-title > span,
+.connection-log-replay-actions {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+}
+
+.connection-log-replay-title {
+  flex: 1 1 auto;
+  gap: 8px;
+}
+
+.connection-log-replay-title > span {
+  width: 27px;
+  height: 27px;
+  flex: 0 0 27px;
+  justify-content: center;
+  border-radius: var(--ld-radius-xs);
+  color: var(--ld-text);
+  background: var(--ld-surface-muted);
+}
+
+.connection-log-replay-title > div {
+  display: flex;
+  min-width: 0;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.connection-log-replay-title strong,
+.connection-log-replay-title small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.connection-log-replay-title strong {
+  font-size: var(--ld-text-footnote-size);
+}
+
+.connection-log-replay-title small {
+  color: var(--logs-muted);
+  font-size: var(--ld-text-caption1-size);
+}
+
+.connection-log-replay-actions {
+  flex: 0 0 auto;
+  gap: 4px;
+}
+
+.connection-log-replay-actions button {
+  min-width: 27px;
+  height: 27px;
+  border-radius: var(--ld-radius-xs);
+  padding: 0 6px;
+  color: var(--ld-text);
+  font-size: var(--ld-text-caption1-size);
+  font-weight: 700;
+}
+
+.connection-log-replay-actions button:not(:disabled):hover {
+  background: var(--ld-surface-muted);
+}
+
+.connection-log-replay-actions button.connection-log-replay-export {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding-inline: 8px;
+}
+
+.connection-log-replay-export .connection-log-glyph {
+  width: 12px;
+  height: 12px;
+}
+
+.connection-log-replay-actions > span {
+  display: inline-flex;
+  height: 24px;
+  align-items: center;
+  margin: 0 4px;
+  border-radius: var(--ld-radius-xs);
+  padding: 0 8px;
+  color: var(--ld-text);
+  background: var(--ld-surface-muted);
+  font-size: var(--ld-text-caption1-size);
+  font-weight: 650;
+}
+
+.connection-log-replay-notice {
+  flex: 0 0 auto;
+  margin: 0;
+  border-bottom: 1px solid var(--ld-accent);
+  padding: 8px 12px;
+  color: var(--ld-text-secondary);
+  background: var(--ld-accent);
+  font-size: var(--ld-text-caption1-size);
+}
+
+.connection-log-replay-state {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 28px;
+  color: var(--ld-text-secondary);
+  background: var(--ld-accent);
+  text-align: center;
+}
+
+.connection-log-replay-state > span:not(.connection-log-replay-spinner) {
+  display: inline-flex;
+  width: 48px;
+  height: 48px;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--ld-radius-md);
+  color: var(--ld-text-secondary);
+  background: var(--ld-accent);
+}
+
+.connection-log-replay-state > span .connection-log-glyph {
+  width: 23px;
+  height: 23px;
+}
+
+.connection-log-replay-state strong {
+  font-size: var(--ld-text-footnote-size);
+}
+
+.connection-log-replay-state p {
+  max-width: 420px;
+  margin: -4px 0 4px;
+  color: var(--ld-text-secondary);
+  font-size: var(--ld-text-caption1-size);
+  line-height: 1.5;
+}
+
+.connection-log-replay-state button {
+  min-height: 34px;
+  border: 1px solid var(--ld-accent);
+  border-radius: var(--ld-radius-xs);
+  padding: 0 14px;
+  color: var(--ld-text-muted);
+  background: var(--ld-accent);
+  cursor: pointer;
+  font-size: var(--ld-text-caption1-size);
+  font-weight: 650;
+}
+
+.connection-log-replay-state button:hover {
+  border-color: var(--ld-accent);
+  background: var(--ld-accent);
+}
+
+.connection-log-replay-spinner {
+  width: 26px;
+  height: 26px;
+  border: 2px solid var(--ld-accent);
+  border-top-color: var(--ld-border);
+  border-radius: 50%;
+  animation: connection-log-replay-spin 700ms linear infinite;
+}
+
+@keyframes connection-log-replay-spin {
+  to { transform: rotate(360deg); }
+}
+
+.connection-log-replay-terminal {
+  min-width: 0;
+  min-height: 0;
+  flex: 1 1 auto;
+  padding: 10px 8px 8px 12px;
+  background: var(--ld-accent);
+}
+
+.connection-log-replay-terminal > div,
+.connection-log-replay-terminal .xterm {
+  width: 100%;
+  height: 100%;
+}
+
+.connection-logs-dialog-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 120;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(40, 48, 47, 0.32);
+  backdrop-filter: blur(2px);
+}
+
+.connection-logs-dialog {
+  width: min(400px, 100%);
+  border: 1px solid var(--ld-border);
+  border-radius: var(--ld-radius-md);
+  padding: 20px;
+  color: var(--ld-text);
+  background: var(--ld-surface-raised);
+  box-shadow: var(--ld-elevation-4);
+}
+
+.connection-logs-dialog h2 {
+  margin: 0 0 8px;
+  font-size: var(--ld-text-headline-size);
+}
+
+.connection-logs-dialog p {
+  margin: 0;
+  color: var(--ld-text);
+  font-size: var(--ld-text-footnote-size);
+  line-height: 1.5;
+}
+
+.connection-logs-dialog > div {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.connection-logs-dialog button {
+  min-height: 36px;
+  border: 1px solid var(--ld-border);
+  border-radius: var(--ld-radius-xs);
+  padding: 0 14px;
+  color: var(--ld-text);
+  background: var(--ld-surface-muted);
+  cursor: pointer;
+  font-size: var(--ld-text-caption1-size);
+  font-weight: 650;
+}
+
+.connection-logs-dialog button.danger {
+  border-color: var(--ld-border);
+  color: var(--ld-danger);
+  background: var(--ld-surface-muted);
+}
+
+@media (max-width: 980px) {
+  .connection-logs-table-header,
+  .connection-log-row {
+    grid-template-columns: 120px 178px minmax(180px, 1fr) 72px;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 760px) {
+  .connection-logs-toolbar > div:first-child small,
+  .connection-logs-clear-button .connection-log-glyph,
+  .connection-log-replay-title small,
+  .connection-log-replay-actions > span {
+    display: none;
+  }
+
+  .connection-logs-clear-button {
+    padding: 0 8px !important;
+  }
+}

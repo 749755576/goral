@@ -1,0 +1,53 @@
+{
+  "name": "goral-ui",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Goral — an Electron-free Rust/Tauri terminal workspace",
+  "author": "749755576 and contributors",
+  "license": "GPL-3.0-or-later",
+  "homepage": "https://github.com/749755576/goral#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/749755576/goral.git"
+  },
+  "bugs": {
+    "url": "https://github.com/749755576/goral/issues"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "vite --port 1420 --strictPort",
+    "build": "tsc --noEmit && vite build",
+    "brand:icons": "tauri icon public/icon.png -o src-tauri/icons",
+    "fetch:native-clients": "node scripts/fetch-native-clients.mjs",
+    "fetch:mosh-client": "node scripts/fetch-native-clients.mjs --client=mosh",
+    "fetch:et-client": "node scripts/fetch-native-clients.mjs --client=et",
+    "test:native-clients": "node --test scripts/fetch-native-clients.test.mjs scripts/package-portable.test.mjs",
+    "package:portable": "npm.cmd run tauri:build && node scripts/package-portable.mjs",
+    "test:frontend": "node --test --experimental-strip-types tests/frontend/*.test.ts",
+    "preview": "vite preview --port 1420",
+    "tauri": "tauri",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build"
+  },
+  "dependencies": {
+    "@fontsource-variable/inter": "^5.3.0",
+    "@tauri-apps/api": "2.11.1",
+    "@tauri-apps/plugin-dialog": "^2.7.2",
+    "@xterm/addon-fit": "^0.12.0-beta.292",
+    "@xterm/addon-webgl": "0.20.0-beta.291",
+    "@xterm/xterm": "^6.1.0-beta.292",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "2.11.4",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.4",
+    "@vitejs/plugin-react": "6.0.5",
+    "typescript": "7.0.2",
+    "vite": "8.2.1"
+  }
+}

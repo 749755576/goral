@@ -1,0 +1,53 @@
+name: 错误报告 / Bug report
+description: 报告可复现的 Goral 功能或界面问题
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢反馈。请先移除主机地址、用户名、密钥、Token、终端输出等敏感信息。
+  - type: input
+    id: version
+    attributes:
+      label: Goral 版本
+      placeholder: 例如 0.1.0 或提交哈希
+    validations:
+      required: true
+  - type: dropdown
+    id: operating-system
+    attributes:
+      label: 操作系统
+      options:
+        - Windows
+        - macOS
+        - Linux
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: 问题描述
+      description: 实际发生了什么？
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: 复现步骤
+      placeholder: |
+        1. 打开……
+        2. 点击……
+        3. 看到……
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 预期行为
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: 补充信息
+      description: 可提供已脱敏截图或日志；不要上传任何凭据或私有连接信息。

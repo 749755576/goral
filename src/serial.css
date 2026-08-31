@@ -1,0 +1,521 @@
+.serial-connect-panel {
+  --serial-ink: var(--ld-text);
+  --serial-muted: var(--ld-text-secondary);
+  --serial-accent: var(--ld-accent);
+  --serial-accent-hover: var(--ld-accent-strong);
+  --serial-border: var(--ld-border);
+  --serial-surface: var(--ld-surface-raised);
+  --serial-panel: var(--ld-surface);
+  --serial-input: var(--ld-surface-control);
+  display: flex;
+  width: min(460px, 100%);
+  min-width: 0;
+  max-height: min(760px, 100%);
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--serial-border);
+  border-radius: var(--ld-radius-md);
+  color: var(--serial-ink);
+  background: var(--serial-surface);
+  box-shadow: var(--ld-elevation-4);
+  font-family: var(--ld-font-ui);
+}
+
+.serial-connect-panel-aside {
+  width: min(420px, 100%);
+  height: 100%;
+  max-height: none;
+  border-radius: 0;
+  box-shadow: -8px 0 26px rgba(48, 62, 59, 0.1);
+}
+
+.serial-connect-panel *,
+.serial-connect-panel *::before,
+.serial-connect-panel *::after {
+  box-sizing: border-box;
+}
+
+.serial-connect-panel [hidden] {
+  display: none !important;
+}
+
+.serial-connect-panel button,
+.serial-connect-panel input,
+.serial-connect-panel select {
+  font: inherit;
+}
+
+.serial-connect-panel button:focus-visible,
+.serial-connect-panel input:focus-visible,
+.serial-connect-panel select:focus-visible {
+  outline: 2px solid rgba(66, 100, 107, 0.32);
+  outline-offset: 2px;
+}
+
+.serial-panel-header {
+  display: flex;
+  min-height: 68px;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid var(--ld-border);
+  padding: 12px 16px;
+  background: var(--ld-surface-raised);
+}
+
+.serial-panel-icon {
+  display: inline-flex;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--ld-border);
+  border-radius: var(--ld-radius-sm);
+  color: var(--ld-accent);
+  background: var(--ld-surface-muted);
+}
+
+.serial-glyph {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+}
+
+.serial-small-glyph {
+  width: 13px;
+  height: 13px;
+  flex: 0 0 auto;
+}
+
+.serial-panel-heading {
+  display: grid;
+  min-width: 0;
+  flex: 1;
+  gap: 2px;
+}
+
+.serial-panel-heading strong {
+  overflow: hidden;
+  font-size: var(--ld-text-subheadline-size);
+  font-weight: 750;
+  letter-spacing: -0.01em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.serial-panel-heading small {
+  overflow: hidden;
+  color: var(--serial-muted);
+  font-size: var(--ld-text-caption1-size);
+  font-weight: 520;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.serial-icon-button {
+  display: inline-flex;
+  width: 30px;
+  height: 30px;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: var(--ld-radius-xs);
+  color: var(--ld-text);
+  background: transparent;
+  cursor: pointer;
+}
+
+.serial-icon-button:hover:not(:disabled) {
+  color: var(--ld-text);
+  background: var(--ld-surface-muted);
+}
+
+.serial-close-button {
+  font-size: var(--ld-text-title3-size);
+  font-weight: 350;
+  line-height: 1;
+}
+
+.serial-message {
+  flex: 0 0 auto;
+  border-bottom: 1px solid;
+  padding: 8px 16px;
+  font-size: var(--ld-text-caption1-size);
+  line-height: 1.45;
+}
+
+.serial-message.error {
+  border-color: var(--ld-border);
+  color: var(--ld-danger);
+  background: var(--ld-surface-muted);
+}
+
+.serial-message.notice {
+  border-color: var(--ld-border);
+  color: var(--ld-accent);
+  background: var(--ld-surface);
+}
+
+.serial-form {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+}
+
+.serial-form-scroll {
+  display: grid;
+  min-height: 0;
+  flex: 1;
+  align-content: start;
+  gap: 16px;
+  overflow: auto;
+  padding: 16px;
+  scrollbar-color: #c2c5bf transparent;
+  scrollbar-width: thin;
+}
+
+.serial-saved-fields {
+  display: grid;
+  gap: 16px;
+}
+
+.serial-field,
+.serial-port-field {
+  display: grid;
+  min-width: 0;
+  gap: 6px;
+}
+
+.serial-field-label {
+  color: var(--ld-text);
+  font-size: var(--ld-text-caption1-size);
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.serial-field > small,
+.serial-port-field > small {
+  color: var(--ld-text-secondary);
+  font-size: var(--ld-text-caption1-size);
+  font-weight: 520;
+  line-height: 1.45;
+}
+
+.serial-field > .serial-field-error,
+.serial-port-field > .serial-field-error {
+  color: var(--ld-danger);
+}
+
+.serial-field input,
+.serial-field select,
+.serial-port-field input {
+  width: 100%;
+  min-width: 0;
+  height: 39px;
+  border: 1px solid var(--ld-border);
+  border-radius: var(--ld-radius-xs);
+  padding: 0 10px;
+  color: var(--ld-text);
+  background: var(--serial-input);
+  font-size: var(--ld-text-caption1-size);
+  transition: border-color 120ms ease, box-shadow 120ms ease, background 120ms ease;
+}
+
+.serial-field select {
+  padding-right: 28px;
+}
+
+.serial-field input::placeholder,
+.serial-port-field input::placeholder {
+  color: var(--ld-text-secondary);
+}
+
+.serial-field input:hover:not(:disabled),
+.serial-field select:hover:not(:disabled),
+.serial-port-field input:hover:not(:disabled) {
+  border-color: var(--ld-border);
+}
+
+.serial-field input:focus,
+.serial-field select:focus,
+.serial-port-field input:focus {
+  border-color: var(--ld-accent);
+  outline: 0;
+  box-shadow: 0 0 0 2px rgba(66, 100, 107, 0.1);
+}
+
+.serial-field input[aria-invalid="true"],
+.serial-port-field input[aria-invalid="true"] {
+  border-color: var(--ld-danger);
+}
+
+.serial-field input:disabled,
+.serial-field select:disabled,
+.serial-port-field input:disabled {
+  color: var(--ld-text);
+  background: var(--ld-surface-muted);
+  cursor: not-allowed;
+}
+
+.serial-field-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px;
+}
+
+.serial-field-heading-row {
+  display: flex;
+  min-height: 24px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.serial-refresh-button {
+  display: inline-flex;
+  height: 24px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 0;
+  border-radius: var(--ld-radius-xs);
+  padding: 0 8px;
+  color: var(--ld-text);
+  background: transparent;
+  cursor: pointer;
+  font-size: var(--ld-text-caption1-size);
+  font-weight: 650;
+}
+
+.serial-refresh-button:hover:not(:disabled) {
+  color: var(--ld-text);
+  background: var(--ld-surface-muted);
+}
+
+.serial-refresh-button:disabled,
+.serial-connect-panel button:disabled {
+  cursor: not-allowed;
+  opacity: 0.56;
+}
+
+.serial-input-with-icon {
+  position: relative;
+  display: block;
+}
+
+.serial-input-with-icon > .serial-glyph {
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  z-index: 1;
+  width: 15px;
+  height: 15px;
+  color: var(--ld-text);
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+.serial-input-with-icon > input {
+  padding-left: 34px;
+}
+
+.serial-port-details {
+  overflow: hidden;
+  color: var(--ld-text) !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.serial-advanced-trigger {
+  display: flex;
+  width: 100%;
+  height: 35px;
+  align-items: center;
+  justify-content: space-between;
+  border: 0;
+  border-radius: var(--ld-radius-xs);
+  padding: 0 4px;
+  color: var(--ld-text);
+  background: transparent;
+  cursor: pointer;
+  font-size: var(--ld-text-caption1-size);
+  font-weight: 700;
+}
+
+.serial-advanced-trigger:hover {
+  color: var(--ld-text);
+  background: var(--ld-surface-muted);
+}
+
+.serial-chevron {
+  font-size: var(--ld-text-headline-size);
+  transition: transform 150ms ease;
+}
+
+.serial-advanced-trigger[aria-expanded="true"] .serial-chevron {
+  transform: rotate(180deg);
+}
+
+.serial-advanced {
+  display: grid;
+  gap: 14px;
+  border: 1px solid var(--ld-border);
+  border-radius: var(--ld-radius-sm);
+  padding: 14px;
+  background: var(--ld-surface);
+}
+
+.serial-section-divider {
+  height: 1px;
+  background: var(--ld-surface-muted);
+}
+
+.serial-switch-row {
+  display: flex;
+  min-height: 46px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  cursor: pointer;
+}
+
+.serial-switch-row > span {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.serial-switch-row strong {
+  color: var(--ld-text);
+  font-size: var(--ld-text-caption1-size);
+  font-weight: 700;
+}
+
+.serial-switch-row small {
+  color: var(--ld-text-secondary);
+  font-size: var(--ld-text-caption1-size);
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.serial-switch-row input {
+  position: relative;
+  width: 32px;
+  height: 18px;
+  flex: 0 0 auto;
+  appearance: none;
+  border: 1px solid var(--ld-border);
+  border-radius: var(--ld-radius-pill);
+  background: var(--ld-surface-muted);
+  cursor: pointer;
+  transition: background 130ms ease, border-color 130ms ease;
+}
+
+.serial-switch-row input::after {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--ld-surface-raised);
+  box-shadow: var(--ld-elevation-1);
+  content: "";
+  transition: transform 130ms ease;
+}
+
+.serial-switch-row input:checked {
+  border-color: var(--serial-accent);
+  background: var(--serial-accent);
+}
+
+.serial-switch-row input:checked::after {
+  transform: translateX(14px);
+}
+
+.serial-panel-footer {
+  display: flex;
+  min-height: 62px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  border-top: 1px solid var(--ld-border);
+  padding: 10px 16px;
+  background: var(--ld-surface-raised);
+}
+
+.serial-button {
+  display: inline-flex;
+  min-width: 92px;
+  height: 39px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid transparent;
+  border-radius: var(--ld-radius-sm);
+  padding: 0 14px;
+  cursor: pointer;
+  font-size: var(--ld-text-caption1-size);
+  font-weight: 720;
+}
+
+.serial-button-secondary {
+  border-color: var(--ld-border);
+  color: var(--ld-text);
+  background: var(--ld-surface-muted);
+}
+
+.serial-button-secondary:hover:not(:disabled) {
+  background: var(--ld-surface-muted);
+}
+
+.serial-button-primary {
+  color: #fff;
+  background: var(--serial-accent);
+  box-shadow: var(--ld-elevation-1);
+}
+
+.serial-button-primary:hover:not(:disabled) {
+  background: var(--serial-accent-hover);
+}
+
+.serial-button-primary > .serial-glyph {
+  width: 15px;
+  height: 15px;
+}
+
+@media (max-width: 520px) {
+  .serial-connect-panel {
+    width: 100%;
+    max-height: 100%;
+    border-radius: 0;
+  }
+
+  .serial-form-scroll {
+    padding: 14px;
+  }
+
+  .serial-field-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .serial-panel-footer {
+    align-items: stretch;
+  }
+
+  .serial-button {
+    flex: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .serial-connect-panel *,
+  .serial-connect-panel *::before,
+  .serial-connect-panel *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,42 @@
+[workspace]
+members = [
+  "crates/netcatty-ai",
+  "crates/netcatty-core",
+  "crates/netcatty-credentials",
+  "crates/netcatty-et",
+  "crates/netcatty-migration",
+  "crates/netcatty-log-export",
+  "crates/netcatty-local-pty",
+  "crates/netcatty-mosh",
+  "crates/netcatty-replay-store",
+  "crates/netcatty-secret-store",
+  "crates/netcatty-ssh",
+  "crates/netcatty-sysmanager",
+  "crates/netcatty-serial",
+  "crates/netcatty-telnet",
+  "crates/netcatty-vault",
+  "src-tauri",
+]
+resolver = "2"
+
+[workspace.package]
+edition = "2024"
+license = "GPL-3.0-or-later"
+rust-version = "1.88"
+repository = "https://github.com/749755576/goral"
+homepage = "https://github.com/749755576/goral"
+
+[workspace.dependencies]
+serde = { version = "1", features = ["derive"] }
+
+[patch.crates-io]
+# Goral needs a narrowly patched ConPTY creation mode; see the vendored
+# crate's README.goral.md before updating portable-pty.
+portable-pty = { path = "vendor/portable-pty" }
+
+# Optimize production builds across crates and omit debug symbols.
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+strip = "symbols"

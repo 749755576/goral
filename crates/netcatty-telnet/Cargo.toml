@@ -1,0 +1,16 @@
+[package]
+name = "netcatty-telnet"
+version = "0.1.0"
+description = "Bounded RFC 854/NVT codec and transport session for Goral"
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+encoding_rs = "0.8"
+tokio = { version = "1", features = ["io-util", "macros", "net", "rt", "sync", "time"] }
+uuid = { version = "1", features = ["v4"] }
+zeroize = "1"
+
+[dev-dependencies]
+tokio = { version = "1", features = ["io-util", "macros", "net", "rt-multi-thread", "time"] }

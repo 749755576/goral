@@ -1,0 +1,712 @@
+:root[data-goral-mode="light"] .settings-workspace,
+:root:not([data-goral-mode="dark"]) .settings-workspace {
+  --settings-bg: var(--ld-bg);
+  --settings-sidebar: var(--ld-sidebar);
+  --settings-content: var(--ld-surface);
+  --settings-card: var(--ld-surface-raised);
+  --settings-border: var(--ld-border);
+  --settings-border-soft: color-mix(in srgb, var(--ld-border) 68%, transparent);
+  --settings-text: var(--ld-text);
+  --settings-muted: var(--ld-text-secondary);
+  --settings-accent: var(--ld-accent);
+  --settings-accent-soft: color-mix(in srgb, var(--ld-accent) 13%, transparent);
+  --settings-danger: var(--ld-danger);
+  font-family: var(--ld-font-ui);
+}
+
+:root[data-goral-mode="dark"] .settings-workspace {
+  --settings-bg: var(--ld-bg);
+  --settings-sidebar: var(--ld-sidebar);
+  --settings-content: var(--ld-surface);
+  --settings-card: var(--ld-surface-raised);
+  --settings-border: var(--ld-border);
+  --settings-border-soft: color-mix(in srgb, var(--ld-border) 68%, transparent);
+  --settings-text: var(--ld-text);
+  --settings-muted: var(--ld-text-secondary);
+  --settings-accent: var(--ld-accent);
+  --settings-accent-soft: color-mix(in srgb, var(--ld-accent) 16%, transparent);
+  --settings-danger: var(--ld-danger);
+  color-scheme: dark;
+  font-family: var(--ld-font-ui);
+}
+
+.settings-workspace .settings-titlebar {
+  border-bottom-color: var(--ld-border);
+  background: var(--ld-chrome);
+  backdrop-filter: blur(14px) saturate(116%);
+}
+
+.settings-workspace .settings-titlebar h1,
+.settings-workspace .settings-section-title,
+.settings-workspace .settings-row-label,
+.settings-workspace .settings-about-card h2,
+.settings-workspace .settings-action-row strong {
+  color: var(--ld-text);
+}
+
+.settings-workspace .settings-sidebar {
+  border-right-color: var(--ld-border);
+  background: var(--ld-sidebar);
+}
+
+.settings-workspace .settings-sidebar nav > button {
+  border: 1px solid transparent;
+  color: var(--ld-text-secondary);
+  transition: color var(--ld-motion-fast) var(--ld-ease), background-color var(--ld-motion-fast) var(--ld-ease), border-color var(--ld-motion-fast) var(--ld-ease);
+}
+
+.settings-workspace .settings-sidebar nav > button:hover {
+  color: var(--ld-text);
+  background: color-mix(in srgb, var(--ld-surface-raised) 52%, transparent);
+}
+
+.settings-workspace .settings-sidebar nav > button.active {
+  border-color: color-mix(in srgb, var(--ld-accent) 22%, var(--ld-border));
+  color: var(--ld-accent-strong);
+  background: var(--ld-accent-soft);
+  box-shadow: none;
+}
+
+.settings-workspace .settings-search-opener,
+.settings-workspace .settings-search > input {
+  border-color: var(--ld-border);
+  border-radius: var(--ld-radius-sm);
+  color: var(--ld-text-secondary);
+  background: var(--ld-surface-control);
+}
+
+.settings-workspace .settings-search-opener:hover,
+.settings-workspace .settings-search > input:focus {
+  border-color: color-mix(in srgb, var(--ld-accent) 46%, var(--ld-border));
+  color: var(--ld-text);
+  background: var(--ld-surface-raised);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ld-accent) 13%, transparent);
+}
+
+.settings-workspace .settings-content {
+  background: var(--settings-content);
+}
+
+.settings-workspace .settings-page {
+  scrollbar-color: var(--ld-border-strong) transparent;
+}
+
+.settings-workspace .settings-card,
+.settings-workspace .settings-about-card,
+.settings-workspace .settings-action-row,
+.settings-workspace .settings-ai-profile,
+.settings-workspace .settings-ai-add-card {
+  border-color: var(--ld-border);
+  border-radius: var(--ld-radius-md);
+  color: var(--ld-text);
+  background: var(--ld-surface-raised);
+  box-shadow: var(--ld-shadow-sm);
+}
+
+.settings-workspace .settings-card {
+  padding: 0 18px;
+}
+
+.settings-workspace .settings-row {
+  border-bottom-color: var(--settings-border-soft);
+}
+
+.settings-workspace .settings-row-description,
+.settings-workspace .settings-save-state,
+.settings-workspace .settings-about-card p,
+.settings-workspace .settings-about-card small {
+  color: var(--ld-text-secondary);
+}
+
+.settings-workspace .settings-select,
+.settings-workspace .settings-text-input,
+.settings-workspace .settings-number input,
+.settings-workspace .settings-code-input,
+.settings-workspace .settings-ai-key-input-row input,
+.settings-workspace .settings-ai-field input,
+.settings-workspace .settings-ai-field select,
+.settings-workspace .settings-ai-field textarea {
+  border-color: var(--ld-border);
+  border-radius: var(--ld-radius-sm);
+  color: var(--ld-text);
+  background: var(--ld-surface-control);
+}
+
+.settings-workspace .settings-select:focus,
+.settings-workspace .settings-text-input:focus,
+.settings-workspace .settings-number input:focus,
+.settings-workspace .settings-code-input:focus,
+.settings-workspace .settings-ai-field input:focus,
+.settings-workspace .settings-ai-field select:focus,
+.settings-workspace .settings-ai-field textarea:focus {
+  border-color: color-mix(in srgb, var(--ld-accent) 56%, var(--ld-border));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ld-accent) 13%, transparent);
+}
+
+.settings-workspace .settings-segmented,
+.settings-workspace .settings-nested-tabs {
+  border-color: var(--ld-border);
+  border-radius: var(--ld-radius-sm);
+  background: var(--ld-surface-muted);
+}
+
+.settings-workspace .settings-segmented button,
+.settings-workspace .settings-nested-tabs button {
+  border-radius: var(--ld-radius-xs);
+  color: var(--ld-text-secondary);
+}
+
+.settings-workspace .settings-segmented button:hover,
+.settings-workspace .settings-nested-tabs button:hover {
+  color: var(--ld-text);
+  background: color-mix(in srgb, var(--ld-surface-raised) 56%, transparent);
+}
+
+.settings-workspace .settings-segmented button.active,
+.settings-workspace .settings-nested-tabs button.active {
+  color: var(--ld-text);
+  background: var(--ld-surface-raised);
+  box-shadow: var(--ld-shadow-sm);
+}
+
+.settings-workspace .settings-primary-button {
+  min-height: 34px;
+  border: 1px solid var(--ld-accent);
+  border-radius: var(--ld-radius-sm);
+  color: var(--ld-accent-contrast);
+  background: var(--ld-accent);
+}
+
+.settings-workspace .settings-secondary-button,
+.settings-workspace .settings-link-button {
+  min-height: 34px;
+  border: 1px solid var(--ld-border);
+  border-radius: var(--ld-radius-sm);
+  color: var(--ld-text-secondary);
+  background: var(--ld-surface-raised);
+}
+
+.settings-workspace .settings-secondary-button:hover,
+.settings-workspace .settings-link-button:hover,
+.settings-workspace .settings-primary-button:hover {
+  box-shadow: var(--ld-shadow-sm);
+  transform: translateY(-1px);
+}
+
+.settings-workspace .settings-toggle {
+  width: 36px;
+  height: 22px;
+  background: var(--ld-surface-muted) !important;
+  box-shadow: inset 0 0 0 1px var(--ld-border);
+}
+
+.settings-workspace .settings-toggle[aria-checked="true"] {
+  background: var(--ld-accent) !important;
+  box-shadow: none;
+}
+
+.settings-workspace .settings-toggle > span {
+  width: 16px;
+  height: 16px;
+  box-shadow: var(--ld-shadow-sm);
+}
+
+.settings-workspace .settings-toggle[aria-checked="true"] > span {
+  transform: translateX(14px);
+}
+
+.settings-workspace .settings-close:hover {
+  background: var(--ld-danger-soft) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .settings-workspace .settings-secondary-button:hover,
+  .settings-workspace .settings-link-button:hover,
+  .settings-workspace .settings-primary-button:hover {
+    transform: none;
+  }
+}
+
+/* Application page: use the available canvas instead of a narrow centered card. */
+.settings-workspace .settings-page-body.settings-application-page {
+  width: min(100%, 1100px);
+  display: grid;
+  grid-template-columns: minmax(260px, .9fr) minmax(360px, 1.1fr);
+  align-content: start;
+  gap: 28px 54px;
+  padding: 46px 56px 72px;
+}
+
+.settings-workspace .settings-application-page .settings-app-identity {
+  grid-column: 1;
+  align-self: start;
+  padding-top: 10px;
+}
+
+.settings-workspace .settings-application-page .settings-action-list {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: start;
+  gap: 10px;
+}
+
+.settings-workspace .settings-application-page .settings-action-row {
+  min-height: 64px;
+  padding: 12px 14px;
+  text-align: left;
+}
+
+.settings-workspace .settings-application-page .settings-action-row:hover {
+  border-color: color-mix(in srgb, var(--ld-accent) 30%, var(--ld-border));
+  transform: translateY(-1px);
+  box-shadow: var(--ld-shadow-md);
+}
+
+.settings-workspace .settings-application-page .settings-about-card {
+  grid-column: 1;
+  align-self: start;
+  width: 100%;
+  margin: 6px 0 0;
+  border: 0;
+  border-top: 1px solid var(--ld-border);
+  border-radius: 0;
+  padding: 22px 0 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.settings-workspace .settings-application-page .settings-about-card h2 {
+  margin: 0 0 12px;
+  font-size: var(--ld-text-headline-size);
+  letter-spacing: -.02em;
+}
+
+.settings-workspace .settings-application-page .settings-about-card p {
+  max-width: 42ch;
+  margin: 0 0 10px;
+  font-size: var(--ld-text-caption1-size);
+  line-height: 1.65;
+}
+
+.settings-workspace .settings-application-page .settings-about-card small {
+  font-size: var(--ld-text-caption1-size);
+}
+
+/* AI provider page: readable editorial width, fewer nested-white-box signals,
+   and a single obvious save action at the end of the setup flow. */
+.settings-workspace .settings-page-body.settings-ai-provider-page {
+  width: min(100%, 1120px);
+  padding: 34px 48px 72px;
+}
+
+.settings-workspace .settings-ai-provider-page > .settings-nested-tabs {
+  width: max-content;
+  margin-bottom: 28px;
+}
+
+.settings-workspace .settings-ai-provider-page > .settings-section-title {
+  margin: 0 0 12px;
+  font-size: var(--ld-text-headline-size);
+  letter-spacing: -.025em;
+}
+
+.settings-workspace .settings-ai-provider-toolbar {
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.settings-workspace .settings-ai-provider-toolbar .settings-ai-description {
+  max-width: 66ch;
+  font-size: var(--ld-text-caption1-size);
+  line-height: 1.55;
+}
+
+.settings-workspace .settings-ai-provider-toolbar small {
+  color: var(--ld-text-muted);
+  font-size: var(--ld-text-caption1-size);
+}
+
+.settings-workspace .settings-ai-provider-list {
+  gap: 16px;
+}
+
+.settings-workspace .settings-ai-profile {
+  overflow: hidden;
+  border-radius: var(--ld-radius-lg);
+  background: var(--ld-surface-raised);
+  box-shadow: var(--ld-shadow-sm);
+}
+
+.settings-workspace .settings-ai-profile.active {
+  border-color: #4d98e8;
+  background: var(--ld-surface-raised);
+  box-shadow: 0 0 0 1px rgba(77,152,232,.16), var(--ld-shadow-sm);
+}
+
+.settings-workspace .settings-ai-profile.active::before {
+  background: #4d98e8;
+}
+
+.settings-workspace .settings-ai-profile-header {
+  grid-template-columns: 46px minmax(0, 1fr) auto;
+  gap: 16px;
+  padding: 20px 22px;
+}
+
+.settings-workspace .settings-ai-profile-logo {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--ld-radius-md);
+  font-size: var(--ld-text-callout-size);
+}
+
+.settings-workspace .settings-ai-profile-heading {
+  gap: 8px;
+}
+
+.settings-workspace .settings-ai-profile-title-row strong {
+  color: var(--ld-text);
+  font-size: var(--ld-text-callout-size);
+  font-weight: 680;
+}
+
+.settings-workspace .settings-ai-profile-meta > span,
+.settings-workspace .settings-ai-profile-meta > small {
+  color: var(--ld-text-secondary);
+  font-size: var(--ld-text-caption1-size);
+}
+
+.settings-workspace .settings-ai-profile-meta > span:nth-child(2) {
+  color: var(--ld-text);
+  font-size: var(--ld-text-caption1-size);
+}
+
+.settings-workspace .settings-ai-badge,
+.settings-workspace .settings-ai-key-status {
+  border: 1px solid var(--ld-border);
+  color: var(--ld-text-secondary);
+  background: var(--ld-surface-muted);
+  font-size: var(--ld-text-caption1-size);
+}
+
+.settings-workspace .settings-ai-badge.active,
+.settings-workspace .settings-ai-key-status.saved {
+  border-color: color-mix(in srgb, var(--ld-success) 30%, var(--ld-border));
+  color: var(--ld-success);
+  background: var(--ld-success-soft);
+}
+
+.settings-workspace .settings-ai-key-status.missing {
+  border-color: color-mix(in srgb, var(--ld-warning) 30%, var(--ld-border));
+  color: var(--ld-warning);
+  background: var(--ld-warning-soft);
+}
+
+.settings-workspace .settings-ai-profile-actions {
+  gap: 8px;
+}
+
+.settings-workspace .settings-ai-profile.active .settings-ai-profile-actions .settings-secondary-button:disabled {
+  opacity: 1;
+  color: var(--ld-success);
+  border-color: color-mix(in srgb, var(--ld-success) 28%, var(--ld-border));
+  background: var(--ld-success-soft);
+}
+
+.settings-workspace .settings-ai-profile-actions .settings-secondary-button,
+.settings-workspace .settings-ai-profile-actions .settings-link-button {
+  min-height: 34px;
+  padding: 0 12px;
+  font-size: var(--ld-text-caption1-size);
+}
+
+.settings-workspace .settings-ai-unified-form {
+  gap: var(--ld-space-12);
+  border-top-color: var(--ld-border);
+  padding: var(--ld-space-12) var(--ld-space-16) var(--ld-space-16);
+  background: var(--ld-surface-muted);
+}
+
+.settings-workspace .settings-ai-editor-intro {
+  border-color: color-mix(in srgb, var(--ld-accent) 25%, var(--ld-border));
+  border-radius: var(--ld-radius-md);
+  padding: 12px 14px;
+  background: color-mix(in srgb, var(--ld-accent-soft) 58%, var(--ld-surface));
+}
+
+.settings-workspace .settings-ai-editor-intro .settings-ai-description {
+  color: var(--ld-text-secondary);
+  font-size: var(--ld-text-caption1-size);
+  line-height: 1.5;
+}
+
+.settings-workspace .settings-ai-form-grid {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr);
+  gap: 14px;
+}
+
+.settings-workspace .settings-ai-form-grid > .settings-ai-connection-section {
+  grid-column: 1 / -1;
+}
+
+.settings-workspace .settings-ai-form-section {
+  gap: 16px;
+  border-color: var(--ld-border);
+  border-radius: var(--ld-radius-md);
+  padding: 18px;
+  background: var(--ld-surface-raised);
+  box-shadow: none;
+}
+
+.settings-workspace .settings-ai-section-heading strong,
+.settings-workspace .settings-ai-key-heading strong {
+  color: var(--ld-text);
+  font-size: var(--ld-text-footnote-size);
+}
+
+.settings-workspace .settings-ai-section-heading small,
+.settings-workspace .settings-ai-field-hint,
+.settings-workspace .settings-ai-key-heading small {
+  color: var(--ld-text-secondary);
+  font-size: var(--ld-text-caption1-size);
+  line-height: 1.45;
+}
+
+.settings-workspace .settings-ai-field {
+  color: var(--ld-text-secondary);
+  font-size: var(--ld-text-caption1-size);
+  font-weight: 620;
+}
+
+.settings-workspace .settings-ai-field .settings-text-input,
+.settings-workspace .settings-ai-field .settings-select,
+.settings-workspace .settings-ai-key-input-row .settings-text-input {
+  min-height: 38px;
+  font-size: var(--ld-text-caption1-size);
+}
+
+.settings-workspace .settings-ai-connection-row {
+  border-color: var(--ld-border);
+  border-radius: var(--ld-radius-sm);
+  padding: 12px 14px;
+  background: var(--ld-surface-muted);
+}
+
+.settings-workspace .settings-ai-connection-row .settings-ai-model-status {
+  font-size: var(--ld-text-caption1-size);
+  line-height: 1.5;
+}
+
+.settings-workspace .settings-ai-model-status.ready {
+  color: var(--ld-success);
+}
+
+.settings-workspace .settings-ai-model-status.error,
+.settings-workspace .settings-ai-form-error {
+  color: var(--ld-danger);
+}
+
+.settings-workspace .settings-ai-key-notice {
+  border: 1px solid color-mix(in srgb, var(--ld-success) 26%, var(--ld-border));
+  color: var(--ld-success);
+  background: var(--ld-success-soft);
+}
+
+.settings-workspace .settings-ai-save-bar {
+  gap: var(--ld-space-8);
+  border-top: 0;
+  border-bottom: 1px solid var(--ld-border);
+  padding: 0 0 var(--ld-space-12);
+  background: var(--ld-surface-muted);
+}
+
+.settings-workspace .settings-ai-save-copy small {
+  color: var(--ld-text-secondary);
+  font-size: var(--ld-text-caption1-size);
+  line-height: 1.45;
+}
+
+@media (max-width: 900px) {
+  .settings-workspace .settings-page-body.settings-application-page {
+    display: block;
+    padding: 30px 24px 56px;
+  }
+
+  .settings-workspace .settings-application-page .settings-action-list {
+    margin-top: 24px;
+  }
+
+  .settings-workspace .settings-application-page .settings-about-card {
+    margin-top: 24px;
+  }
+
+  .settings-workspace .settings-page-body.settings-ai-provider-page {
+    padding: 28px 24px 56px;
+  }
+
+  .settings-workspace .settings-ai-profile-header {
+    grid-template-columns: 42px minmax(0, 1fr);
+  }
+
+  .settings-workspace .settings-ai-profile-actions {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+  }
+}
+
+/* Focused editing is a different interaction mode from browsing providers.
+   Keep the selected provider in view and remove competing actions while the
+   user is configuring it. */
+.settings-workspace .settings-ai-provider-list.is-editing > .settings-ai-profile:not(.editing) {
+  display: none;
+}
+
+.settings-workspace .settings-ai-profile.editing {
+  overflow: visible;
+  border-color: color-mix(in srgb, var(--ld-accent) 58%, var(--ld-border));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ld-accent) 12%, transparent), var(--ld-shadow-md);
+}
+
+.settings-workspace .settings-ai-profile.editing .settings-ai-profile-header {
+  padding: var(--ld-space-12) var(--ld-space-16);
+}
+
+.settings-workspace .settings-ai-profile.editing .settings-ai-unified-form {
+  border-top: 1px solid var(--ld-border);
+}
+
+.settings-workspace .settings-ai-connection-section {
+  grid-column: 1 / -1;
+}
+
+.settings-workspace .settings-ai-key-panel {
+  grid-column: 1;
+}
+
+.settings-workspace .settings-ai-model-panel {
+  grid-column: 2;
+}
+
+.settings-workspace .settings-ai-editor-intro {
+  min-height: 44px;
+}
+
+.settings-workspace .settings-ai-save-bar .settings-secondary-button,
+.settings-workspace .settings-ai-save-bar .settings-primary-button {
+  min-height: 38px;
+  padding: 0 16px;
+  font-size: var(--ld-text-caption1-size);
+  font-weight: 650;
+}
+
+@media (max-width: 760px) {
+  .settings-workspace .settings-ai-key-panel,
+  .settings-workspace .settings-ai-model-panel {
+    grid-column: 1 / -1;
+  }
+
+  .settings-workspace .settings-ai-connection-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Dark controls must remain readable even when disabled: inactive is a state,
+   not permission to reduce the label below a usable contrast level. */
+:root[data-goral-mode="dark"] .settings-workspace button:disabled {
+  opacity: .78;
+}
+
+:root[data-goral-mode="dark"] .settings-workspace .settings-secondary-button {
+  color: var(--ld-text) !important;
+  border-color: var(--ld-border-strong) !important;
+  background: var(--ld-surface-raised) !important;
+}
+
+:root[data-goral-mode="dark"] .settings-workspace .settings-secondary-button:hover:not(:disabled) {
+  border-color: var(--ld-accent-strong) !important;
+  background: var(--ld-surface-muted) !important;
+}
+
+:root[data-goral-mode="dark"] .settings-workspace .settings-ai-profile-actions .settings-secondary-button:disabled {
+  color: var(--ld-text);
+  border-color: var(--ld-border-strong);
+  background: var(--ld-surface-muted);
+}
+
+:root[data-goral-mode="dark"] .settings-workspace .settings-ai-profile-actions .settings-link-button {
+  color: var(--ld-text-secondary);
+  border-color: var(--ld-border-strong);
+  background: var(--ld-surface-control);
+}
+
+:root[data-goral-mode="dark"] .settings-workspace .settings-ai-profile-actions .settings-link-button:hover:not(:disabled) {
+  color: var(--ld-text);
+  border-color: var(--ld-accent-strong);
+  background: var(--ld-surface-muted);
+}
+
+:root[data-goral-mode="dark"] .settings-workspace .settings-ai-profile-actions .settings-link-button.danger,
+:root[data-goral-mode="dark"] .settings-workspace .settings-secondary-button.danger {
+  color: #ff9a9f;
+  border-color: rgba(255, 127, 134, .38);
+  background: rgba(106, 35, 43, .42);
+}
+
+:root[data-goral-mode="dark"] .settings-workspace .settings-ai-profile-actions .settings-link-button.danger:hover:not(:disabled),
+:root[data-goral-mode="dark"] .settings-workspace .settings-secondary-button.danger:hover:not(:disabled) {
+  color: #ffd7d9;
+  border-color: rgba(255, 154, 159, .62);
+  background: rgba(132, 42, 51, .58);
+}
+
+:root[data-goral-mode="dark"] .settings-workspace .settings-ai-profile-actions .settings-primary-button,
+:root[data-goral-mode="dark"] .settings-workspace .settings-ai-provider-toolbar .settings-primary-button {
+  color: #ffffff;
+  border-color: var(--ld-accent-strong);
+  background: var(--ld-accent);
+}
+
+:root[data-goral-mode="dark"] .settings-workspace .settings-ai-profile-actions .settings-primary-button:hover:not(:disabled),
+:root[data-goral-mode="dark"] .settings-workspace .settings-ai-provider-toolbar .settings-primary-button:hover:not(:disabled) {
+  color: #ffffff;
+  border-color: #83c5ff;
+  background: var(--ld-accent-strong);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-goral-mode="light"]) .settings-workspace button:disabled {
+    opacity: .78;
+  }
+
+  :root:not([data-goral-mode="light"]) .settings-workspace .settings-secondary-button {
+    color: var(--ld-text) !important;
+    border-color: var(--ld-border-strong) !important;
+    background: var(--ld-surface-raised) !important;
+  }
+
+  :root:not([data-goral-mode="light"]) .settings-workspace .settings-ai-profile-actions .settings-secondary-button:disabled {
+    color: var(--ld-text);
+    border-color: var(--ld-border-strong);
+    background: var(--ld-surface-muted);
+  }
+
+  :root:not([data-goral-mode="light"]) .settings-workspace .settings-ai-profile-actions .settings-link-button {
+    color: var(--ld-text-secondary);
+    border-color: var(--ld-border-strong);
+    background: var(--ld-surface-control);
+  }
+
+  :root:not([data-goral-mode="light"]) .settings-workspace .settings-ai-profile-actions .settings-link-button.danger,
+  :root:not([data-goral-mode="light"]) .settings-workspace .settings-secondary-button.danger {
+    color: #ff9a9f;
+    border-color: rgba(255, 127, 134, .38);
+    background: rgba(106, 35, 43, .42);
+  }
+
+  :root:not([data-goral-mode="light"]) .settings-workspace .settings-ai-profile-actions .settings-primary-button,
+  :root:not([data-goral-mode="light"]) .settings-workspace .settings-ai-provider-toolbar .settings-primary-button {
+    color: #ffffff;
+    border-color: var(--ld-accent-strong);
+    background: var(--ld-accent);
+  }
+}
