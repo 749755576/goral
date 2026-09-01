@@ -11,6 +11,14 @@ coverage/
 .env.*
 output/
 
+# Never stage local credential material or private-key exports.
+*.pem
+*.key
+*.p12
+*.pfx
+*.ppk
+*.secret
+
 .DS_Store
 Thumbs.db
 .idea/
