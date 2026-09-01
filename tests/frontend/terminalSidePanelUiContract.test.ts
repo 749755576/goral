@@ -51,6 +51,10 @@ test("terminal uses one sibling side panel for SFTP and the AI workspace", async
   );
   assert.match(sidePanelSource, /<AiWorkspace[\s\S]*complete=\{openAiCompatibleCompletion\}/);
   assert.match(sidePanelSource, /<AiWorkspace[\s\S]*onClose=\{\(\) => \{/);
+  assert.match(
+    sidePanelSource,
+    /sftpOpen && !activeSftpRender && !NATIVE_DESKTOP_RUNTIME_AVAILABLE[\s\S]*?sftp\.previewUnavailableTitle[\s\S]*?sftp\.previewUnavailableDescription/,
+  );
 
   const sftpGuard = source
     .slice(Math.max(0, sftpPanel - 1_000), sftpPanel)

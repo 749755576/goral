@@ -32,6 +32,7 @@ import {
   type PortForwardDraft,
 } from "./portForwardingUi";
 import { useI18n, type Locale, type Translate } from "./i18n";
+import { WorkspaceGlyph } from "./NotesScriptsShared";
 import { WindowControlGlyph } from "./WindowControlGlyph";
 
 type PortForwardEditor = PortForwardDraft & {
@@ -511,7 +512,7 @@ export const PortForwardingCatalog = ({
           </div>
         </div>
         <label className="port-forward-search">
-          <span aria-hidden="true">⌕</span>
+          <WorkspaceGlyph name="search" />
           <input
             type="search"
             value={search}

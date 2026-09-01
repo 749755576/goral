@@ -7433,7 +7433,7 @@ export function TerminalWorkspace() {
           <section className="saved-hosts-view" role="tabpanel">
             <div className="saved-hosts-toolbar" role="toolbar" aria-label={t("workspace.savedHostsToolbar")}>
               <label className="saved-host-search">
-                <span className="saved-host-search-icon" aria-hidden="true">⌕</span>
+                <span className="saved-host-search-icon" aria-hidden="true"><VaultGlyph name="search" /></span>
                 <input
                   type="search"
                   value={savedHostSearch}
@@ -7481,7 +7481,7 @@ export function TerminalWorkspace() {
                 aria-label={t("workspace.importLegacyVault")}
                 title={t("workspace.importLegacyVaultTitle")}
               >
-                ⇩
+                <VaultGlyph name="download" />
               </button>
               <button
                 className="saved-host-toolbar-action"
@@ -7491,7 +7491,7 @@ export function TerminalWorkspace() {
                 aria-label={t("workspace.refreshHosts")}
                 title={t("workspace.refreshHosts")}
               >
-                ↻
+                <VaultGlyph name="refresh" />
               </button>
             </div>
             {(savedHostsError || error) && (
@@ -8450,6 +8450,13 @@ export function TerminalWorkspace() {
             formatBytes={formatBytes}
             glyph={(name) => <VaultGlyph name={name} />}
           />
+        )}
+        {sftpOpen && !activeSftpRender && !NATIVE_DESKTOP_RUNTIME_AVAILABLE && (
+          <div className="runtime-preview-placeholder" role="status">
+            <span aria-hidden="true"><VaultGlyph name="folder" /></span>
+            <h2>{t("sftp.previewUnavailableTitle")}</h2>
+            <p>{t("sftp.previewUnavailableDescription")}</p>
+          </div>
         )}
 
       </aside>

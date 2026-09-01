@@ -103,7 +103,7 @@ export function SavedHostChainEditor({
                         ];
                         return { ...current, hostChainIds };
                       })}
-                    >↑</button>
+                    ><span aria-hidden="true">↑</span></button>
                     <button
                       type="button"
                       disabled={submitting || index === editor.hostChainIds.length - 1}
@@ -119,7 +119,7 @@ export function SavedHostChainEditor({
                         ];
                         return { ...current, hostChainIds };
                       })}
-                    >↓</button>
+                    ><span aria-hidden="true">↓</span></button>
                     <button
                       type="button"
                       disabled={submitting}

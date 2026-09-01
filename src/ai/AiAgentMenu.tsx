@@ -1,5 +1,6 @@
 import type { DiscoveredAiAgent } from "../aiAgentDiscoveryApi";
 import type { Translate } from "../i18n";
+import AiGlyph from "./AiGlyph";
 import AiPopupMenu from "./AiPopupMenu";
 
 export type AiAgentMenuProps = Readonly<{
@@ -119,7 +120,7 @@ export default function AiAgentMenu({
           {onOpenSettings ? (
             <div className="ai-popup-footer">
               <button type="button" role="menuitem" tabIndex={-1} onClick={() => { close(false); onOpenSettings(); }}>
-                <span className="ai-popup-settings-icon" aria-hidden="true">⚙</span>
+                <span className="ai-popup-settings-icon" aria-hidden="true"><AiGlyph name="settings" /></span>
                 <span>{t("ai.menu.agent.manage")}</span>
               </button>
             </div>
