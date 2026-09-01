@@ -2200,7 +2200,15 @@ export function TerminalWorkspace() {
       );
     const groupConfigCatalogIsStale = groupConfigInventoryRevision.current.seen
       && !sameInventoryRevision(groupConfigInventoryRevision.current.value, inventoryRevision);
-    if (managedGraphChanged || passwordIdentityCatalogIsStale || proxyProfileCatalogIsStale || groupConfigCatalogIsStale) {
+    // A catalog's first snapshot is hydration, not a mutation. During the
+    // initial parallel loads the other catalogs may still expose a different
+    // point-in-time revision; fanning out refresh keys here makes the Hosts
+    // surface alternate between its full loader and background refresh. Only
+    // reconcile dependents after this source has already been hydrated once.
+    if (
+      previous.seen
+      && (managedGraphChanged || passwordIdentityCatalogIsStale || proxyProfileCatalogIsStale || groupConfigCatalogIsStale)
+    ) {
       setPasswordIdentityRefreshKey((current) => current + 1);
       setProxyProfileRefreshKey((current) => current + 1);
       setGroupConfigRefreshKey((current) => current + 1);
@@ -2268,7 +2276,10 @@ export function TerminalWorkspace() {
       );
     const groupConfigCatalogIsStale = groupConfigInventoryRevision.current.seen
       && !sameInventoryRevision(groupConfigInventoryRevision.current.value, catalog.inventoryRevision);
-    if (passwordIdentityGraphChanged || managedCatalogIsStale || proxyProfileCatalogIsStale || groupConfigCatalogIsStale) {
+    if (
+      previous.seen
+      && (passwordIdentityGraphChanged || managedCatalogIsStale || proxyProfileCatalogIsStale || groupConfigCatalogIsStale)
+    ) {
       setProxyProfileRefreshKey((current) => current + 1);
       setGroupConfigRefreshKey((current) => current + 1);
       void Promise.all([
@@ -2303,10 +2314,13 @@ export function TerminalWorkspace() {
     const groupConfigCatalogIsStale = groupConfigInventoryRevision.current.seen
       && !sameInventoryRevision(groupConfigInventoryRevision.current.value, catalog.inventoryRevision);
     if (
-      proxyProfileGraphChanged
-      || managedCatalogIsStale
-      || passwordIdentityCatalogIsStale
-      || groupConfigCatalogIsStale
+      previous.seen
+      && (
+        proxyProfileGraphChanged
+        || managedCatalogIsStale
+        || passwordIdentityCatalogIsStale
+        || groupConfigCatalogIsStale
+      )
     ) {
       setPasswordIdentityRefreshKey((current) => current + 1);
       setGroupConfigRefreshKey((current) => current + 1);
@@ -2335,7 +2349,10 @@ export function TerminalWorkspace() {
       && !sameInventoryRevision(passwordIdentityInventoryRevision.current.value, catalog.inventoryRevision);
     const proxyCatalogIsStale = proxyProfileInventoryRevision.current.seen
       && !sameInventoryRevision(proxyProfileInventoryRevision.current.value, catalog.inventoryRevision);
-    if (groupGraphChanged || managedCatalogIsStale || identityCatalogIsStale || proxyCatalogIsStale) {
+    if (
+      previous.seen
+      && (groupGraphChanged || managedCatalogIsStale || identityCatalogIsStale || proxyCatalogIsStale)
+    ) {
       setPasswordIdentityRefreshKey((current) => current + 1);
       setProxyProfileRefreshKey((current) => current + 1);
       void Promise.all([refreshSavedHosts(false, true), refreshManagedSshKeys()]);
@@ -7789,7 +7806,6 @@ export function TerminalWorkspace() {
             <ConnectionLogsWorkspace
               locale={rendererLocale}
               disabled={savedActionsDisabled}
-              onCatalogChange={() => refreshCatalogsAfterKnownHostsMutation()}
             />
           </section>
         )}
@@ -8874,15 +8890,29 @@ export function TerminalWorkspace() {
           onCancel={cancelSavedHostPasswordPrompt}
           onManualLogin={() => {
             const { host, workspaceSessionId } = savedHostPasswordPrompt;
-            setSavedHostPasswordPrompt(null);
+            // Keep the prompt mounted while Telnet falls back to manual login.
+            // Unmounting it before the async attempt completes produces a
+            // visible close/open flash when the fallback fails.
+            setSavedHostPasswordPrompt((current) => current ? {
+              ...current,
+              password: "",
+              error: undefined,
+            } : current);
             void connectSavedHost(host).then((failure) => {
               if (failure) {
-                setSavedHostPasswordPrompt({
+                setSavedHostPasswordPrompt((current) => current ? {
+                  ...current,
+                  error: failure,
+                } : {
                   host,
                   ...(workspaceSessionId ? { workspaceSessionId } : {}),
                   password: "",
                   error: failure,
                 });
+              } else {
+                setSavedHostPasswordPrompt((current) => (
+                  current?.host.id === host.id ? null : current
+                ));
               }
             });
           }}

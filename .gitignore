@@ -17,6 +17,15 @@ Thumbs.db
 .vscode/
 .playwright-cli/
 
+# Local-only working state; release source and product documentation stay
+# tracked separately from machine-specific notes and temporary material.
+.superpowers/
+docs/superpowers/
+.local/
+.private/
+**/*_HANDOFF.md
+**/*_PARITY.md
+
 src-tauri/resources/mosh/mosh-client
 src-tauri/resources/mosh/mosh-client.exe
 src-tauri/resources/et/et

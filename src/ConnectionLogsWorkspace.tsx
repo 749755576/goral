@@ -16,6 +16,7 @@ import {
 import {
   classifyConnectionLogReplayError,
   classifyConnectionLogsError,
+  clearUnsavedConnectionLogs,
   exportConnectionLog,
   listConnectionLogs,
   readConnectionLogReplay,
@@ -38,6 +39,7 @@ import {
 import "./connectionLogs.css";
 
 export type ConnectionLogsWorkspaceApi = {
+  clearUnsaved: typeof clearUnsavedConnectionLogs;
   exportLog: typeof exportConnectionLog;
   list: typeof listConnectionLogs;
   readReplay: typeof readConnectionLogReplay;
@@ -65,6 +67,10 @@ type ConnectionLogGlyphName =
   | "user";
 
 type CatalogMutation = (logs: readonly SavedConnectionLog[]) => SavedConnectionLog[];
+type CatalogCommit = (request: {
+  expectedInventoryRevision: unknown;
+  logs: SavedConnectionLog[];
+}) => Promise<ConnectionLogsCatalog>;
 type ReplayViewState =
   | { logId: string; status: "loading" }
   | { logId: string; status: "ready"; terminalData: string }
@@ -76,6 +82,7 @@ const EMPTY_CATALOG: ConnectionLogsCatalog = {
 };
 
 const DEFAULT_API: ConnectionLogsWorkspaceApi = {
+  clearUnsaved: clearUnsavedConnectionLogs,
   exportLog: exportConnectionLog,
   list: listConnectionLogs,
   readReplay: readConnectionLogReplay,
@@ -521,6 +528,7 @@ export const ConnectionLogsWorkspace = ({
   const [catalog, setCatalog] = useState<ConnectionLogsCatalog | null>(null);
   const [loading, setLoading] = useState(true);
   const [mutationPending, setMutationPending] = useState(false);
+  const [mutationPendingLabel, setMutationPendingLabel] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [renderLimit, setRenderLimit] = useState(CONNECTION_LOGS_PAGE_SIZE);
@@ -662,15 +670,30 @@ export const ConnectionLogsWorkspace = ({
   const mutateCatalog = useCallback(async (
     mutate: CatalogMutation,
     successNotice: string,
+    commit: CatalogCommit = adapter.replace,
+    pendingNotice = t("connectionLogs.updating"),
   ): Promise<boolean> => {
     if (disabled || mutationLock.current || !nativeRuntimeAvailable) return false;
     mutationLock.current = true;
+    // A catalog read can still be settling when the user starts a mutation
+    // (for example, a focus-triggered refresh). Invalidate that read before
+    // publishing the mutation so a late response cannot restore records that
+    // were just cleared.
+    loadSequence.current += 1;
+    // The invalidated refresh will intentionally skip its `finally` update.
+    // Clear the loading flag here so a refresh that was already in flight
+    // cannot leave the workspace permanently showing a spinner/disabled state.
+    if (catalogRef.current) setLoading(false);
     setMutationPending(true);
+    setMutationPendingLabel(pendingNotice);
     setError(null);
     setNotice(null);
     try {
       let base = catalogRef.current ?? await adapter.list();
-      if (!catalogRef.current) applyCatalog(base);
+      if (!catalogRef.current) {
+        applyCatalog(base);
+        setLoading(false);
+      }
       for (let attempt = 0; attempt < 2; attempt += 1) {
         const logs = mutate(base.logs);
         if (sameLogReferences(base.logs, logs)) {
@@ -678,7 +701,7 @@ export const ConnectionLogsWorkspace = ({
           return true;
         }
         try {
-          const committed = await adapter.replace({
+          const committed = await commit({
             expectedInventoryRevision: base.inventoryRevision,
             logs,
           });
@@ -700,7 +723,10 @@ export const ConnectionLogsWorkspace = ({
       return false;
     } finally {
       mutationLock.current = false;
-      if (mounted.current) setMutationPending(false);
+      if (mounted.current) {
+        setMutationPending(false);
+        setMutationPendingLabel(null);
+      }
     }
   }, [adapter, applyCatalog, disabled, nativeRuntimeAvailable, t]);
 
@@ -718,9 +744,11 @@ export const ConnectionLogsWorkspace = ({
     const changed = await mutateCatalog(
       (logs) => logs.filter((log) => log.saved),
       t("connectionLogs.notice.cleared"),
+      ({ expectedInventoryRevision }) => adapter.clearUnsaved({ expectedInventoryRevision }),
+      t("connectionLogs.clearing"),
     );
     if (changed && mounted.current) setClearConfirmationOpen(false);
-  }, [mutateCatalog, t]);
+  }, [adapter, mutateCatalog, t]);
 
   const updateFontSize = useCallback((id: string, fontSize: number | undefined) => mutateCatalog(
     (logs) => logs.map((log) => {
@@ -818,6 +846,11 @@ export const ConnectionLogsWorkspace = ({
 
       {error ? <div className="connection-logs-message error" role="alert">{error}</div> : null}
       {notice ? <div className="connection-logs-message notice" role="status">{notice}</div> : null}
+      {mutationPending ? (
+        <div className="connection-logs-message pending" role="status" aria-live="polite">
+          {mutationPendingLabel ?? t("connectionLogs.updating")}
+        </div>
+      ) : null}
 
       {displayedLogs.length > 0 ? (
         <div className="connection-logs-table-header" role="row">
@@ -939,7 +972,19 @@ export const ConnectionLogsWorkspace = ({
               <button type="button" disabled={mutationPending} onClick={() => setClearConfirmationOpen(false)}>
                 {t("connectionLogs.cancel")}
               </button>
-              <button type="button" className="danger" disabled={mutationPending} onClick={() => void clearUnsaved()}>
+              <button
+                type="button"
+                className="danger"
+                disabled={mutationPending}
+                onClick={() => {
+                  // Dismiss the modal before entering the native transaction.
+                  // Native Vault/replay cleanup can involve disk/keyring I/O;
+                  // keeping the backdrop mounted makes the whole page look
+                  // frozen while that work is in flight.
+                  setClearConfirmationOpen(false);
+                  void clearUnsaved();
+                }}
+              >
                 {mutationPending ? t("connectionLogs.clearing") : t("connectionLogs.clearUnsaved")}
               </button>
             </div>

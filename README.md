@@ -19,6 +19,12 @@ Eternal Terminal, local shells and SFTP.
 
 </div>
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/goral-terminal-ai-dark.png">
+  <source media="(prefers-color-scheme: light)" srcset="docs/images/goral-terminal-ai-light.png">
+  <img alt="Goral terminal workspace with the built-in AI assistant" src="docs/images/goral-terminal-ai-light.png">
+</picture>
+
 ---
 
 ## What it is

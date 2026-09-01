@@ -18,6 +18,18 @@ pub(crate) struct ReplaceConnectionLogsRequest {
     logs: Vec<ConnectionLogRequest>,
 }
 
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub(crate) struct ClearUnsavedConnectionLogsRequest {
+    pub(crate) expected_inventory_revision: SavedVaultInventoryRevision,
+}
+
+impl ClearUnsavedConnectionLogsRequest {
+    pub(crate) fn into_expected_revision(self) -> SavedVaultInventoryRevision {
+        self.expected_inventory_revision
+    }
+}
+
 impl ReplaceConnectionLogsRequest {
     pub(crate) fn into_parts(self) -> (SavedVaultInventoryRevision, Vec<SavedConnectionLog>) {
         (
@@ -134,8 +146,8 @@ pub(crate) fn connection_logs_invalid() -> String {
 #[cfg(test)]
 mod tests {
     use super::{
-        CONNECTION_LOGS_INVALID, ConnectionLogsCatalog, ReplaceConnectionLogsRequest,
-        connection_logs_invalid,
+        CONNECTION_LOGS_INVALID, ClearUnsavedConnectionLogsRequest, ConnectionLogsCatalog,
+        ReplaceConnectionLogsRequest, connection_logs_invalid,
     };
     use serde_json::json;
 
@@ -178,5 +190,28 @@ mod tests {
             .to_string();
         assert!(!error.contains("private-terminal-output"));
         assert!(connection_logs_invalid().starts_with(CONNECTION_LOGS_INVALID));
+    }
+
+    #[test]
+    fn clear_request_is_camel_case_strict_and_contains_only_inventory_cas() {
+        let directory = tempfile::tempdir().expect("temporary Vault");
+        let store = netcatty_vault::SavedHostStore::open(directory.path()).expect("open Vault");
+        let revision = store
+            .connection_log_catalog()
+            .expect("Connection Logs catalog")
+            .revision()
+            .clone();
+        let request = serde_json::json!({
+            "expectedInventoryRevision": serde_json::to_value(revision).expect("revision JSON")
+        });
+        assert!(serde_json::from_value::<ClearUnsavedConnectionLogsRequest>(request).is_ok());
+        let unknown = serde_json::json!({
+            "expectedInventoryRevision": {
+                "generation": 0,
+                "checksum": "0000000000000000000000000000000000000000000000000000000000000000"
+            },
+            "logs": []
+        });
+        assert!(serde_json::from_value::<ClearUnsavedConnectionLogsRequest>(unknown).is_err());
     }
 }

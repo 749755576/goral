@@ -59,10 +59,12 @@ test("Connection Logs API separates list/CAS metadata from one-log replay and ex
   assert.match(api, /exportLog: "export_connection_log"/);
   assert.match(api, /list: "list_connection_logs"/);
   assert.match(api, /replace: "replace_connection_logs"/);
+  assert.match(api, /clearUnsaved: "clear_unsaved_connection_logs"/);
   assert.match(api, /readReplay: "read_connection_log_replay"/);
   assert.match(api, /expectedInventoryRevision: unknown;/);
   assert.match(api, /invoke<ConnectionLogsCatalog>\(CONNECTION_LOGS_COMMANDS\.list\)/);
   assert.match(api, /invoke<ConnectionLogsCatalog>\(CONNECTION_LOGS_COMMANDS\.replace, \{ request \}\)/);
+  assert.match(api, /invoke<ConnectionLogsCatalog>\(CONNECTION_LOGS_COMMANDS\.clearUnsaved, \{ request \}\)/);
   assert.match(api, /invoke<ConnectionLogReplay>\(CONNECTION_LOGS_COMMANDS\.readReplay, \{ request: \{ logId \} \}\)/);
   assert.match(api, /export const exportConnectionLog = \(\s*logId: string,\s*locale: Locale,/);
   assert.match(
@@ -166,6 +168,29 @@ test("bookmark, delete, and clear use complete-inventory CAS with one conflict r
   assert.match(component, /logs\.filter\(\(log\) => log\.id !== id\)/);
   assert.match(component, /logs\.filter\(\(log\) => log\.saved\)/);
   assert.match(component, /t\([\s\S]*?"connectionLogs\.clearDescriptionOne"[\s\S]*?"connectionLogs\.clearDescription"/);
+  assert.match(mutation, /pendingNotice = t\("connectionLogs\.updating"\)/);
+  assert.match(mutation, /setMutationPendingLabel\(pendingNotice\)/);
+  const clearStart = component.indexOf("const clearUnsaved = useCallback");
+  const clear = component.slice(clearStart, clearStart + 520);
+  assert.match(clear, /t\("connectionLogs\.clearing"\)/);
+});
+
+test("clearing logs dismisses the blocking backdrop before native cleanup and retires late reads", async () => {
+  const component = await readFile(componentUrl, "utf8");
+  const mutationStart = component.indexOf("mutationLock.current = true;");
+  const mutationGuard = component.slice(mutationStart, mutationStart + 420);
+  assert.match(mutationGuard, /loadSequence\.current \+= 1/);
+
+  const confirmStart = component.indexOf("className=\"danger\"");
+  const confirm = component.slice(confirmStart, confirmStart + 520);
+  assert.match(confirm, /setClearConfirmationOpen\(false\)/);
+  assert.match(confirm, /void clearUnsaved\(\)/);
+  assert.ok(
+    confirm.indexOf("setClearConfirmationOpen(false)") < confirm.indexOf("void clearUnsaved()"),
+    "the clear dialog must close before awaiting native Vault/replay cleanup",
+  );
+  assert.match(component, /className="connection-logs-message pending"/);
+  assert.match(component, /t\("connectionLogs\.clearing"\)/);
 });
 
 test("single-log replay writes captured data into read-only xterm and handles every state", async () => {
@@ -223,6 +248,9 @@ test("Connection Logs styles preserve the legacy light Vault table and replay sh
   assert.match(styles, /\.connection-log-replay-export \.connection-log-glyph/);
   assert.match(styles, /@keyframes connection-log-replay-spin/);
   assert.match(styles, /\.connection-logs-dialog-backdrop/);
+  assert.match(styles, /\.connection-logs-workspace\s*\{[\s\S]*?container-type:\s*inline-size/);
+  assert.match(styles, /\.connection-logs-toolbar > div:first-child\s*\{[\s\S]*?flex:\s*1 1 auto/);
+  assert.match(styles, /@container \(max-width: 520px\)[\s\S]*?flex-wrap:\s*wrap/);
 });
 
 test("TerminalWorkspace enables the original Logs navigation and mounts the catalog", async () => {

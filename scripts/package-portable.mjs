@@ -52,6 +52,14 @@ const WINDOWS_FILES = Object.freeze([
     destination: "licenses/Inter-OFL-1.1.txt",
   }),
   Object.freeze({
+    source: "licenses/Simple-Icons-CC0-1.0.txt",
+    destination: "licenses/Simple-Icons-CC0-1.0.txt",
+  }),
+  Object.freeze({
+    source: "licenses/portable-pty-MIT.txt",
+    destination: "licenses/portable-pty-MIT.txt",
+  }),
+  Object.freeze({
     source: "SOURCE.md",
     destination: "SOURCE.md",
   }),

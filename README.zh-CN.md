@@ -19,6 +19,12 @@
 
 </div>
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/goral-terminal-ai-dark.png">
+  <source media="(prefers-color-scheme: light)" srcset="docs/images/goral-terminal-ai-light.png">
+  <img alt="Goral 终端工作区与内置 AI 助手" src="docs/images/goral-terminal-ai-light.png">
+</picture>
+
 ---
 
 ## 这是什么

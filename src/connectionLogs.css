@@ -31,6 +31,9 @@
   color: var(--logs-ink);
   background: var(--logs-panel);
   font-family: var(--ld-font-ui);
+  /* The logs view is also mounted in a grid cell. Container queries keep its
+     toolbar usable when the host workbench is narrower than the viewport. */
+  container-type: inline-size;
 }
 
 .connection-logs-workspace *,
@@ -74,6 +77,15 @@
   gap: 10px;
 }
 
+.connection-logs-toolbar > div:first-child {
+  flex: 1 1 auto;
+  overflow: hidden;
+}
+
+.connection-logs-toolbar > div:last-child {
+  flex: 0 0 auto;
+}
+
 .connection-logs-toolbar > div:first-child > span:last-child {
   display: grid;
   min-width: 0;
@@ -81,15 +93,21 @@
 }
 
 .connection-logs-toolbar strong {
+  overflow: hidden;
   color: var(--ld-text);
   font-size: var(--ld-text-subheadline-size);
   line-height: 18px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .connection-logs-toolbar small {
+  overflow: hidden;
   color: var(--logs-muted);
   font-size: var(--ld-text-caption1-size);
   line-height: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .connection-logs-toolbar-icon {
@@ -172,6 +190,12 @@
   border-color: var(--ld-border);
   color: var(--ld-accent);
   background: var(--ld-surface);
+}
+
+.connection-logs-message.pending {
+  border-color: color-mix(in srgb, var(--ld-accent) 28%, var(--ld-border));
+  color: var(--ld-text-secondary);
+  background: var(--ld-surface-muted);
 }
 
 .connection-logs-message.replay-message {
@@ -740,5 +764,24 @@
 
   .connection-logs-clear-button {
     padding: 0 8px !important;
+  }
+}
+
+@container (max-width: 520px) {
+  .connection-logs-toolbar {
+    min-height: 0;
+    flex: 0 0 auto;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .connection-logs-toolbar > div:first-child {
+    flex: 1 1 160px;
+  }
+
+  .connection-logs-toolbar > div:last-child {
+    width: 100%;
+    justify-content: flex-end;
   }
 }

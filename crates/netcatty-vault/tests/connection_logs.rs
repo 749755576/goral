@@ -240,3 +240,36 @@ fn connection_logs_preserve_other_catalogs_survive_host_deletion_and_ab_fallback
         &[known_host("known-1")]
     );
 }
+
+#[test]
+fn clear_unsaved_connection_logs_filters_from_fresh_vault_snapshot_and_preserves_bookmarks() {
+    let directory = tempfile::tempdir().expect("temporary Vault");
+    let store = SavedHostStore::open(directory.path()).expect("open Vault");
+    let initial = store.connection_log_catalog().expect("initial log catalog");
+    let mut bookmarked = connection_log("bookmarked", "host-a", 100);
+    bookmarked.saved = true;
+    let transient = connection_log("transient", "host-b", 200);
+    store
+        .replace_connection_logs(
+            initial.revision().clone(),
+            vec![transient, bookmarked.clone()],
+        )
+        .expect("publish logs");
+
+    let before_clear = store.connection_log_catalog().expect("logs before clear");
+    let committed = store
+        .clear_unsaved_connection_logs(before_clear.revision().clone())
+        .expect("clear unsaved logs");
+    assert_eq!(committed.logs(), &[bookmarked.clone()]);
+    assert_eq!(
+        store
+            .connection_log_catalog()
+            .expect("logs after clear")
+            .logs(),
+        &[bookmarked]
+    );
+    assert!(matches!(
+        store.clear_unsaved_connection_logs(initial.revision().clone()),
+        Err(StoreError::InventoryRevisionConflict { .. })
+    ));
+}

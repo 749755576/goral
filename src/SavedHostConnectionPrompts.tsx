@@ -40,7 +40,7 @@ export function SavedHostPasswordPromptDialog({
   const { t } = useI18n(locale);
 
   return (
-    <div className="dialog-backdrop" role="presentation">
+    <div className="dialog-backdrop connection-prompt-backdrop" role="presentation">
       <form
         className="trust-dialog saved-host-dialog"
         role="dialog"
@@ -134,7 +134,7 @@ export function SavedHostProxyPasswordPromptDialog({
   const { t } = useI18n(locale);
 
   return (
-    <div className="dialog-backdrop" role="presentation">
+    <div className="dialog-backdrop connection-prompt-backdrop" role="presentation">
       <form
         className="trust-dialog saved-host-dialog"
         role="dialog"
@@ -242,7 +242,7 @@ export function SavedHostKeyPassphrasePromptDialog({
   const { t } = useI18n(locale);
 
   return (
-    <div className="dialog-backdrop" role="presentation">
+    <div className="dialog-backdrop connection-prompt-backdrop" role="presentation">
       <form
         className="trust-dialog saved-host-dialog"
         role="dialog"

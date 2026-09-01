@@ -1355,6 +1355,44 @@ impl SavedHostStore {
         })
     }
 
+    /// Removes all unbookmarked Connection Log metadata under the complete
+    /// inventory CAS. The filtering is performed from the freshly loaded
+    /// snapshot while holding the Vault gate, so a renderer cannot accidentally
+    /// replace the catalog with a stale full-list projection.
+    pub fn clear_unsaved_connection_logs(
+        &self,
+        expected_revision: SavedVaultInventoryRevision,
+    ) -> Result<SavedConnectionLogCatalogCommit, StoreError> {
+        let _guard = self.gate.lock().map_err(|_| StoreError::LockPoisoned)?;
+        let mut loaded = self.load_locked()?;
+        let actual_revision =
+            verify_inventory_revision(&loaded, self.store_id.as_ref(), expected_revision)?;
+        let retained: Vec<SavedConnectionLog> = loaded
+            .connection_logs
+            .iter()
+            .filter(|log| log.saved)
+            .cloned()
+            .collect();
+        let catalog = SavedConnectionLogCatalog::with_legacy_retention(retained)
+            .map_err(|_| StoreError::Serialization)?;
+        if loaded.connection_logs == catalog.logs {
+            return Ok(SavedConnectionLogCatalogCommit {
+                revision: actual_revision,
+                catalog,
+                durability: SavedVaultCommitDurability::Durable,
+            });
+        }
+        loaded.connection_logs = catalog.logs.clone();
+        let publication = self.commit_locked(&loaded)?;
+        loaded.generation = publication.generation;
+        loaded.max_seen_generation = publication.generation;
+        Ok(SavedConnectionLogCatalogCommit {
+            revision: loaded.inventory_revision(self.store_id.as_ref()),
+            catalog,
+            durability: publication.durability,
+        })
+    }
+
     /// Replaces the device-local Known Hosts catalog under the same complete
     /// Vault inventory CAS used by every other catalog.
     pub fn replace_known_hosts(

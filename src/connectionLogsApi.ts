@@ -86,6 +86,10 @@ export type ReplaceConnectionLogsRequest = {
   logs: SavedConnectionLog[];
 };
 
+export type ClearUnsavedConnectionLogsRequest = {
+  expectedInventoryRevision: unknown;
+};
+
 /** Secret-bearing payload returned only for one explicitly opened log. */
 export type ConnectionLogReplay = {
   logId: string;
@@ -101,6 +105,7 @@ export const CONNECTION_LOGS_COMMANDS = {
   exportLog: "export_connection_log",
   list: "list_connection_logs",
   replace: "replace_connection_logs",
+  clearUnsaved: "clear_unsaved_connection_logs",
   readReplay: "read_connection_log_replay",
 } as const;
 
@@ -119,6 +124,11 @@ export const replaceConnectionLogs = (
   request: ReplaceConnectionLogsRequest,
 ): Promise<ConnectionLogsCatalog> =>
   invoke<ConnectionLogsCatalog>(CONNECTION_LOGS_COMMANDS.replace, { request });
+
+export const clearUnsavedConnectionLogs = (
+  request: ClearUnsavedConnectionLogsRequest,
+): Promise<ConnectionLogsCatalog> =>
+  invoke<ConnectionLogsCatalog>(CONNECTION_LOGS_COMMANDS.clearUnsaved, { request });
 
 export const readConnectionLogReplay = (logId: string): Promise<ConnectionLogReplay> =>
   invoke<ConnectionLogReplay>(CONNECTION_LOGS_COMMANDS.readReplay, { request: { logId } });

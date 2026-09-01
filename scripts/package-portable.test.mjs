@@ -16,6 +16,8 @@ const DELIVERY_FILES = Object.freeze([
   "NOTICE.md",
   "THIRD_PARTY_NOTICES.md",
   "licenses/Inter-OFL-1.1.txt",
+  "licenses/Simple-Icons-CC0-1.0.txt",
+  "licenses/portable-pty-MIT.txt",
   "SOURCE.md",
   "NATIVE_CLIENTS.md",
   "mosh/moshcatty.version",
@@ -63,12 +65,16 @@ const makeFixture = async ({ legacyOutput = true } = {}) => {
     notice: Buffer.from("Goral notices\n"),
     thirdParty: Buffer.from("Third-party notices\n"),
     interLicense: Buffer.from("Inter OFL-1.1 license and copyright\n"),
+    simpleIconsLicense: Buffer.from("Simple Icons CC0-1.0 license and copyright\n"),
+    portablePtyLicense: Buffer.from("portable-pty MIT license and copyright\n"),
     source: Buffer.from("Corresponding source\n"),
   };
   await writeFixtureFile(root, "LICENSE", bodies.license);
   await writeFixtureFile(root, "NOTICE.md", bodies.notice);
   await writeFixtureFile(root, "THIRD_PARTY_NOTICES.md", bodies.thirdParty);
   await writeFixtureFile(root, "licenses/Inter-OFL-1.1.txt", bodies.interLicense);
+  await writeFixtureFile(root, "licenses/Simple-Icons-CC0-1.0.txt", bodies.simpleIconsLicense);
+  await writeFixtureFile(root, "licenses/portable-pty-MIT.txt", bodies.portablePtyLicense);
   await writeFixtureFile(root, "SOURCE.md", bodies.source);
   await writeFixtureFile(root, "target/release/goral-desktop.exe", bodies.desktop);
   await writeFixtureFile(root, "src-tauri/resources/mosh/mosh-client.exe", bodies.mosh);
@@ -147,6 +153,8 @@ test("portable v2 publishes a clean independent runtime tree and writes the desk
     "NOTICE.md",
     "THIRD_PARTY_NOTICES.md",
     "licenses/Inter-OFL-1.1.txt",
+    "licenses/Simple-Icons-CC0-1.0.txt",
+    "licenses/portable-pty-MIT.txt",
     "SOURCE.md",
     "NATIVE_CLIENTS.md",
     "mosh/moshcatty.version",
@@ -167,6 +175,8 @@ test("portable v2 publishes a clean independent runtime tree and writes the desk
       "THIRD_PARTY_NOTICES.md",
       "et/et.exe",
       "licenses/Inter-OFL-1.1.txt",
+      "licenses/Simple-Icons-CC0-1.0.txt",
+      "licenses/portable-pty-MIT.txt",
       "mosh/mosh-client.exe",
       "mosh/moshcatty.version",
     ],

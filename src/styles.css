@@ -942,6 +942,50 @@ button:disabled {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--ld-accent) 14%, transparent);
 }
 
+/* A prompt sits above a live terminal. Keep its focus treatment single and
+   local; the broad connection-panel rule otherwise adds a second ring. */
+.dialog-backdrop.connection-prompt-backdrop {
+  backdrop-filter: none;
+}
+
+.connection-prompt-backdrop .saved-host-fields input:focus,
+.connection-prompt-backdrop .saved-host-fields select:focus,
+.connection-prompt-backdrop .saved-host-fields textarea:focus {
+  border-color: var(--ld-border-strong);
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ld-accent) 42%, transparent);
+}
+
+.connection-prompt-backdrop .saved-host-fields input:focus-visible,
+.connection-prompt-backdrop .saved-host-fields select:focus-visible,
+.connection-prompt-backdrop .saved-host-fields textarea:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ld-accent) 62%, transparent);
+}
+
+.connection-prompt-backdrop .saved-host-dialog > .connection-error {
+  margin: 12px 0 0;
+  border: 1px solid color-mix(in srgb, var(--ld-danger) 34%, var(--ld-border));
+  border-left-width: 3px;
+  border-radius: var(--ld-radius-sm);
+  padding: 8px 10px;
+  color: var(--ld-danger);
+  background: color-mix(in srgb, var(--ld-danger-soft) 46%, var(--ld-surface-raised));
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.connection-prompt-backdrop .saved-host-dialog > .security-note {
+  margin: 16px 0 0;
+  border: 1px solid color-mix(in srgb, var(--ld-accent) 18%, var(--ld-border));
+  border-radius: var(--ld-radius-sm);
+  padding: 10px 12px;
+  color: var(--ld-text-secondary);
+  background: color-mix(in srgb, var(--ld-accent-soft) 26%, var(--ld-surface-raised));
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
 .saved-host-fields select {
   appearance: none;
 }

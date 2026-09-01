@@ -58,8 +58,8 @@ use connection_log_capture::{
 };
 use connection_log_catalog::{
     CONNECTION_LOGS_INVENTORY_CHANGED, CONNECTION_LOGS_PUBLICATION_FAILED,
-    CONNECTION_LOGS_REPAIR_REQUIRED, ConnectionLogsCatalog, ReplaceConnectionLogsRequest,
-    connection_logs_error, connection_logs_invalid,
+    CONNECTION_LOGS_REPAIR_REQUIRED, ClearUnsavedConnectionLogsRequest, ConnectionLogsCatalog,
+    ReplaceConnectionLogsRequest, connection_logs_error, connection_logs_invalid,
 };
 use connection_log_export::{
     ConnectionLogExportDialogLocale, ConnectionLogExportError, ConnectionLogExportTarget,
@@ -2524,6 +2524,47 @@ async fn replace_connection_logs(
         {
             // The coordinator remains held across metadata publication and
             // replay retention, making delete/bookmark/read linearizable.
+            let _ = replays.reconcile_catalog(catalog.logs.clone()).await;
+        }
+        Ok(catalog)
+    })
+    .await
+    .map_err(normalize_connection_logs_command_error)
+}
+
+#[tauri::command]
+async fn clear_unsaved_connection_logs(
+    state: State<'_, DesktopState>,
+    request: ClearUnsavedConnectionLogsRequest,
+) -> Result<ConnectionLogsCatalog, String> {
+    let expected_inventory_revision = request.into_expected_revision();
+    run_saved_host_operation(state.inner().clone(), move |state| async move {
+        let store = state.saved_hosts.clone();
+        let catalog = run_connection_logs_vault(move || {
+            let committed = store.clear_unsaved_connection_logs(expected_inventory_revision)?;
+            if committed.durability() == SavedVaultCommitDurability::Durable {
+                return Ok(ConnectionLogsCatalog::from_commit(&committed));
+            }
+            let confirmed = store.confirm_current_snapshot_durability()?;
+            if confirmed.revision() != committed.revision()
+                || confirmed.connection_logs() != committed.logs()
+            {
+                return Err(StoreError::SnapshotDurabilityUnconfirmed);
+            }
+            Ok(ConnectionLogsCatalog {
+                inventory_revision: confirmed.revision().clone(),
+                logs: confirmed.connection_logs().to_vec(),
+            })
+        })
+        .await?;
+        if let Some(replays) = state
+            .connection_log_replays
+            .as_ref()
+            .and_then(ConnectionLogReplayRuntime::ready_manager)
+        {
+            // Keep metadata and encrypted replay retention in one ordered
+            // transaction. A replay cleanup fault is retried by startup
+            // reconciliation without restoring deleted metadata.
             let _ = replays.reconcile_catalog(catalog.logs.clone()).await;
         }
         Ok(catalog)
@@ -10936,6 +10977,7 @@ pub fn run() {
             read_connection_log_replay,
             export_connection_log,
             replace_connection_logs,
+            clear_unsaved_connection_logs,
             list_settings,
             replace_settings,
             list_vault_notes,
