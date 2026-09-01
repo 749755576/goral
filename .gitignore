@@ -20,9 +20,15 @@ Thumbs.db
 # Local-only working state; release source and product documentation stay
 # tracked separately from machine-specific notes and temporary material.
 .superpowers/
+.codex/
+.claude/
+.agents/
 docs/superpowers/
 .local/
 .private/
+AGENTS.md
+CLAUDE.md
+docs/DEVELOPMENT_PLAN.md
 **/*_HANDOFF.md
 **/*_PARITY.md
 

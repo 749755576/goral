@@ -298,6 +298,22 @@ test("blur radius stays within the documented ceiling", async () => {
   assert.deepEqual(offenders, [], "blur cost grows with radius; stay at or below --ld-blur-thick");
 });
 
+test("dialog scrims stay translucent enough to preserve workbench context", async () => {
+  const sheets = await Promise.all([
+    readFile(new URL("goralSkin.css", srcDir), "utf8"),
+    readFile(new URL("goralContrast.css", srcDir), "utf8"),
+  ]);
+  const alphas = sheets.flatMap((css) =>
+    [...stripComments(css).matchAll(/--ld-overlay:\s*rgba\([^,]+,[^,]+,[^,]+,\s*([\d.]+)\)/g)]
+      .map((match) => Number(match[1])),
+  );
+  assert.ok(alphas.length >= 4, "both palette layers must define light and dark scrims");
+  assert.ok(
+    alphas.every((alpha) => Number.isFinite(alpha) && alpha <= 0.6),
+    "a modal scrim must dim the workbench without washing it into an opaque white/black sheet",
+  );
+});
+
 /* ---------------------------------------------------------------------
  * One palette.
  *

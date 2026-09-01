@@ -5,6 +5,7 @@ import {
   MAX_SFTP_FILE_FILTER_LENGTH,
   createSftpFilterDirectoryScopeKey,
   createSftpFilterSessionScopeKey,
+  createSftpFilterMemory,
   filterSftpEntries,
   isEditableSftpFilterShortcutTarget,
   limitSftpFileFilter,
@@ -54,6 +55,33 @@ test("clearing the filter restores the exact complete directory snapshot", () =>
   assert.deepEqual(filterSftpEntries(entries, "log"), [entries[1]]);
   assert.equal(resolveSftpFilterEscapeAction("log"), "clear");
   assert.equal(resolveSftpFilterEscapeAction(""), "close");
+});
+
+test("filter memory restores exact directory scopes and stays bounded", () => {
+  const memory = createSftpFilterMemory(2);
+  memory.write("session-a:/home", { open: true, value: "  report  " });
+  memory.write("session-b:/home", { open: false, value: "秘密" });
+
+  assert.deepEqual(memory.read("session-a:/home"), {
+    open: true,
+    value: "  report  ",
+  });
+  assert.deepEqual(memory.read("session-b:/home"), {
+    open: false,
+    value: "秘密",
+  });
+
+  // Touch A, then add C: B is the least recently used scope and is evicted.
+  assert.ok(memory.read("session-a:/home"));
+  memory.write("session-c:/home", { open: true, value: "c" });
+  assert.equal(memory.read("session-b:/home"), undefined);
+  assert.deepEqual(memory.read("session-a:/home"), { open: true, value: "  report  " });
+  assert.deepEqual(memory.read("session-c:/home"), { open: true, value: "c" });
+
+  memory.write("session-c:/home", { open: false, value: `${"x".repeat(MAX_SFTP_FILE_FILTER_LENGTH)}tail` });
+  assert.equal(memory.read("session-c:/home")?.value.length, MAX_SFTP_FILE_FILTER_LENGTH);
+  memory.clear();
+  assert.equal(memory.read("session-a:/home"), undefined);
 });
 
 test("filter input is bounded by Unicode code point without splitting emoji", () => {

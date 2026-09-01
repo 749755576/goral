@@ -186,16 +186,18 @@ function SettingRow({
   id,
   label,
   description,
+  className = "",
   children,
 }: {
   id: SettingsAnchorId;
   label?: string;
   description?: string;
+  className?: string;
   children: ReactNode;
 }) {
   const t = useSettingsTranslation();
   return (
-    <SettingsAnchor id={id} className="settings-row">
+    <SettingsAnchor id={id} className={`settings-row ${className}`.trim()}>
       <div className="settings-row-copy">
         <div className="settings-row-label">{label ?? settingsAnchorText(t, id)}</div>
         {description ? <div className="settings-row-description">{description}</div> : null}
@@ -443,9 +445,10 @@ function LocalShellSettings({
   return (
     <SettingRow
       id="terminal-local-shell"
+      className="settings-local-shell-row"
       description={t("settings.localShell.description")}
     >
-      <div style={{ display: "flex", width: 390, maxWidth: "52vw", flexDirection: "column", alignItems: "stretch", gap: 8 }}>
+      <div className="settings-local-shell-control">
         <select
           aria-label={t("settings.localShell.label")}
           className="settings-select"
@@ -467,7 +470,7 @@ function LocalShellSettings({
         {shellLoadState === "error" ? <small role="alert">{t("settings.localShell.discoveryError")}</small> : null}
 
         {showCustomEditor ? (
-          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+          <div className="settings-local-shell-custom-editor">
             <input
               aria-label={t("settings.localShell.customCommandLabel")}
               className="settings-text-input"
@@ -491,7 +494,7 @@ function LocalShellSettings({
             {!customShellValid && customShellDraft.length > 0 ? (
               <small role="alert">{t("settings.localShell.commandLimitError")}</small>
             ) : null}
-            <span style={{ display: "flex", justifyContent: "flex-end", gap: 6 }}>
+            <span className="settings-local-shell-custom-actions">
               <button
                 type="button"
                 className="settings-secondary-button"
@@ -521,7 +524,7 @@ function LocalShellSettings({
           </div>
         ) : null}
 
-        <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+        <span className="settings-local-shell-directory-row">
           <input
             aria-label={t("settings.localShell.startDirectory")}
             className="settings-text-input"
@@ -623,6 +626,7 @@ function SftpPage({ settings, patch }: PageProps) {
   const t = useSettingsTranslation();
   return <div className="settings-page-body"><SectionTitle>SFTP</SectionTitle><SettingsCard>
     <SettingRow id="sftp-show-hidden-files"><Toggle label={settingsAnchorText(t, "sftp-show-hidden-files")} checked={sftp.showHiddenFiles} onChange={(checked) => patch((draft) => { draft.sftp.showHiddenFiles = checked; })} /></SettingRow>
+    <SettingRow id="sftp-follow-terminal-cwd" description={t("settings.sftp.followTerminalCwdDescription")}><Toggle label={settingsAnchorText(t, "sftp-follow-terminal-cwd")} checked={sftp.followTerminalCwd} onChange={(checked) => patch((draft) => { draft.sftp.followTerminalCwd = checked; })} /></SettingRow>
     <SettingRow id="sftp-auto-open-sidebar"><Toggle label={settingsAnchorText(t, "sftp-auto-open-sidebar")} checked={sftp.autoOpenSidebar} onChange={(checked) => patch((draft) => { draft.sftp.autoOpenSidebar = checked; })} /></SettingRow>
   </SettingsCard></div>;
 }
@@ -931,6 +935,13 @@ function AiProviderCard({
       return false;
     }
     if (!keyDraft.trim()) return true;
+
+    // Browser previews have no OS credential store.  The profile itself can
+    // still be saved through the in-memory settings adapter so the layout and
+    // validation remain testable, but never send the key to a native command
+    // that cannot exist in this environment.  The advanced hint already
+    // explains that credentials become durable only in the desktop app.
+    if (!isTauri()) return true;
 
     const sequence = ++keySequenceRef.current;
     setKeyState("saving");

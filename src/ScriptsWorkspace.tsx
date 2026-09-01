@@ -137,6 +137,9 @@ export const ScriptsWorkspace = ({
   const { t } = useI18n(locale);
   const scriptsApi = api ?? DEFAULT_API;
   const nativeRuntimeAvailable = api !== undefined || isTauri();
+  const nativeUnavailableMessage = nativeRuntimeAvailable
+    ? null
+    : t("notesScripts.desktopOnly");
   const [catalog, setCatalog] = useState<NotesSnippetsCatalog | null>(null);
   const [loading, setLoading] = useState(true);
   const [mutationPending, setMutationPending] = useState(false);
@@ -235,7 +238,7 @@ export const ScriptsWorkspace = ({
   }, [hosts, selectedSnippet?.targets, selectedSnippet?.targetsAllHosts]);
 
   const openCreateEditor = () => {
-    if (!catalog || disabled || mutationPending) return;
+    if (!catalog || disabled || !nativeRuntimeAvailable || mutationPending) return;
     setError(null);
     setDeletePrompt(null);
     setEditor({
@@ -250,7 +253,7 @@ export const ScriptsWorkspace = ({
   };
 
   const openUpdateEditor = (snippet: SavedSnippet) => {
-    if (!catalog || disabled || mutationPending) return;
+    if (!catalog || disabled || !nativeRuntimeAvailable || mutationPending) return;
     setError(null);
     setDeletePrompt(null);
     setSelectedId(snippet.id);
@@ -326,6 +329,10 @@ export const ScriptsWorkspace = ({
     const snapshot = editor;
     const catalogSnapshot = catalog;
     if (!snapshot || !catalogSnapshot || disabled || mutationLock.current) return;
+    if (!nativeRuntimeAvailable) {
+      setError(nativeUnavailableMessage ?? t("notesScripts.desktopOnly"));
+      return;
+    }
 
     const label = snapshot.draft.label.trim();
     if (!label) {
@@ -392,7 +399,7 @@ export const ScriptsWorkspace = ({
 
   const confirmDelete = async () => {
     const prompt = deletePrompt;
-    if (!prompt || !catalog || disabled || mutationLock.current) return;
+    if (!prompt || !catalog || disabled || !nativeRuntimeAvailable || mutationLock.current) return;
     mutationLock.current = true;
     loadSequence.current += 1;
     setMutationPending(true);
@@ -446,10 +453,17 @@ export const ScriptsWorkspace = ({
             type="button"
             className="notes-scripts-primary-button"
             onClick={openCreateEditor}
-            disabled={!catalog || disabled || mutationPending}
+            disabled={!catalog || disabled || !nativeRuntimeAvailable || mutationPending}
+            title={nativeUnavailableMessage ?? undefined}
           ><WorkspaceGlyph name="plus" />{t("scripts.new")}</button>
         </div>
       </header>
+
+      {nativeUnavailableMessage ? (
+        <p className="notes-scripts-native-notice" role="status">
+          {nativeUnavailableMessage}
+        </p>
+      ) : null}
 
       {error ? <div className="notes-scripts-error" role="alert">{error}</div> : null}
 
@@ -524,6 +538,7 @@ export const ScriptsWorkspace = ({
                   type="button"
                   className="notes-scripts-row-action"
                   onClick={() => openUpdateEditor(snippet)}
+                  disabled={!nativeRuntimeAvailable || disabled || mutationPending}
                   aria-label={t("scripts.editAria", { title: snippet.label })}
                   title={t("notesScripts.action.edit")}
                 ><WorkspaceGlyph name="edit" /></button>
@@ -550,7 +565,7 @@ export const ScriptsWorkspace = ({
                   <button
                     type="submit"
                     className="notes-scripts-primary-button"
-                    disabled={disabled || mutationPending}
+                    disabled={disabled || !nativeRuntimeAvailable || mutationPending}
                   >{mutationPending ? t("notesScripts.action.saving") : t("scripts.save")}</button>
                 </div>
               </div>
@@ -687,7 +702,7 @@ export const ScriptsWorkspace = ({
                 hosts={hosts}
                 selectedIds={editor.draft.targets ?? []}
                 allHosts={editor.draft.targetsAllHosts === true}
-                disabled={disabled || mutationPending}
+                disabled={disabled || !nativeRuntimeAvailable || mutationPending}
                 onAllHostsChange={(checked) => updateEditorDraft({ targetsAllHosts: checked || undefined })}
                 onToggle={toggleTargetHost}
               />
@@ -712,7 +727,7 @@ export const ScriptsWorkspace = ({
                     type="button"
                     className="notes-scripts-secondary-button"
                     onClick={() => openUpdateEditor(selectedSnippet)}
-                    disabled={disabled || mutationPending}
+                    disabled={disabled || !nativeRuntimeAvailable || mutationPending}
                   ><WorkspaceGlyph name="edit" />{t("notesScripts.action.edit")}</button>
                   <button
                     type="button"
@@ -721,7 +736,7 @@ export const ScriptsWorkspace = ({
                       id: selectedSnippet.id,
                       expectedInventoryRevision: catalog.inventoryRevision,
                     })}
-                    disabled={disabled || mutationPending}
+                    disabled={disabled || !nativeRuntimeAvailable || mutationPending}
                   ><WorkspaceGlyph name="trash" />{t("notesScripts.action.delete")}</button>
                 </div>
               </header>
@@ -780,7 +795,7 @@ export const ScriptsWorkspace = ({
                     <span>{t("scripts.deleteDescription")}</span>
                   </div>
                   <button type="button" onClick={() => setDeletePrompt(null)}>{t("notesScripts.action.cancel")}</button>
-                  <button type="button" className="danger" onClick={() => void confirmDelete()} disabled={mutationPending}>
+                  <button type="button" className="danger" onClick={() => void confirmDelete()} disabled={!nativeRuntimeAvailable || mutationPending}>
                     {mutationPending ? t("notesScripts.action.deleting") : t("notesScripts.action.confirmDelete")}
                   </button>
                 </div>
@@ -797,7 +812,8 @@ export const ScriptsWorkspace = ({
                 type="button"
                 className="notes-scripts-primary-button"
                 onClick={openCreateEditor}
-                disabled={!catalog || disabled || mutationPending}
+                disabled={!catalog || disabled || !nativeRuntimeAvailable || mutationPending}
+                title={nativeUnavailableMessage ?? undefined}
               ><WorkspaceGlyph name="plus" />{t("scripts.new")}</button>
             </div>
           )}

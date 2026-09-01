@@ -6,7 +6,6 @@
 export function errorText(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
-
 export function hasErrorCode(error: unknown, code: string): boolean {
   const rendered = errorText(error).trim();
   if (!rendered || !code) return false;

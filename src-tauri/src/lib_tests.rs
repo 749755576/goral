@@ -10038,4 +10038,20 @@ mod tests {
         assert_eq!(repeated_result.telnet_credentials_stored_count, 0);
         assert!(controller.operation_log().is_empty());
     }
+
+    #[test]
+    fn saved_host_lock_contention_classifier_only_retries_lock_errors() {
+        assert!(super::is_saved_host_lock_contention(&std::io::Error::from(
+            std::io::ErrorKind::WouldBlock,
+        )));
+        assert!(super::is_saved_host_lock_contention(
+            &std::io::Error::from_raw_os_error(32)
+        ));
+        assert!(super::is_saved_host_lock_contention(
+            &std::io::Error::from_raw_os_error(33)
+        ));
+        assert!(!super::is_saved_host_lock_contention(
+            &std::io::Error::from(std::io::ErrorKind::NotFound)
+        ));
+    }
 }

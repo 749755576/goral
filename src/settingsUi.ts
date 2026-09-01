@@ -245,7 +245,6 @@ export const SETTINGS_PREVIEW_HIDDEN_ANCHORS = [
   "sftp-double-click",
   "sftp-default-view-mode",
   "sftp-auto-sync",
-  "sftp-follow-terminal-cwd",
   "sftp-transfer-concurrency",
   "sftp-default-opener",
   "sftp-file-associations-list",

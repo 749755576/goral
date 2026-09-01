@@ -48,7 +48,7 @@
 
 .connection-logs-workspace button:focus-visible,
 .connection-log-row:focus-visible {
-  outline: 2px solid rgba(66, 100, 107, 0.42);
+  outline: 2px solid color-mix(in srgb, var(--ld-accent) 72%, transparent);
   outline-offset: -2px;
 }
 
@@ -84,6 +84,12 @@
 
 .connection-logs-toolbar > div:last-child {
   flex: 0 0 auto;
+  min-width: max-content;
+}
+
+.connection-logs-toolbar > div:last-child button {
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 
 .connection-logs-toolbar > div:first-child > span:last-child {
@@ -220,10 +226,10 @@
 .connection-logs-table-header {
   min-height: 34px;
   flex: 0 0 34px;
-  border-bottom: 1px solid rgba(211, 209, 202, 0.8);
+  border-bottom: 1px solid var(--ld-border);
   padding: 0 16px;
   color: var(--logs-muted);
-  background: rgba(232, 232, 225, 0.58);
+  background: var(--ld-surface-muted);
   font-size: var(--ld-text-caption1-size);
   font-weight: 700;
 }
@@ -244,7 +250,7 @@
   min-height: 0;
   flex: 1 1 auto;
   overflow: auto;
-  scrollbar-color: #c4c5bf transparent;
+  scrollbar-color: var(--ld-border-strong) transparent;
   scrollbar-width: thin;
 }
 
@@ -254,7 +260,7 @@
 
 .connection-log-row {
   min-height: 64px;
-  border-bottom: 1px solid rgba(211, 209, 202, 0.56);
+  border-bottom: 1px solid var(--ld-border);
   padding: 10px 16px;
   background: transparent;
   cursor: pointer;
@@ -267,7 +273,7 @@
 
 .connection-log-row:hover,
 .connection-log-row:focus-visible {
-  background: rgba(226, 226, 219, 0.72);
+  background: var(--ld-surface-muted);
 }
 
 .connection-log-date,
@@ -327,7 +333,7 @@
 }
 
 .connection-log-user > span {
-  color: white;
+  color: var(--ld-accent-contrast);
   background: var(--ld-accent);
 }
 
@@ -343,17 +349,17 @@
 }
 
 .connection-log-target-icon.host {
-  color: white;
+  color: var(--ld-accent-contrast);
   background: var(--ld-accent);
 }
 
 .connection-log-target-icon.host.snapshot {
-  color: white;
+  color: var(--ld-accent-contrast);
   background: var(--connection-log-icon-color, var(--ld-accent));
 }
 
 .connection-log-target-icon.host.distro {
-  border: 1px solid rgba(65, 95, 100, 0.18);
+  border: 1px solid var(--ld-border);
   color: var(--ld-text);
   background: var(--ld-surface-muted);
   font-size: var(--ld-text-caption1-size);
@@ -362,12 +368,12 @@
 }
 
 .connection-log-target-icon.local {
-  color: white;
+  color: var(--ld-accent-contrast);
   background: var(--ld-accent);
 }
 
 .connection-log-target-icon.serial {
-  color: white;
+  color: var(--ld-accent-contrast);
   background: var(--ld-danger);
 }
 
@@ -388,7 +394,7 @@
 .connection-log-actions button:not(:disabled):hover,
 .connection-log-actions button.saved {
   color: var(--ld-text);
-  background: rgba(66, 100, 107, 0.12);
+  background: var(--ld-accent-soft);
 }
 
 .connection-log-actions button.saved .connection-log-glyph {
@@ -406,7 +412,7 @@
 
 .connection-log-actions button.delete:not(:disabled):hover {
   color: var(--ld-danger);
-  background: rgba(160, 71, 66, 0.1);
+  background: var(--ld-danger-soft);
 }
 
 .connection-logs-load-more {
@@ -414,7 +420,7 @@
   width: 100%;
   min-height: 42px;
   border: 0;
-  border-top: 1px solid rgba(211, 209, 202, 0.56);
+  border-top: 1px solid var(--ld-border);
   border-radius: 0;
   padding: 8px;
   color: var(--ld-text);
@@ -425,7 +431,7 @@
 }
 
 .connection-logs-load-more:hover {
-  background: rgba(226, 226, 219, 0.72);
+  background: var(--ld-surface-muted);
 }
 
 .connection-logs-loading,
@@ -470,6 +476,9 @@
   color: var(--ld-text);
   font-size: var(--ld-text-headline-size);
   font-weight: 700;
+  /* Keep short Chinese empty-state labels together on narrow workbench
+     cells; the available content width is still enough for the phrase. */
+  word-break: keep-all;
 }
 
 .connection-logs-empty-state p {
@@ -485,7 +494,10 @@
   min-height: 0;
   flex: 1 1 auto;
   flex-direction: column;
-  background: var(--ld-accent);
+  /* The terminal/replay surface is intentionally not an accent fill. The
+     section receives the selected terminal colour inline; this fallback is
+     only used before that value is available. */
+  background: var(--terminal-resolved-bg, var(--ld-surface-terminal));
 }
 
 .connection-log-replay-header {
@@ -594,10 +606,10 @@
 .connection-log-replay-notice {
   flex: 0 0 auto;
   margin: 0;
-  border-bottom: 1px solid var(--ld-accent);
+  border-bottom: 1px solid color-mix(in srgb, var(--ld-accent) 32%, var(--ld-border));
   padding: 8px 12px;
-  color: var(--ld-text-secondary);
-  background: var(--ld-accent);
+  color: var(--ld-text);
+  background: var(--ld-accent-soft);
   font-size: var(--ld-text-caption1-size);
 }
 
@@ -612,7 +624,8 @@
   gap: 10px;
   padding: 28px;
   color: var(--ld-text-secondary);
-  background: var(--ld-accent);
+  /* Inherit the selected terminal background from the replay section. */
+  background: inherit;
   text-align: center;
 }
 
@@ -624,7 +637,7 @@
   justify-content: center;
   border-radius: var(--ld-radius-md);
   color: var(--ld-text-secondary);
-  background: var(--ld-accent);
+  background: var(--ld-surface-muted);
 }
 
 .connection-log-replay-state > span .connection-log-glyph {
@@ -646,11 +659,11 @@
 
 .connection-log-replay-state button {
   min-height: 34px;
-  border: 1px solid var(--ld-accent);
+  border: 1px solid var(--ld-border);
   border-radius: var(--ld-radius-xs);
   padding: 0 14px;
-  color: var(--ld-text-muted);
-  background: var(--ld-accent);
+  color: var(--ld-text);
+  background: var(--ld-surface-muted);
   cursor: pointer;
   font-size: var(--ld-text-caption1-size);
   font-weight: 650;
@@ -658,14 +671,14 @@
 
 .connection-log-replay-state button:hover {
   border-color: var(--ld-accent);
-  background: var(--ld-accent);
+  background: var(--ld-accent-soft);
 }
 
 .connection-log-replay-spinner {
   width: 26px;
   height: 26px;
-  border: 2px solid var(--ld-accent);
-  border-top-color: var(--ld-border);
+  border: 2px solid var(--ld-border-strong);
+  border-top-color: var(--ld-accent);
   border-radius: 50%;
   animation: connection-log-replay-spin 700ms linear infinite;
 }
@@ -679,7 +692,7 @@
   min-height: 0;
   flex: 1 1 auto;
   padding: 10px 8px 8px 12px;
-  background: var(--ld-accent);
+  background: var(--terminal-resolved-bg, var(--ld-surface-terminal));
 }
 
 .connection-log-replay-terminal > div,
@@ -695,8 +708,12 @@
   display: grid;
   place-items: center;
   padding: 18px;
-  background: rgba(40, 48, 47, 0.32);
-  backdrop-filter: blur(2px);
+  background: var(--ld-overlay);
+  /* Keep this surface crisp even when the global skin enables glass effects.
+     Connection-log actions must never make the whole table look frozen or
+     inaccessible while a mutation is being started. */
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
 .connection-logs-dialog {
@@ -755,7 +772,6 @@
 }
 
 @media (max-width: 760px) {
-  .connection-logs-toolbar > div:first-child small,
   .connection-logs-clear-button .connection-log-glyph,
   .connection-log-replay-title small,
   .connection-log-replay-actions > span {
@@ -783,5 +799,43 @@
   .connection-logs-toolbar > div:last-child {
     width: 100%;
     justify-content: flex-end;
+  }
+}
+
+/* The logs panel is often narrower than the application viewport (for
+   example, when the AI/SFTP side panel is open).  Hide the secondary count
+   only when this panel itself is tight, and keep the action group on a
+   dedicated row so the title never competes with a destructive action. */
+@container (max-width: 680px) {
+  .connection-logs-toolbar > div:first-child small {
+    display: none;
+  }
+
+  .connection-logs-toolbar {
+    gap: var(--ld-space-12);
+  }
+}
+
+@container (max-width: 360px) {
+  .connection-logs-toolbar {
+    padding-inline: var(--ld-space-12);
+  }
+
+  .connection-logs-toolbar > div:first-child {
+    width: 100%;
+    flex-basis: 100%;
+  }
+
+  .connection-logs-toolbar > div:last-child {
+    width: 100%;
+    min-width: 0;
+    justify-content: flex-end;
+  }
+
+  .connection-logs-clear-button {
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }

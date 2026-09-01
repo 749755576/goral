@@ -673,7 +673,73 @@
   background: var(--ld-accent-strong);
 }
 
+/* Keep the local-shell controls inside the settings viewport.  The original
+   inline flex width made the start-directory input and Browse/Clear buttons
+   overflow when the window was compact. */
+.settings-workspace .settings-local-shell-row .settings-row-control {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.settings-workspace .settings-local-shell-control {
+  display: flex;
+  width: min(390px, 100%);
+  max-width: 100%;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--ld-space-8);
+}
+
+.settings-workspace .settings-local-shell-custom-editor {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--ld-space-6);
+}
+
+.settings-workspace .settings-local-shell-custom-actions {
+  display: flex;
+  max-width: 100%;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--ld-space-8);
+  flex-wrap: wrap;
+}
+
+.settings-workspace .settings-local-shell-directory-row {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: var(--ld-space-8);
+}
+
+.settings-workspace .settings-local-shell-directory-row > .settings-text-input {
+  width: 100%;
+  min-width: 0;
+}
+
 @media (prefers-color-scheme: dark) {
+  /* Before the settings snapshot arrives, use the system palette as the
+     first paint.  Without this block the generic :not([data-goral-mode])
+     selector pins the standalone window to light colors for one frame (and
+     on slower keychain loads, visibly longer). */
+  :root:not([data-goral-mode="light"]) .settings-workspace {
+    --settings-bg: var(--ld-bg);
+    --settings-sidebar: var(--ld-sidebar);
+    --settings-content: var(--ld-surface);
+    --settings-card: var(--ld-surface-raised);
+    --settings-border: var(--ld-border);
+    --settings-border-soft: color-mix(in srgb, var(--ld-border) 68%, transparent);
+    --settings-text: var(--ld-text);
+    --settings-muted: var(--ld-text-secondary);
+    --settings-accent: var(--ld-accent);
+    --settings-accent-soft: color-mix(in srgb, var(--ld-accent) 16%, transparent);
+    --settings-danger: var(--ld-danger);
+    color-scheme: dark;
+  }
+
   :root:not([data-goral-mode="light"]) .settings-workspace button:disabled {
     opacity: .78;
   }
@@ -708,5 +774,138 @@
     color: #ffffff;
     border-color: var(--ld-accent-strong);
     background: var(--ld-accent);
+  }
+}
+
+/* Keep the standalone settings webview usable when it is opened in a small
+   browser preview or a compact desktop window.  The historical 820px floor
+   made the action bar (including Save) land outside the viewport, which felt
+   like a dead button because the user could not reach it.  The native window
+   can still choose a larger minimum; this is only a renderer-side safety net.
+   */
+@media (max-width: 900px) {
+  /* styles.css keeps the main workbench at 980px so its terminal controls
+     never collapse.  Settings is a separate route; let its own responsive
+     grid determine the width instead of inheriting that workbench floor. */
+  body:has(.settings-workspace),
+  #root:has(.settings-workspace) {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .settings-workspace {
+    min-width: 0;
+    min-height: 0;
+  }
+
+  .settings-layout {
+    grid-template-columns: minmax(176px, 28vw) minmax(0, 1fr);
+  }
+
+  .settings-workspace .settings-page-body.settings-ai-provider-page {
+    width: 100%;
+    padding-right: var(--ld-space-16);
+    padding-left: var(--ld-space-16);
+  }
+
+  .settings-workspace .settings-ai-compact-grid,
+  .settings-workspace .settings-ai-model-row,
+  .settings-workspace .settings-ai-advanced-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .settings-workspace .settings-ai-key-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .settings-workspace .settings-ai-key-controls {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .settings-workspace .settings-ai-save-bar {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .settings-workspace .settings-ai-save-bar > button {
+    flex: 1 1 12ch;
+  }
+}
+
+@media (max-width: 760px) {
+  /* Give the destructive/secondary actions a row of their own and keep the
+     primary action readable.  Flex shrinking used to break the Chinese label
+     into three lines and could push the click target outside the card. */
+  .settings-workspace .settings-ai-save-bar {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .settings-workspace .settings-ai-save-bar > button {
+    width: 100%;
+    min-width: 0;
+    white-space: nowrap;
+  }
+
+  .settings-workspace .settings-ai-save-bar > .settings-primary-button {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 560px) {
+  .settings-workspace .settings-local-shell-row {
+    align-items: stretch;
+    flex-direction: column;
+    gap: var(--ld-space-8);
+  }
+
+  .settings-workspace .settings-local-shell-row .settings-row-control,
+  .settings-workspace .settings-local-shell-control {
+    width: 100%;
+    max-width: none;
+  }
+
+  .settings-workspace .settings-local-shell-directory-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .settings-workspace .settings-local-shell-directory-row > .settings-text-input {
+    grid-column: 1 / -1;
+  }
+
+  .settings-workspace .settings-local-shell-directory-row > button {
+    min-width: 0;
+  }
+
+  .settings-workspace .settings-titlebar {
+    height: 56px;
+    padding-bottom: var(--ld-space-8);
+  }
+
+  .settings-workspace .settings-layout {
+    height: calc(100vh - 56px);
+    grid-template-columns: 1fr;
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .settings-workspace .settings-sidebar {
+    max-height: 178px;
+    padding: var(--ld-space-8);
+  }
+
+  .settings-workspace .settings-sidebar nav {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    overflow-y: auto;
+  }
+
+  .settings-workspace .settings-content {
+    min-height: 0;
+  }
+
+  .settings-workspace .settings-page-body.settings-ai-provider-page {
+    padding-top: var(--ld-space-16);
+    padding-bottom: var(--ld-space-32);
   }
 }

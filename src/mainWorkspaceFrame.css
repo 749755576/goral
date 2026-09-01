@@ -14,6 +14,8 @@
   --ld-frame-success: #207936;
   --ld-frame-success-ink: #ffffff;
   --ld-frame-ai: #9546bd;
+  /* AI marks use the purple frame fill rather than the general accent. */
+  --ld-frame-ai-ink: #ffffff;
 }
 
 :root[data-goral-mode="dark"] {
@@ -28,8 +30,12 @@
   --ld-frame-accent: #2a90ff;
   --ld-frame-accent-ink: #ffffff;
   --ld-frame-success: #34c759;
-  --ld-frame-success-ink: #072414;
+  /* The status pill uses a translucent green surface.  Near-black text was
+     unreadable on that surface in dark mode; keep the signal bright enough
+     for normal-size labels and WCAG contrast. */
+  --ld-frame-success-ink: #c7ffd5;
   --ld-frame-ai: #bc6fe3;
+  --ld-frame-ai-ink: #ffffff;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -45,8 +51,9 @@
     --ld-frame-accent: #2a90ff;
     --ld-frame-accent-ink: #ffffff;
     --ld-frame-success: #34c759;
-    --ld-frame-success-ink: #072414;
+    --ld-frame-success-ink: #c7ffd5;
     --ld-frame-ai: #bc6fe3;
+    --ld-frame-ai-ink: #ffffff;
   }
 }
 
@@ -1918,8 +1925,9 @@ body {
   display: grid;
   place-items: center;
   padding: 28px;
-  background: rgba(12,16,23,.36);
-  backdrop-filter: blur(10px);
+  background: var(--ld-overlay);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 
 .session-restore-dialog {
@@ -1998,8 +2006,9 @@ body {
   display: grid;
   place-items: center;
   padding: 28px;
-  background: rgba(12, 16, 23, .34);
-  backdrop-filter: blur(10px);
+  background: var(--ld-overlay);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 
 .saved-host-details-panel {
@@ -2183,6 +2192,29 @@ body {
   }
 }
 
+/* Secondary Vault workspaces are mounted in the same grid cell as the
+ * top-level toolbar.  The shared catalogue rule above intentionally gives
+ * ordinary forms a content-sized card, but that rule used to leak into the
+ * full-height Logs/Notes/Hosts surfaces: they collapsed to their content
+ * height and left a large, empty (or accent-coloured) slab below.  Restore
+ * the feature surfaces' own full-cell geometry at the end of this sheet so
+ * it wins the cascade without changing the compact form cards. */
+.workbench-shell.surface-vault .notes-scripts-view,
+.workbench-shell.surface-vault .known-hosts-view,
+.workbench-shell.surface-vault .connection-logs-view {
+  height: auto;
+  min-height: 0;
+  margin: 0 8px 8px 0;
+  align-self: stretch;
+}
+
+.workbench-shell.surface-vault .port-forwarding-view {
+  height: auto;
+  min-height: 0;
+  margin: 0 8px 8px 0;
+  align-self: stretch;
+}
+
 /* -----------------------------------------------------------------
  * Icon rail
  *
@@ -2234,4 +2266,547 @@ body {
   margin-top: auto;
   padding-top: var(--ld-space-8);
   border-top: 1px solid var(--ld-frame-window-line);
+}
+
+/* -----------------------------------------------------------------
+ * Port-forward editor
+ *
+ * The forwarding form shares the Host editor class for its dialog shell,
+ * but it is a denser, single-purpose form.  Letting the generic Host rules
+ * win made it a 920px sheet with half-width type cards and oversized footer
+ * actions.  Keep this override last in the frame sheet so the final visual
+ * owner is explicit, while retaining the same mode-aware frame tokens.
+ * ----------------------------------------------------------------- */
+.saved-host-details-panel.port-forward-details-panel {
+  width: min(680px, calc(100vw - 48px));
+  height: auto;
+  max-height: calc(100vh - 48px);
+  min-height: 0;
+  border: 1px solid var(--ld-frame-window-line);
+  border-radius: var(--ld-radius-xl);
+  color: var(--ld-frame-ink);
+  background: var(--ld-frame-window);
+  box-shadow: var(--ld-elevation-4);
+}
+
+.port-forward-details-panel .saved-host-details-header {
+  min-height: 64px;
+  padding: var(--ld-space-12) var(--ld-space-16) var(--ld-space-12) var(--ld-space-20);
+  border-bottom-color: var(--ld-frame-window-line);
+  background: var(--ld-frame-window);
+}
+
+.port-forward-details-panel .saved-host-details-header-actions .saved-host-header-close {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--ld-radius-sm);
+  color: var(--ld-frame-secondary);
+  background: var(--ld-frame-control);
+}
+
+.port-forward-details-panel .saved-host-details-scroll {
+  padding: var(--ld-space-20) var(--ld-space-24) var(--ld-space-24);
+  background: color-mix(in srgb, var(--ld-frame-window) 90%, var(--ld-frame-control));
+}
+
+.port-forward-details-panel .port-forward-traffic {
+  min-height: 48px;
+  margin: 0 0 var(--ld-space-16);
+  border-color: var(--ld-frame-window-line);
+  border-radius: var(--ld-radius-sm);
+  padding: var(--ld-space-10) var(--ld-space-12);
+  color: var(--ld-frame-secondary);
+  background: var(--ld-frame-control);
+  font-size: var(--ld-text-caption1-size);
+}
+
+.port-forward-details-panel .port-forward-traffic b {
+  color: var(--ld-frame-accent);
+}
+
+.port-forward-details-panel .saved-host-fields {
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--ld-space-12);
+}
+
+.port-forward-details-panel .port-forward-type-picker {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--ld-space-8);
+}
+
+.port-forward-details-panel .port-forward-type-picker button {
+  min-height: 52px;
+  border-color: var(--ld-frame-window-line);
+  border-radius: var(--ld-radius-sm);
+  padding: var(--ld-space-10);
+  color: var(--ld-frame-secondary);
+  background: var(--ld-frame-control);
+}
+
+.port-forward-details-panel .port-forward-type-picker button:hover:not(:disabled),
+.port-forward-details-panel .port-forward-type-picker button.active {
+  border-color: var(--ld-frame-accent);
+  color: var(--ld-frame-accent);
+  background: color-mix(in srgb, var(--ld-frame-accent) 14%, var(--ld-frame-window));
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--ld-frame-accent) 14%, transparent);
+}
+
+.port-forward-details-panel .port-forward-type-picker small,
+.port-forward-details-panel .port-forward-type-description {
+  color: var(--ld-frame-muted);
+}
+
+.port-forward-details-panel .field-row {
+  grid-template-columns: minmax(15ch, 1fr) minmax(8ch, 0.45fr);
+  gap: var(--ld-space-12);
+}
+
+.port-forward-details-panel .field-row label {
+  min-width: 0;
+}
+
+.port-forward-details-panel .field-row label:first-child input {
+  min-width: 15ch;
+}
+
+.port-forward-details-panel .saved-host-fields input,
+.port-forward-details-panel .saved-host-fields select {
+  min-width: 0;
+  width: 100%;
+  border-color: var(--ld-frame-window-line);
+  border-radius: var(--ld-radius-sm);
+  color: var(--ld-frame-ink);
+  background: var(--ld-frame-control);
+}
+
+.port-forward-details-panel .saved-host-fields input:focus,
+.port-forward-details-panel .saved-host-fields select:focus {
+  border-color: var(--ld-frame-accent);
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ld-frame-accent) 24%, transparent);
+}
+
+.port-forward-details-panel > .saved-host-details-scroll > .connection-error {
+  margin: var(--ld-space-16) 0 0;
+  border: 1px solid color-mix(in srgb, var(--ld-frame-accent) 24%, var(--ld-frame-window-line));
+  border-radius: var(--ld-radius-sm);
+  padding: var(--ld-space-10) var(--ld-space-12);
+  color: var(--ld-frame-secondary);
+  background: color-mix(in srgb, var(--ld-frame-accent) 10%, var(--ld-frame-window));
+  overflow-wrap: anywhere;
+}
+
+.port-forward-details-panel .dialog-actions {
+  min-height: 64px;
+  gap: var(--ld-space-8);
+  border-top-color: var(--ld-frame-window-line);
+  padding: var(--ld-space-12) var(--ld-space-20);
+  background: var(--ld-frame-window);
+}
+
+.port-forward-details-panel .dialog-actions button {
+  min-width: 80px;
+  min-height: 36px;
+  border: 1px solid var(--ld-frame-window-line);
+  border-radius: var(--ld-radius-sm);
+  padding: 0 var(--ld-space-16);
+  color: var(--ld-frame-secondary);
+  background: var(--ld-frame-control);
+  font-size: var(--ld-text-footnote-size);
+  font-weight: 650;
+}
+
+.port-forward-details-panel .dialog-actions button:hover:not(:disabled) {
+  border-color: var(--ld-frame-accent);
+  color: var(--ld-frame-ink);
+  background: color-mix(in srgb, var(--ld-frame-accent) 10%, var(--ld-frame-control));
+}
+
+.port-forward-details-panel .dialog-actions .primary-button {
+  min-width: 112px;
+  border-color: var(--ld-frame-accent);
+  color: var(--ld-frame-accent-ink);
+  background: var(--ld-frame-accent);
+}
+
+.port-forward-details-panel .dialog-actions .primary-button:hover:not(:disabled) {
+  border-color: var(--ld-frame-accent);
+  color: var(--ld-frame-accent-ink);
+  background: color-mix(in srgb, var(--ld-frame-accent) 84%, var(--ld-frame-window));
+}
+
+@media (max-width: 720px) {
+  .saved-host-details-panel.port-forward-details-panel {
+    width: min(680px, calc(100vw - 24px));
+    max-height: calc(100vh - 24px);
+  }
+}
+
+@media (max-width: 560px) {
+  .port-forward-details-panel .field-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .port-forward-details-panel .field-row label:first-child input {
+    min-width: 0;
+  }
+
+  .port-forward-details-panel .dialog-actions button,
+  .port-forward-details-panel .dialog-actions .primary-button {
+    min-width: 0;
+    flex: 1 1 0;
+  }
+}
+
+/* Empty proxy catalog: keep the action hierarchy visible instead of leaving
+   a one-line card floating in the canvas.  The icon, explanation, and create
+   action form one compact task card and use the same frame palette as the
+   surrounding workspace in both color modes. */
+.workbench-shell.surface-vault .proxy-profile-empty-state {
+  display: grid;
+  width: min(100%, 640px);
+  min-height: 180px;
+  grid-template-columns: 56px minmax(0, 1fr);
+  grid-template-areas:
+    "icon copy"
+    "icon action";
+  align-content: center;
+  align-items: start;
+  gap: var(--ld-space-12) var(--ld-space-16);
+  margin: var(--ld-space-16) 0;
+  border: 1px solid var(--ld-frame-window-line);
+  border-radius: var(--ld-radius-lg);
+  padding: var(--ld-space-24);
+  color: var(--ld-frame-secondary);
+  background: color-mix(in srgb, var(--ld-frame-window) 88%, var(--ld-frame-control));
+  box-shadow: var(--ld-elevation-2);
+}
+
+.workbench-shell.surface-vault .proxy-profile-empty-state .proxy-profile-empty-icon {
+  grid-area: icon;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--ld-radius-md);
+  color: var(--ld-frame-accent);
+  background: color-mix(in srgb, var(--ld-frame-accent) 12%, var(--ld-frame-control));
+}
+
+.workbench-shell.surface-vault .proxy-profile-empty-state .proxy-profile-empty-copy {
+  grid-area: copy;
+}
+
+.workbench-shell.surface-vault .proxy-profile-empty-state .proxy-profile-empty-copy h3 {
+  color: var(--ld-frame-ink);
+  font-size: var(--ld-text-title3-size);
+  font-weight: 650;
+}
+
+.workbench-shell.surface-vault .proxy-profile-empty-state .proxy-profile-empty-copy p {
+  margin-top: var(--ld-space-8);
+  color: var(--ld-frame-secondary);
+  font-size: var(--ld-text-footnote-size);
+  line-height: 1.6;
+}
+
+.workbench-shell.surface-vault .proxy-profile-empty-state > .primary-button {
+  grid-area: action;
+  justify-self: start;
+  min-height: 38px;
+  min-width: 0;
+  border-radius: var(--ld-radius-sm);
+  padding-inline: var(--ld-space-16);
+  color: var(--ld-frame-accent-ink);
+  background: var(--ld-frame-accent);
+  font-size: var(--ld-text-footnote-size);
+  font-weight: 650;
+}
+
+@media (max-width: 560px) {
+  .workbench-shell.surface-vault .proxy-profile-empty-state {
+    width: 100%;
+    grid-template-columns: 44px minmax(0, 1fr);
+    min-height: 160px;
+    padding: var(--ld-space-20);
+  }
+
+  .workbench-shell.surface-vault .proxy-profile-empty-state .proxy-profile-empty-icon {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+/* The native main window has a 980px minimum, but the same renderer is also
+ * used by the browser preview and embedded webviews.  Do not let the desktop
+ * guard-width leak into those surfaces: at phone widths the rail stays
+ * usable, the onboarding actions become a readable vertical stack, and the
+ * document no longer creates an invisible horizontal scroll area. */
+@media (max-width: 979px) {
+  body {
+    min-width: 0;
+  }
+
+  .shell,
+  .workbench-shell {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 700px) {
+  .surface-vault .connection-panel {
+    grid-template-columns: 60px minmax(0, 1fr);
+  }
+
+  .surface-vault .workspace-navigation .connection-tabs button,
+  .surface-vault .vault-navigation-footer button {
+    width: 44px;
+  }
+
+  .surface-vault .vault-toolbar {
+    padding-inline: var(--ld-space-12);
+  }
+
+  .surface-vault .saved-hosts-view,
+  .surface-vault .password-identities-view,
+  .surface-vault .proxy-profiles-view,
+  .surface-vault .port-forwarding-view,
+  .surface-vault .notes-scripts-view,
+  .surface-vault .known-hosts-view,
+  .surface-vault .connection-logs-view {
+    padding: var(--ld-space-20) var(--ld-space-12) var(--ld-space-32);
+  }
+
+  .surface-vault .vault-onboarding {
+    width: 100%;
+    min-height: 0;
+    gap: var(--ld-space-24);
+    padding: var(--ld-space-24) var(--ld-space-16);
+  }
+
+  .surface-vault .vault-onboarding-intro {
+    justify-items: center;
+    text-align: center;
+  }
+
+  .surface-vault .vault-onboarding-intro h3 {
+    font-size: var(--ld-text-title2-size);
+  }
+
+  .surface-vault .vault-onboarding-intro p:last-child {
+    max-width: 30ch;
+  }
+
+  .surface-vault .vault-onboarding-paths {
+    grid-template-columns: 1fr;
+    gap: var(--ld-space-12);
+  }
+
+  .surface-vault .vault-onboarding-path,
+  .surface-vault .vault-onboarding-paths > .primary-button[data-onboarding-path="primary"] {
+    min-height: 132px;
+    padding: var(--ld-space-16);
+  }
+
+  .surface-vault .vault-empty-actions[data-onboarding-secondary="true"] {
+    justify-content: center;
+  }
+}
+
+/* Compact catalog layout --------------------------------------------------
+ * The native window is deliberately wide, but the same workbench is used in
+ * the browser preview and in a temporarily narrow split view.  The original
+ * two-column catalog headers have an intrinsic second track; without an
+ * explicit compact owner that track can consume the whole cell and make the
+ * title wrap one character per line.  Keep every catalog's content inside
+ * its grid cell and let controls wrap in a predictable order. */
+@media (max-width: 700px) {
+  .workbench-shell.surface-vault .managed-keys-view,
+  .workbench-shell.surface-vault .password-identities-view,
+  .workbench-shell.surface-vault .proxy-profiles-view {
+    grid-template-columns: minmax(0, 1fr);
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .workbench-shell.surface-vault .managed-keys-view > .panel-title,
+  .workbench-shell.surface-vault .password-identities-view > .panel-title,
+  .workbench-shell.surface-vault .proxy-profiles-view > .panel-title,
+  .workbench-shell.surface-vault .managed-keys-view > .managed-keys-toolbar {
+    grid-column: 1;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .workbench-shell.surface-vault .managed-keys-view .panel-title,
+  .workbench-shell.surface-vault .password-identities-view .panel-title,
+  .workbench-shell.surface-vault .proxy-profiles-view .panel-title {
+    min-height: 0;
+    align-items: flex-start;
+  }
+
+  .workbench-shell.surface-vault .managed-keys-view .panel-title h2,
+  .workbench-shell.surface-vault .password-identities-view .panel-title h2,
+  .workbench-shell.surface-vault .proxy-profiles-view .panel-title h2 {
+    min-width: 0;
+    overflow-wrap: normal;
+    word-break: keep-all;
+  }
+
+  .workbench-shell.surface-vault .managed-keys-view > .managed-key-list {
+    grid-column: 1;
+    width: 100%;
+    min-width: 0;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .workbench-shell.surface-vault .managed-keys-view .saved-host-empty {
+    width: 100%;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .workbench-shell.surface-vault .managed-keys-toolbar {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .workbench-shell.surface-vault .managed-keys-toolbar button {
+    min-width: 0;
+    white-space: nowrap;
+  }
+
+  .workbench-shell.surface-vault .port-forwarding-view {
+    grid-template-columns: minmax(0, 1fr);
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .workbench-shell.surface-vault .port-forwarding-view > *,
+  .workbench-shell.surface-vault .port-forwarding-view .port-forward-catalog > * {
+    grid-column: 1;
+    min-width: 0;
+  }
+
+  .workbench-shell.surface-vault .port-forwarding-view .port-forward-page-heading {
+    width: 100%;
+    min-width: 0;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "new new"
+      "search refresh";
+    gap: var(--ld-space-8);
+  }
+
+  .workbench-shell.surface-vault .port-forwarding-view .port-forward-new-menu {
+    grid-area: new;
+    width: 100%;
+    min-width: 0;
+    flex-wrap: wrap;
+  }
+
+  .workbench-shell.surface-vault .port-forwarding-view .port-forward-new-menu > .primary-button {
+    min-width: 0;
+    white-space: nowrap;
+  }
+
+  .workbench-shell.surface-vault .port-forwarding-view .port-forward-search {
+    grid-area: search;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .workbench-shell.surface-vault .port-forwarding-view .port-forward-refresh {
+    grid-area: refresh;
+    min-width: 0;
+    white-space: nowrap;
+  }
+
+  .workbench-shell.surface-vault .port-forwarding-view .port-forward-filter-bar {
+    display: grid;
+    width: 100%;
+    min-width: 0;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    align-items: stretch;
+    gap: var(--ld-space-4);
+    overflow: hidden;
+  }
+
+  .workbench-shell.surface-vault .port-forwarding-view .port-forward-filter-bar button {
+    min-width: 0;
+    padding-inline: var(--ld-space-4);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .workbench-shell.surface-vault .port-forwarding-view .port-forward-filter-bar .port-forward-bulk-start,
+  .workbench-shell.surface-vault .port-forwarding-view .port-forward-filter-bar .port-forward-bulk-stop {
+    grid-column: span 2;
+  }
+
+  .workbench-shell.surface-vault .port-forwarding-view .port-forward-filter-bar > span {
+    grid-column: 1 / -1;
+    margin-left: 0;
+    text-align: right;
+  }
+
+  .workbench-shell.surface-vault .port-forwarding-view .port-forward-empty {
+    width: 100%;
+    min-width: 0;
+    min-height: 300px;
+    padding-inline: var(--ld-space-16);
+  }
+
+  .workbench-shell.surface-vault .known-hosts-view {
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .workbench-shell.surface-vault .known-hosts-view .known-hosts-workspace,
+  .workbench-shell.surface-vault .known-hosts-view .known-hosts-header,
+  .workbench-shell.surface-vault .known-hosts-view .known-hosts-header-controls {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .workbench-shell.surface-vault .known-hosts-view .known-hosts-header {
+    flex: 0 0 auto;
+  }
+
+  .workbench-shell.surface-vault .known-hosts-view .known-hosts-search {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    flex-basis: 100%;
+  }
+
+  .workbench-shell.surface-vault .known-hosts-view .known-hosts-header-controls {
+    flex-wrap: wrap;
+  }
+
+  .workbench-shell.surface-vault .known-hosts-view .known-hosts-header-controls > * {
+    min-width: 0;
+  }
+
+  .workbench-shell.surface-vault .known-hosts-view .known-hosts-empty-state {
+    width: 100%;
+    min-width: 0;
+    padding-inline: var(--ld-space-12);
+  }
+}
+
+/* The shared skin applies a glass blur to every dialog backdrop.  Streaming
+ * terminals and side-panel editors are live surfaces, so that inherited blur
+ * makes the entire canvas shimmer and leaves a distracting fog behind the
+ * panel.  This rule is intentionally late (the frame sheet is loaded last)
+ * so the exception wins the cascade without weakening static dialogs. */
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+  .dialog-backdrop.serial-dialog-backdrop,
+  .dialog-backdrop.saved-host-editor-backdrop,
+  .dialog-backdrop.connection-prompt-backdrop,
+  .dialog-backdrop.live-terminal-dialog-backdrop,
+  .dialog-backdrop.session-restore-backdrop {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
 }

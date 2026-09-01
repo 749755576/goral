@@ -41,6 +41,10 @@ import {
 import { createTerminalResizeCoordinator } from "./terminalResizeCoordinator";
 import type { TerminalSendTextErrorCode } from "./terminalSessionBridge";
 import type { Translate } from "./i18n";
+import {
+  parseRemoteTerminalOsc7Cwd,
+  parseRemoteTerminalOsc9Cwd,
+} from "./remoteTerminalCwd";
 
 export type {
   SshClientAttemptId,
@@ -63,6 +67,10 @@ type SshTerminalViewRuntime = {
   webglAddon: DisposableXtermAddon | null;
   webglGeneration: number;
   appearance: ResolvedTerminalAppearance;
+  /** Latest trusted cwd and the SSH attempt that reported it. */
+  cwd: string | null;
+  cwdOperationGeneration: number;
+  cwdDisposables: Array<{ dispose: () => void }>;
 };
 
 export type UseSshTerminalSessionsResult = Readonly<{
@@ -72,6 +80,8 @@ export type UseSshTerminalSessionsResult = Readonly<{
   targetFor: (id: WorkspaceSessionId) => SshTerminalTarget | undefined;
   backendSessionIdFor: (id: WorkspaceSessionId) => string | undefined;
   operationGenerationFor: (id: WorkspaceSessionId) => number | undefined;
+  /** Latest cwd announced by the exact connected SSH attempt, if known. */
+  cwdFor: (id: WorkspaceSessionId) => string | undefined;
   appearanceFor: (id: WorkspaceSessionId) => ResolvedTerminalAppearance | undefined;
   open: (
     target: SshTerminalTarget,
@@ -117,6 +127,9 @@ const makeViewRuntime = (
   webglAddon: null,
   webglGeneration: 0,
   appearance,
+  cwd: null,
+  cwdOperationGeneration: -1,
+  cwdDisposables: [],
 });
 
 /**
@@ -139,6 +152,10 @@ export function useSshTerminalSessions(
   const [registry, setRegistry] = useState<TerminalSessionRegistrySnapshot>(
     () => catalog.snapshot,
   );
+  // CWD announcements arrive through xterm's parser and are intentionally not
+  // added to the durable/shared session snapshot. This counter only prompts a
+  // renderer update so consumers can read the exact per-tab value.
+  const [, setCwdVersion] = useState(0);
   const resolveAppearanceRef = useRef(resolveAppearance);
   const translateRef = useRef(translate);
   const viewsRef = useRef(new Map<WorkspaceSessionId, SshTerminalViewRuntime>());
@@ -164,7 +181,39 @@ export function useSshTerminalSessions(
         });
         const fitAddon = new FitAddon();
         terminal.loadAddon(fitAddon);
-        viewsRef.current.set(id, makeViewRuntime(appearance));
+        const view = makeViewRuntime(appearance);
+        viewsRef.current.set(id, view);
+        const publishCwd = (cwd: string): boolean => {
+          const currentController = controllerRef.current;
+          const operationGeneration = currentController?.getRuntime(id)?.operationGeneration ?? -1;
+          if (
+            view.cwd === cwd
+            && view.cwdOperationGeneration === operationGeneration
+          ) return true;
+          view.cwd = cwd;
+          view.cwdOperationGeneration = operationGeneration;
+          setCwdVersion((version) => version + 1);
+          return true;
+        };
+        // OSC 7 is the standard shell notification (`file://host/path`). The
+        // handler returns false for malformed values so xterm's normal parser
+        // behavior remains untouched. OSC 9;9 is supported by Windows-style
+        // shell integrations and is treated with the same strict validation.
+        try {
+          view.cwdDisposables.push(terminal.parser.registerOscHandler(7, (payload) => {
+            const cwd = parseRemoteTerminalOsc7Cwd(payload);
+            return cwd ? publishCwd(cwd) : false;
+          }));
+          view.cwdDisposables.push(terminal.parser.registerOscHandler(9, (payload) => {
+            const cwd = parseRemoteTerminalOsc9Cwd(payload);
+            return cwd ? publishCwd(cwd) : false;
+          }));
+        } catch {
+          // Older/partial xterm adapters may not expose parser hooks. CWD
+          // following is optional; never make an otherwise usable SSH tab fail
+          // merely because the observer could not be installed.
+          view.cwdDisposables.length = 0;
+        }
         return {
           terminal,
           fit: {
@@ -190,6 +239,13 @@ export function useSshTerminalSessions(
       onRuntimeDestroyed(runtime) {
         const view = viewsRef.current.get(runtime.id);
         if (!view) return;
+        for (const disposable of view.cwdDisposables.splice(0)) {
+          try {
+            disposable.dispose();
+          } catch {
+            // A parser disposer must not prevent the remaining view cleanup.
+          }
+        }
         view.viewportObserver?.disconnect();
         view.viewportObserver = null;
         view.webglGeneration += 1;
@@ -329,6 +385,19 @@ export function useSshTerminalSessions(
   const operationGenerationFor = useCallback((id: WorkspaceSessionId) => (
     controller.getRuntime(id)?.operationGeneration
   ), [controller]);
+  const cwdFor = useCallback((id: WorkspaceSessionId) => {
+    const runtime = controller.getRuntime(id);
+    const view = viewsRef.current.get(id);
+    const snapshot = catalog.snapshot.sessions[id];
+    if (
+      !runtime
+      || !view
+      || !snapshot
+      || snapshot.state !== "connected"
+      || view.cwdOperationGeneration !== runtime.operationGeneration
+    ) return undefined;
+    return view.cwd ?? undefined;
+  }, [catalog, controller]);
   const appearanceFor = useCallback((id: WorkspaceSessionId) => (
     viewsRef.current.get(id)?.appearance
   ), []);
@@ -406,6 +475,7 @@ export function useSshTerminalSessions(
     targetFor,
     backendSessionIdFor,
     operationGenerationFor,
+    cwdFor,
     appearanceFor,
     open,
     restoreDisconnected,

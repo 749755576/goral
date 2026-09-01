@@ -537,6 +537,15 @@ test("startup restore UI remains a callback-only explicit reconnect boundary", a
   assert.match(startupEffect, /setSessionRestoreSnapshot\(null\)/);
 });
 
+test("startup restore backdrop stays crisp while the workbench is live", async () => {
+  const frameCss = await readFile(new URL("../../src/mainWorkspaceFrame.css", import.meta.url), "utf8");
+  const backdropRule = frameCss.match(/\.session-restore-backdrop\s*\{([^}]*)\}/)?.[1] ?? "";
+  assert.match(backdropRule, /background:\s*var\(--ld-overlay\)/);
+  assert.match(backdropRule, /-webkit-backdrop-filter:\s*none/);
+  assert.match(backdropRule, /backdrop-filter:\s*none/);
+  assert.doesNotMatch(backdropRule, /blur\(/);
+});
+
 test("oversized display labels fail before persistence", () => {
   assert.throws(() => createSessionRestoreSnapshot([{
     ...saved(7),

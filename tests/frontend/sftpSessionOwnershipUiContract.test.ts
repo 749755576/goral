@@ -5,11 +5,6 @@ import test from "node:test";
 const workspaceUrl = new URL("../../src/TerminalWorkspace.tsx", import.meta.url);
 const controllerUrl = new URL("../../src/sftpSessionController.ts", import.meta.url);
 
-// Source files may be checked out with CRLF on Windows. Contract markers are
-// written in LF form so the structural assertions remain platform-neutral.
-const readSource = (url: URL): Promise<string> => readFile(url, "utf8")
-  .then((source) => source.replace(/\r\n/g, "\n"));
-
 const sliceBetween = (source: string, start: string, end: string): string => {
   const startIndex = source.indexOf(start);
   const endIndex = source.indexOf(end, startIndex + start.length);
@@ -20,8 +15,8 @@ const sliceBetween = (source: string, start: string, end: string): string => {
 
 test("late SFTP listings require the exact workspace owner and latest request token", async () => {
   const [workspace, controller] = await Promise.all([
-    readSource(workspaceUrl),
-    readSource(controllerUrl),
+    readFile(workspaceUrl, "utf8"),
+    readFile(controllerUrl, "utf8"),
   ]);
   const adapter = sliceBetween(workspace, "const loadSftpPath", "const updateTransfer");
   const listing = sliceBetween(controller, "async load(\n", "/** Alias for callers");
@@ -46,8 +41,8 @@ test("late SFTP listings require the exact workspace owner and latest request to
 
 test("activation, retry, and close project only one exact workspace SFTP snapshot", async () => {
   const [workspace, controller] = await Promise.all([
-    readSource(workspaceUrl),
-    readSource(controllerUrl),
+    readFile(workspaceUrl, "utf8"),
+    readFile(controllerUrl, "utf8"),
   ]);
   const projection = sliceBetween(workspace, "const projectActiveSftpSnapshot", "const bindSftpWorkspace");
   const binding = sliceBetween(workspace, "const bindSftpWorkspace", "useEffect(() => sftpController.subscribe");
@@ -109,8 +104,8 @@ test("activation, retry, and close project only one exact workspace SFTP snapsho
 
 test("transfer backend IDs stay out of React snapshots and controls cannot cross workspaces", async () => {
   const [workspace, controller] = await Promise.all([
-    readSource(workspaceUrl),
-    readSource(controllerUrl),
+    readFile(workspaceUrl, "utf8"),
+    readFile(controllerUrl, "utf8"),
   ]);
   const snapshotType = sliceBetween(controller, "export type SftpTransferSnapshot =", "/** Minimal input");
   const privateState = sliceBetween(controller, "type MutableSftpSession =", "const emptySnapshot");
@@ -148,8 +143,8 @@ test("transfer backend IDs stay out of React snapshots and controls cannot cross
 
 test("drag/drop and SFTP mutations remain owner-bound and path-safe", async () => {
   const [workspace, controller] = await Promise.all([
-    readSource(workspaceUrl),
-    readSource(controllerUrl),
+    readFile(workspaceUrl, "utf8"),
+    readFile(controllerUrl, "utf8"),
   ]);
   const dragDrop = sliceBetween(
     workspace,

@@ -277,6 +277,26 @@ test("Notes and Scripts presentation catalogs are complete in Chinese and Englis
   );
 });
 
+test("browser Notes and Scripts previews keep native mutations disabled with a localized notice", async () => {
+  const [notes, scripts] = await Promise.all([
+    readFile(notesWorkspaceUrl, "utf8"),
+    readFile(scriptsWorkspaceUrl, "utf8"),
+  ]);
+  const zh = createTranslator("zh-CN");
+  const en = createTranslator("en-US");
+
+  assert.match(notes, /const nativeUnavailableMessage = nativeRuntimeAvailable/);
+  assert.match(scripts, /const nativeUnavailableMessage = nativeRuntimeAvailable/);
+  for (const source of [notes, scripts]) {
+    assert.match(source, /t\("notesScripts\.desktopOnly"\)/);
+    assert.match(source, /disabled=\{!catalog \|\| disabled \|\| !nativeRuntimeAvailable \|\| mutationPending\}/);
+    assert.match(source, /className="notes-scripts-native-notice" role="status"/);
+    assert.match(source, /if \(!nativeRuntimeAvailable\) \{[\s\S]*?setError\(nativeUnavailableMessage/);
+  }
+  assert.match(zh("notesScripts.desktopOnly"), /Goral/);
+  assert.match(en("notesScripts.desktopOnly"), /Goral/);
+});
+
 test("standalone workspaces expose list, search, empty, editor, delete, body, and host selection surfaces", async () => {
   const [notes, scripts, shared, styles] = await Promise.all([
     readFile(notesWorkspaceUrl, "utf8"),

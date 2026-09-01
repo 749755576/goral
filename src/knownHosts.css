@@ -147,6 +147,14 @@
   height: 10px;
 }
 
+/* Chromium's details default is not consistent once the menu is mounted in
+   the workbench grid.  Keep the popover out of layout and hit testing until
+   its owner is actually opened; this also prevents a closed menu near the
+   narrow left edge from creating a stray off-canvas box. */
+.known-hosts-menu:not([open]) > .known-hosts-menu-popover {
+  display: none;
+}
+
 .known-hosts-menu > summary:hover,
 .known-hosts-menu[open] > summary {
   color: var(--ld-text);
@@ -574,5 +582,13 @@
 
   .known-hosts-items.grid {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* The controls can wrap into a second row in the compact workbench.  A
+     right-aligned 136px popover anchored to a 40px icon then starts off the
+     left edge; anchor it to the trigger's left edge on narrow surfaces. */
+  .known-hosts-menu-popover {
+    right: auto;
+    left: 0;
   }
 }

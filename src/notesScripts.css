@@ -250,6 +250,21 @@
   font-size: var(--ld-text-caption1-size);
 }
 
+.notes-scripts-native-notice {
+  display: flex;
+  min-height: 36px;
+  align-items: center;
+  margin: 0 8px 0 0;
+  border-right: 1px solid var(--ld-border);
+  border-bottom: 1px solid var(--ld-border);
+  border-left: 1px solid var(--ld-border);
+  padding: 8px 14px;
+  color: var(--ld-text-secondary);
+  background: var(--ld-surface-muted);
+  font-size: var(--ld-text-caption1-size);
+  line-height: 1.4;
+}
+
 .notes-scripts-filterbar {
   display: flex;
   align-items: center;
@@ -691,9 +706,12 @@
 
 .notes-scripts-body-field .notes-scripts-code-input,
 .notes-scripts-code-input {
-  color: #dde5df;
-  background: var(--ld-accent);
-  border-color: var(--ld-accent);
+  /* Code is a neutral reading surface.  The accent belongs on the focus
+     edge, not behind every character; a saturated editor made the whole
+     form look like one oversized button in dark mode. */
+  color: var(--ld-text);
+  background: var(--ld-surface-terminal);
+  border-color: var(--ld-border);
   font-family: var(--ld-font-mono);
   font-size: var(--ld-text-caption1-size);
   line-height: 1.65;
@@ -701,9 +719,10 @@
 }
 
 .notes-scripts-body-field .notes-scripts-code-input:focus {
-  color: #edf2ee;
-  background: var(--ld-accent);
+  color: var(--ld-text);
+  background: var(--ld-surface-terminal);
   border-color: var(--ld-accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--ld-accent) 24%, transparent);
 }
 
 .notes-scripts-compact-textarea {
@@ -1013,10 +1032,10 @@
 
 .notes-scripts-code-block {
   margin-top: 16px;
-  border: 1px solid var(--ld-accent);
+  border: 1px solid var(--ld-border);
   border-radius: var(--ld-radius-sm);
   overflow: hidden;
-  background: var(--ld-accent);
+  background: var(--ld-surface-terminal);
 }
 
 .notes-scripts-code-block > div {
@@ -1024,10 +1043,10 @@
   height: 32px;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid var(--ld-accent);
+  border-bottom: 1px solid var(--ld-border);
   padding: 0 12px;
   color: var(--ld-text-secondary);
-  background: var(--ld-accent);
+  background: var(--ld-surface-muted);
   font-family: var(--ld-font-mono);
   font-size: var(--ld-text-caption1-size);
 }
@@ -1038,7 +1057,8 @@
   margin: 0;
   padding: 16px;
   overflow: auto;
-  color: #dce5df;
+  color: var(--ld-text);
+  background: var(--ld-surface-terminal);
   font-family: var(--ld-font-mono);
   font-size: var(--ld-text-caption1-size);
   line-height: 1.65;

@@ -167,7 +167,7 @@ test("bookmark, delete, and clear use complete-inventory CAS with one conflict r
   assert.match(component, /saved: !log\.saved/);
   assert.match(component, /logs\.filter\(\(log\) => log\.id !== id\)/);
   assert.match(component, /logs\.filter\(\(log\) => log\.saved\)/);
-  assert.match(component, /t\([\s\S]*?"connectionLogs\.clearDescriptionOne"[\s\S]*?"connectionLogs\.clearDescription"/);
+  assert.match(component, /adapter\.clearUnsaved\(\{ expectedInventoryRevision \}\)/);
   assert.match(mutation, /pendingNotice = t\("connectionLogs\.updating"\)/);
   assert.match(mutation, /setMutationPendingLabel\(pendingNotice\)/);
   const clearStart = component.indexOf("const clearUnsaved = useCallback");
@@ -175,20 +175,17 @@ test("bookmark, delete, and clear use complete-inventory CAS with one conflict r
   assert.match(clear, /t\("connectionLogs\.clearing"\)/);
 });
 
-test("clearing logs dismisses the blocking backdrop before native cleanup and retires late reads", async () => {
+test("clearing logs starts immediately without a blocking confirmation backdrop", async () => {
   const component = await readFile(componentUrl, "utf8");
   const mutationStart = component.indexOf("mutationLock.current = true;");
   const mutationGuard = component.slice(mutationStart, mutationStart + 420);
   assert.match(mutationGuard, /loadSequence\.current \+= 1/);
-
-  const confirmStart = component.indexOf("className=\"danger\"");
-  const confirm = component.slice(confirmStart, confirmStart + 520);
-  assert.match(confirm, /setClearConfirmationOpen\(false\)/);
-  assert.match(confirm, /void clearUnsaved\(\)/);
-  assert.ok(
-    confirm.indexOf("setClearConfirmationOpen(false)") < confirm.indexOf("void clearUnsaved()"),
-    "the clear dialog must close before awaiting native Vault/replay cleanup",
+  assert.match(
+    component,
+    /className="connection-logs-clear-button"[\s\S]*?aria-label=\{t\("connectionLogs\.clearUnsaved"\)\}[\s\S]*?title=\{t\("connectionLogs\.clearUnsaved"\)\}[\s\S]*?onClick=\{\(\) => void clearUnsaved\(\)\}/,
   );
+  assert.doesNotMatch(component, /clearConfirmationOpen|setClearConfirmationOpen/);
+  assert.doesNotMatch(component, /connection-logs-dialog-backdrop/);
   assert.match(component, /className="connection-logs-message pending"/);
   assert.match(component, /t\("connectionLogs\.clearing"\)/);
 });
@@ -248,9 +245,11 @@ test("Connection Logs styles preserve the legacy light Vault table and replay sh
   assert.match(styles, /\.connection-log-replay-export \.connection-log-glyph/);
   assert.match(styles, /@keyframes connection-log-replay-spin/);
   assert.match(styles, /\.connection-logs-dialog-backdrop/);
+  assert.match(styles, /\.connection-logs-dialog-backdrop\s*\{[\s\S]*?backdrop-filter:\s*none\s*!important/);
   assert.match(styles, /\.connection-logs-workspace\s*\{[\s\S]*?container-type:\s*inline-size/);
   assert.match(styles, /\.connection-logs-toolbar > div:first-child\s*\{[\s\S]*?flex:\s*1 1 auto/);
   assert.match(styles, /@container \(max-width: 520px\)[\s\S]*?flex-wrap:\s*wrap/);
+  assert.match(styles, /\.connection-logs-empty-state h2\s*\{[\s\S]*?word-break:\s*keep-all/);
 });
 
 test("TerminalWorkspace enables the original Logs navigation and mounts the catalog", async () => {

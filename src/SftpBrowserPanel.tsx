@@ -20,6 +20,7 @@ import {
   limitSftpFileFilter,
   normalizeSftpFileFilter,
   resolveSftpFilterEscapeAction,
+  sftpFilterMemory,
   shouldFocusSftpFileFilter,
 } from "./sftpFileFilter.ts";
 
@@ -125,26 +126,30 @@ export function SftpBrowserPanel({
   const compositionScopeRef = useRef<string | null>(null);
   const sessionScopeKey = createSftpFilterSessionScopeKey(activeOwner);
   const directoryScopeKey = createSftpFilterDirectoryScopeKey(activeOwner, path);
+  const rememberedFilter = sftpFilterMemory.read(directoryScopeKey);
   const [filterState, setFilterState] = useState(() => ({
+    sessionScopeKey,
+    directoryScopeKey,
+    open: rememberedFilter?.open ?? false,
+    value: rememberedFilter?.value ?? "",
+  }));
+  const defaultScopedFilterState = {
     sessionScopeKey,
     directoryScopeKey,
     open: false,
     value: "",
-  }));
+  };
   const scopedFilterState = filterState.sessionScopeKey !== sessionScopeKey
-    ? {
-        sessionScopeKey,
-        directoryScopeKey,
-        open: false,
-        value: "",
-      }
+    ? rememberedFilter
+      ? { ...defaultScopedFilterState, ...rememberedFilter }
+      : defaultScopedFilterState
     : filterState.directoryScopeKey !== directoryScopeKey
-      ? {
-          sessionScopeKey,
-          directoryScopeKey,
-          open: filterState.open,
-          value: "",
-        }
+      ? rememberedFilter
+        ? { ...defaultScopedFilterState, ...rememberedFilter }
+        : {
+            ...defaultScopedFilterState,
+            open: filterState.open,
+          }
       : filterState;
   const filteredEntries = useMemo(
     () => filterSftpEntries(visibleEntries, scopedFilterState.value),
@@ -159,21 +164,37 @@ export function SftpBrowserPanel({
         current.sessionScopeKey === sessionScopeKey
         && current.directoryScopeKey === directoryScopeKey
       ) return current;
-      return current.sessionScopeKey === sessionScopeKey
+      return rememberedFilter
         ? {
             sessionScopeKey,
             directoryScopeKey,
-            open: current.open,
-            value: "",
+            ...rememberedFilter,
           }
-        : {
-            sessionScopeKey,
-            directoryScopeKey,
-            open: false,
-            value: "",
-          };
+        : current.sessionScopeKey === sessionScopeKey
+          ? {
+              sessionScopeKey,
+              directoryScopeKey,
+              open: current.open,
+              value: "",
+            }
+          : {
+              sessionScopeKey,
+              directoryScopeKey,
+              open: false,
+              value: "",
+            };
     });
-  }, [directoryScopeKey, sessionScopeKey]);
+  }, [directoryScopeKey, rememberedFilter, sessionScopeKey]);
+
+  // Persist only the UI affordance, keyed by the exact session+directory
+  // scope. This lets an unmounted panel restore its filter after a tab switch
+  // while keeping filters isolated across retries and terminal sessions.
+  useEffect(() => {
+    sftpFilterMemory.write(directoryScopeKey, {
+      open: scopedFilterState.open,
+      value: scopedFilterState.value,
+    });
+  }, [directoryScopeKey, scopedFilterState.open, scopedFilterState.value]);
 
   const setCurrentFilterState = (
     update: (current: typeof scopedFilterState) => typeof scopedFilterState,

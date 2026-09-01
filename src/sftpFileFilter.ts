@@ -1,5 +1,7 @@
 export const MAX_SFTP_FILE_FILTER_LENGTH = 256;
 
+const utf8 = new TextEncoder();
+
 export type SftpFilterEntry = Readonly<{
   name: string;
 }>;
@@ -119,3 +121,78 @@ export type SftpFilterEscapeAction = "clear" | "close";
 export const resolveSftpFilterEscapeAction = (
   filter: string,
 ): SftpFilterEscapeAction => filter.length > 0 ? "clear" : "close";
+
+/**
+ * Small renderer-only memory for the SFTP filter affordance.
+ *
+ * `SftpBrowserPanel` is intentionally mounted only while the panel is visible,
+ * so its React state disappears when the user switches to another terminal
+ * tab or opens the AI/System tool.  The directory listing itself already
+ * lives in `SftpSessionController`; this companion memory keeps the filter
+ * presentation aligned with that listing without putting UI-only data into a
+ * native request or a durable Vault snapshot.
+ *
+ * Keys are the exact owner+directory scope generated above.  The bounded LRU
+ * makes the module-level instance safe for long-lived workbenches and ensures
+ * a retired session cannot accumulate unbounded presentation state.
+ */
+export type SftpFilterMemoryValue = Readonly<{
+  open: boolean;
+  value: string;
+}>;
+
+export type SftpFilterMemory = Readonly<{
+  read: (scopeKey: string) => SftpFilterMemoryValue | undefined;
+  write: (scopeKey: string, value: SftpFilterMemoryValue) => void;
+  clear: () => void;
+}>;
+
+const DEFAULT_SFTP_FILTER_MEMORY_LIMIT = 64;
+const MAX_SFTP_FILTER_SCOPE_KEY_BYTES = 8 * 1024;
+
+const validFilterMemoryKey = (scopeKey: string): boolean => (
+  typeof scopeKey === "string"
+  && scopeKey.length > 0
+  && utf8.encode(scopeKey).byteLength <= MAX_SFTP_FILTER_SCOPE_KEY_BYTES
+);
+
+/** Create an isolated bounded memory store (also useful for pure tests). */
+export const createSftpFilterMemory = (
+  maximumEntries = DEFAULT_SFTP_FILTER_MEMORY_LIMIT,
+): SftpFilterMemory => {
+  const limit = Number.isSafeInteger(maximumEntries)
+    ? Math.max(1, Math.min(maximumEntries, DEFAULT_SFTP_FILTER_MEMORY_LIMIT))
+    : DEFAULT_SFTP_FILTER_MEMORY_LIMIT;
+  const entries = new Map<string, SftpFilterMemoryValue>();
+
+  const read = (scopeKey: string): SftpFilterMemoryValue | undefined => {
+    if (!validFilterMemoryKey(scopeKey)) return undefined;
+    const value = entries.get(scopeKey);
+    if (!value) return undefined;
+    // Touch the entry so frequently revisited tabs stay in the bounded set.
+    entries.delete(scopeKey);
+    entries.set(scopeKey, value);
+    return value;
+  };
+
+  const write = (scopeKey: string, value: SftpFilterMemoryValue): void => {
+    if (!validFilterMemoryKey(scopeKey) || typeof value?.open !== "boolean") return;
+    const boundedValue = limitSftpFileFilter(typeof value.value === "string" ? value.value : "");
+    entries.delete(scopeKey);
+    entries.set(scopeKey, Object.freeze({ open: value.open, value: boundedValue }));
+    while (entries.size > limit) {
+      const oldest = entries.keys().next().value as string | undefined;
+      if (oldest === undefined) break;
+      entries.delete(oldest);
+    }
+  };
+
+  return Object.freeze({
+    read,
+    write,
+    clear: () => entries.clear(),
+  });
+};
+
+/** Shared only within this renderer process; no credentials or paths are kept. */
+export const sftpFilterMemory = createSftpFilterMemory();

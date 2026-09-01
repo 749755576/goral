@@ -976,12 +976,21 @@ button:disabled {
 }
 
 .connection-prompt-backdrop .saved-host-dialog > .security-note {
+  /* Terminal surfaces hide the generic security note to keep their compact
+     host list dense.  A one-time credential prompt is the exception: the
+     assurance is part of the interaction and must remain visible. */
+  display: block;
+  width: 100%;
+  max-width: 100%;
   margin: 16px 0 0;
   border: 1px solid color-mix(in srgb, var(--ld-accent) 18%, var(--ld-border));
   border-radius: var(--ld-radius-sm);
   padding: 10px 12px;
   color: var(--ld-text-secondary);
-  background: color-mix(in srgb, var(--ld-accent-soft) 26%, var(--ld-surface-raised));
+  /* Keep the note quiet in both modes.  The accent is carried by the
+     hairline; a saturated accent-soft slab made the prompt look like a
+     second, unrelated panel in dark mode. */
+  background: var(--ld-surface-muted);
   line-height: 1.55;
   overflow-wrap: anywhere;
 }
@@ -1841,7 +1850,7 @@ button:hover:not(:disabled) {
   height: 29px;
   place-items: center;
   border-radius: var(--ld-radius-sm);
-  color: var(--ld-bg);
+  color: var(--ld-frame-ai-ink);
   background: linear-gradient(145deg, var(--ld-purple), var(--ld-purple));
   font-size: var(--ld-text-caption1-size);
   font-weight: 800;
@@ -3394,7 +3403,7 @@ button:hover:not(:disabled) {
 }
 
 .surface-terminal .catty-agent-avatar {
-  color: var(--ld-bg);
+  color: var(--ld-frame-ai-ink);
   background: var(--ld-purple);
 }
 
@@ -4352,6 +4361,14 @@ button:hover:not(:disabled) {
 
 .saved-host-header-close {
   font-size: var(--ld-text-headline-size);
+}
+
+/* Header actions use the same vector geometry as the rest of the workbench.
+   Keeping the close mark as an SVG avoids font-dependent glyphs (which can
+   render as a missing square on systems with a different fallback font). */
+.saved-host-header-close .vault-glyph {
+  width: 16px;
+  height: 16px;
 }
 
 .saved-host-details-scroll {
@@ -7447,7 +7464,7 @@ button:hover:not(:disabled) {
   display: grid;
   flex: 0 0 auto;
   place-items: center;
-  color: var(--ld-bg);
+  color: var(--ld-frame-ai-ink);
   background: linear-gradient(145deg, var(--ld-purple), var(--ld-purple));
   box-shadow: 0 5px 18px var(--ld-border);
 }
@@ -9300,6 +9317,105 @@ button:hover:not(:disabled) {
   .ai-empty-suggestions button:hover:not(:disabled),
   .ai-primary-action:hover:not(:disabled) {
     transform: none;
+  }
+}
+
+/* -------------------------------------------------------------------------
+ * Live-terminal prompts
+ *
+ * Host-key and interactive-auth prompts are mounted over a streaming xterm.
+ * The global glass treatment is appropriate for static chrome, but forcing a
+ * backdrop blur over a repainting terminal makes the whole window shimmer
+ * and can make an otherwise successful prompt look stuck.  Keep these two
+ * transient surfaces opaque/crisp and let the dialog itself carry the visual
+ * hierarchy.
+ * ------------------------------------------------------------------------- */
+.dialog-backdrop.live-terminal-dialog-backdrop {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: var(--ld-overlay);
+}
+
+.live-terminal-dialog-backdrop .trust-dialog {
+  width: min(480px, calc(100vw - var(--ld-space-40)));
+  max-height: calc(100vh - var(--ld-space-40));
+  overflow: auto;
+}
+
+.live-terminal-dialog-backdrop .dialog-actions {
+  flex-wrap: wrap;
+}
+
+.live-terminal-dialog-backdrop .interactive-fields {
+  gap: var(--ld-space-16);
+}
+
+.live-terminal-dialog-backdrop .interactive-fields label {
+  color: var(--ld-text-secondary);
+}
+
+.live-terminal-dialog-backdrop .interactive-fields input {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid var(--ld-border);
+  border-radius: var(--ld-radius-sm);
+  padding: var(--ld-space-10) var(--ld-space-12);
+  color: var(--ld-text);
+  background: var(--ld-surface-control);
+}
+
+.live-terminal-dialog-backdrop .interactive-fields input:focus,
+.live-terminal-dialog-backdrop .interactive-fields input:focus-visible {
+  border-color: var(--ld-accent);
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ld-accent) 42%, transparent);
+}
+
+.live-terminal-dialog-backdrop .dialog-actions button:not(.primary-button) {
+  border: 1px solid var(--ld-border);
+  color: var(--ld-text);
+  background: var(--ld-surface-muted);
+}
+
+.live-terminal-dialog-backdrop .dialog-actions .primary-button {
+  border-color: var(--ld-accent);
+  color: var(--ld-accent-contrast);
+  background: var(--ld-accent);
+}
+
+/* One-time credential prompts must remain usable on a compact side-by-side
+   window.  The actions wrap before the dialog itself starts clipping. */
+.connection-prompt-backdrop {
+  padding: var(--ld-space-20);
+}
+
+.connection-prompt-backdrop .trust-dialog {
+  width: min(480px, calc(100vw - var(--ld-space-40)));
+  max-height: calc(100vh - var(--ld-space-40));
+  overflow: auto;
+}
+
+.connection-prompt-backdrop .dialog-actions {
+  flex-wrap: wrap;
+}
+
+@media (max-width: 480px) {
+  .connection-prompt-backdrop {
+    padding: var(--ld-space-12);
+  }
+
+  .connection-prompt-backdrop .trust-dialog {
+    width: 100%;
+    max-height: calc(100vh - var(--ld-space-24));
+  }
+
+  .connection-prompt-backdrop .dialog-actions {
+    justify-content: stretch;
+  }
+
+  .connection-prompt-backdrop .dialog-actions button {
+    flex: 1 1 0;
+    min-width: 0;
   }
 }
 

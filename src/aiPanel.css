@@ -40,6 +40,18 @@
   letter-spacing: var(--ld-text-subheadline-track);
 }
 
+/* Keep the assistant mark legible in both colour modes.  The legacy rule in
+ * styles.css used --ld-bg for the glyph, which is intentionally the page
+ * background and becomes near-black on a dark surface.  That made the purple
+ * assistant squares look like empty blocks in the dark screenshots.  The
+ * contrast token is the foreground paired with an accent fill, so it remains
+ * readable without hard-coding a light/dark colour here. */
+.surface-terminal .ai-agent-avatar,
+.surface-terminal .ai-message-avatar,
+.surface-terminal .ai-empty-mark {
+  color: var(--ld-frame-ai-ink);
+}
+
 /* The desktop shell has a 980px minimum. At that edge, retain the 420px AI
  * floor by allowing the terminal canvas to absorb the remaining width instead
  * of letting the two minimum tracks overflow into one another. */
@@ -158,7 +170,7 @@
   width: 36px;
   height: 36px;
   border-radius: var(--ld-radius-md);
-  color: #ffffff;
+  color: var(--ld-frame-ai-ink);
   background: var(--ld-frame-ai);
   box-shadow: var(--ld-elevation-2);
 }

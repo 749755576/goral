@@ -4,12 +4,14 @@ import test from "node:test";
 
 const stylesUrl = new URL("../../src/styles.css", import.meta.url);
 const aiPanelStylesUrl = new URL("../../src/aiPanel.css", import.meta.url);
+const frameStylesUrl = new URL("../../src/mainWorkspaceFrame.css", import.meta.url);
 const composerUrl = new URL("../../src/ai/AiComposer.tsx", import.meta.url);
 
 test("AI side panel keeps the conversation layout readable and keyboard accessible", async () => {
-  const [styles, aiPanelStyles, composer] = await Promise.all([
+  const [styles, aiPanelStyles, frameStyles, composer] = await Promise.all([
     readFile(stylesUrl, "utf8"),
     readFile(aiPanelStylesUrl, "utf8"),
+    readFile(frameStylesUrl, "utf8"),
     readFile(composerUrl, "utf8"),
   ]);
 
@@ -52,6 +54,21 @@ test("AI side panel keeps the conversation layout readable and keyboard accessib
     aiPanelStyles,
     /@container ai-workspace \(min-width:\s*520px\)[\s\S]*?\.ai-composer-main-controls,[\s\S]*?\.ai-composer-routing-controls\s*\{[\s\S]*?display:\s*contents;/u,
     "wide panels must deliberately collapse the two groups to one row",
+  );
+  assert.match(
+    frameStyles,
+    /--ld-frame-ai:\s*#[0-9a-f]{6};[\s\S]*?--ld-frame-ai-ink:\s*#[0-9a-f]{6};/iu,
+    "the AI frame must define a foreground paired with its purple fill",
+  );
+  assert.match(
+    aiPanelStyles,
+    /\.surface-terminal \.ai-agent-avatar,[\s\S]*?color:\s*var\(--ld-frame-ai-ink\);/u,
+    "AI avatar glyphs must use the purple-fill contrast token",
+  );
+  assert.doesNotMatch(
+    styles,
+    /\.surface-terminal \.catty-agent-avatar\s*\{[^}]*color:\s*var\(--ld-bg\)/u,
+    "AI avatars must not use the page background as their foreground",
   );
   // Every control keeps its localized accessible name. Routing controls
   // stay directly visible in the footer instead of hiding behind an

@@ -117,6 +117,9 @@ export const NotesWorkspace = ({
   const { t } = useI18n(locale);
   const notesApi = api ?? DEFAULT_API;
   const nativeRuntimeAvailable = api !== undefined || isTauri();
+  const nativeUnavailableMessage = nativeRuntimeAvailable
+    ? null
+    : t("notesScripts.desktopOnly");
   const [catalog, setCatalog] = useState<NotesSnippetsCatalog | null>(null);
   const [loading, setLoading] = useState(true);
   const [mutationPending, setMutationPending] = useState(false);
@@ -213,7 +216,7 @@ export const NotesWorkspace = ({
   }, [hosts, selectedNote?.linkedHostIds]);
 
   const openCreateEditor = () => {
-    if (!catalog || disabled || mutationPending) return;
+    if (!catalog || disabled || !nativeRuntimeAvailable || mutationPending) return;
     setError(null);
     setDeletePrompt(null);
     setEditor({
@@ -225,7 +228,7 @@ export const NotesWorkspace = ({
   };
 
   const openUpdateEditor = (note: SavedVaultNote) => {
-    if (!catalog || disabled || mutationPending) return;
+    if (!catalog || disabled || !nativeRuntimeAvailable || mutationPending) return;
     setError(null);
     setDeletePrompt(null);
     setSelectedId(note.id);
@@ -269,6 +272,10 @@ export const NotesWorkspace = ({
     const snapshot = editor;
     const catalogSnapshot = catalog;
     if (!snapshot || !catalogSnapshot || disabled || mutationLock.current) return;
+    if (!nativeRuntimeAvailable) {
+      setError(nativeUnavailableMessage ?? t("notesScripts.desktopOnly"));
+      return;
+    }
 
     const title = snapshot.draft.title.trim();
     if (!title) {
@@ -319,7 +326,7 @@ export const NotesWorkspace = ({
 
   const confirmDelete = async () => {
     const prompt = deletePrompt;
-    if (!prompt || !catalog || disabled || mutationLock.current) return;
+    if (!prompt || !catalog || disabled || !nativeRuntimeAvailable || mutationLock.current) return;
     mutationLock.current = true;
     loadSequence.current += 1;
     setMutationPending(true);
@@ -375,12 +382,19 @@ export const NotesWorkspace = ({
             type="button"
             className="notes-scripts-primary-button"
             onClick={openCreateEditor}
-            disabled={!catalog || disabled || mutationPending}
+            disabled={!catalog || disabled || !nativeRuntimeAvailable || mutationPending}
+            title={nativeUnavailableMessage ?? undefined}
           >
             <WorkspaceGlyph name="plus" />{t("notes.new")}
           </button>
         </div>
       </header>
+
+      {nativeUnavailableMessage ? (
+        <p className="notes-scripts-native-notice" role="status">
+          {nativeUnavailableMessage}
+        </p>
+      ) : null}
 
       {error ? <div className="notes-scripts-error" role="alert">{error}</div> : null}
 
@@ -431,6 +445,7 @@ export const NotesWorkspace = ({
                   type="button"
                   className="notes-scripts-row-action"
                   onClick={() => openUpdateEditor(note)}
+                  disabled={!nativeRuntimeAvailable || disabled || mutationPending}
                   aria-label={t("notes.editAria", { title: note.title })}
                   title={t("notesScripts.action.edit")}
                 >
@@ -459,7 +474,7 @@ export const NotesWorkspace = ({
                   <button
                     type="submit"
                     className="notes-scripts-primary-button"
-                    disabled={disabled || mutationPending}
+                    disabled={disabled || !nativeRuntimeAvailable || mutationPending}
                   >{mutationPending ? t("notesScripts.action.saving") : t("notes.save")}</button>
                 </div>
               </div>
@@ -512,7 +527,7 @@ export const NotesWorkspace = ({
                 locale={locale}
                 hosts={hosts}
                 selectedIds={editor.draft.linkedHostIds ?? []}
-                disabled={disabled || mutationPending}
+                disabled={disabled || !nativeRuntimeAvailable || mutationPending}
                 onToggle={toggleLinkedHost}
               />
             </form>
@@ -535,7 +550,7 @@ export const NotesWorkspace = ({
                     type="button"
                     className="notes-scripts-secondary-button"
                     onClick={() => openUpdateEditor(selectedNote)}
-                    disabled={disabled || mutationPending}
+                    disabled={disabled || !nativeRuntimeAvailable || mutationPending}
                   ><WorkspaceGlyph name="edit" />{t("notesScripts.action.edit")}</button>
                   <button
                     type="button"
@@ -544,7 +559,7 @@ export const NotesWorkspace = ({
                       id: selectedNote.id,
                       expectedInventoryRevision: catalog.inventoryRevision,
                     })}
-                    disabled={disabled || mutationPending}
+                    disabled={disabled || !nativeRuntimeAvailable || mutationPending}
                   ><WorkspaceGlyph name="trash" />{t("notesScripts.action.delete")}</button>
                 </div>
               </header>
@@ -588,7 +603,7 @@ export const NotesWorkspace = ({
                     <span>{t("notes.deleteDescription")}</span>
                   </div>
                   <button type="button" onClick={() => setDeletePrompt(null)}>{t("notesScripts.action.cancel")}</button>
-                  <button type="button" className="danger" onClick={() => void confirmDelete()} disabled={mutationPending}>
+                  <button type="button" className="danger" onClick={() => void confirmDelete()} disabled={!nativeRuntimeAvailable || mutationPending}>
                     {mutationPending ? t("notesScripts.action.deleting") : t("notesScripts.action.confirmDelete")}
                   </button>
                 </div>
@@ -605,7 +620,8 @@ export const NotesWorkspace = ({
                 type="button"
                 className="notes-scripts-primary-button"
                 onClick={openCreateEditor}
-                disabled={!catalog || disabled || mutationPending}
+                disabled={!catalog || disabled || !nativeRuntimeAvailable || mutationPending}
+                title={nativeUnavailableMessage ?? undefined}
               ><WorkspaceGlyph name="plus" />{t("notes.new")}</button>
             </div>
           )}

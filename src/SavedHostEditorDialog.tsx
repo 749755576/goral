@@ -15,7 +15,7 @@ import { SavedHostCredentialFields } from "./SavedHostCredentialFields";
 import { SavedHostGeneralFields } from "./SavedHostGeneralFields";
 import { SavedHostProxyFields } from "./SavedHostProxyFields";
 
-type SavedHostEditorGlyph = "check" | "hosts" | "key" | "proxy" | "settings" | "tree";
+type SavedHostEditorGlyph = "check" | "close" | "hosts" | "key" | "proxy" | "settings" | "tree";
 
 export type SavedHostEditorDialogProps = Readonly<{
   editor: SavedHostEditor;
@@ -106,7 +106,7 @@ export function SavedHostEditorDialog({
               aria-label={t("savedHost.editor.dialog.closeAria")}
               title={t("savedHost.editor.dialog.close")}
             >
-              ×
+              {glyph("close")}
             </button>
           </div>
         </header>

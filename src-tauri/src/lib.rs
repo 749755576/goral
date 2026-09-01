@@ -249,6 +249,12 @@ const SAVED_PASSWORD_IDENTITY_HINT_REPAIR_FAILED: &str =
 const SAVED_PROXY_HINT_REPAIR_FAILED: &str = "SAVED_PROXY_HINT_REPAIR_FAILED";
 const SAVED_GROUP_HINT_REPAIR_FAILED: &str = "SAVED_GROUP_HINT_REPAIR_FAILED";
 const SAVED_HOST_COORDINATOR_FAILED: &str = "Saved-host coordinator failed";
+// A second Goral instance (or an interrupted older build) must not leave a
+// renderer mutation waiting on an unbounded OS file-lock call.  Operations
+// that legitimately take longer still run after this acquisition step; the
+// bound only covers contention while acquiring the cross-process gate.
+const SAVED_HOST_LOCK_WAIT: std::time::Duration = std::time::Duration::from_secs(8);
+const SAVED_HOST_LOCK_RETRY: std::time::Duration = std::time::Duration::from_millis(25);
 const LEGACY_VAULT_SOURCE_UNAVAILABLE: &str = "LEGACY_VAULT_SOURCE_UNAVAILABLE";
 const LEGACY_VAULT_SOURCE_NOT_REGULAR: &str = "LEGACY_VAULT_SOURCE_NOT_REGULAR";
 const LEGACY_VAULT_SOURCE_TOO_LARGE: &str = "LEGACY_VAULT_SOURCE_TOO_LARGE";
@@ -1137,12 +1143,34 @@ async fn acquire_saved_host_lock(
             .truncate(false)
             .open(path.as_ref())
             .map_err(|_| "Saved-host transaction lock is unavailable".to_owned())?;
-        fs2::FileExt::lock_exclusive(&file)
-            .map_err(|_| "Saved-host transaction lock is unavailable".to_owned())?;
+        let deadline = std::time::Instant::now() + SAVED_HOST_LOCK_WAIT;
+        loop {
+            match fs2::FileExt::try_lock_exclusive(&file) {
+                Ok(()) => break,
+                Err(error) if is_saved_host_lock_contention(&error) => {
+                    if std::time::Instant::now() >= deadline {
+                        return Err("Saved-host transaction lock is unavailable".to_owned());
+                    }
+                    std::thread::sleep(SAVED_HOST_LOCK_RETRY);
+                }
+                Err(_) => return Err("Saved-host transaction lock is unavailable".to_owned()),
+            }
+        }
         Ok(CrossProcessSavedHostLock(file))
     })
     .await
     .map_err(|_| SAVED_HOST_COORDINATOR_FAILED.to_owned())?
+}
+
+/// `fs2` maps a held Windows byte-range lock to either `WouldBlock` or one of
+/// the sharing/lock violation codes, depending on the filesystem provider.
+/// Keep genuine path/permission failures fail-fast while retrying only those
+/// contention forms.  Unix uses `WouldBlock` consistently.
+fn is_saved_host_lock_contention(error: &std::io::Error) -> bool {
+    if error.kind() == std::io::ErrorKind::WouldBlock {
+        return true;
+    }
+    matches!(error.raw_os_error(), Some(5 | 32 | 33))
 }
 
 /// Runs an entire saved-host operation in a detached coordinator task. Dropping
@@ -2562,10 +2590,12 @@ async fn clear_unsaved_connection_logs(
             .as_ref()
             .and_then(ConnectionLogReplayRuntime::ready_manager)
         {
-            // Keep metadata and encrypted replay retention in one ordered
-            // transaction. A replay cleanup fault is retried by startup
-            // reconciliation without restoring deleted metadata.
-            let _ = replays.reconcile_catalog(catalog.logs.clone()).await;
+            // The Vault mutation above is the authoritative, durable action.
+            // Replay retention is derived data; schedule it after publication
+            // so a stale replay file lock can never leave the clear action
+            // waiting forever in the renderer. Startup reconciliation retries
+            // cleanup if this process exits before the worker completes.
+            replays.reconcile_catalog_background(catalog.logs.clone());
         }
         Ok(catalog)
     })

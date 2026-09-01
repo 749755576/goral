@@ -1565,6 +1565,9 @@ export function TerminalWorkspace() {
 
   const activeLocalSession = localTerminals.activeSession;
   const activeSshSession = sshTerminals.activeSession;
+  const activeSshTerminalCwd = activeSshSession
+    ? sshTerminals.cwdFor(activeSshSession.id) ?? null
+    : null;
   const activeSharedSession = activeLocalSession ?? activeSshSession;
   const activeSshTarget = activeSshSession
     ? sshTerminals.targetFor(activeSshSession.id)
@@ -2571,6 +2574,49 @@ export function TerminalWorkspace() {
     await sftpController.load(owner.workspaceId, path, owner);
   }, [captureCurrentSftpOwner, isCurrentSftpOwner, sftpController]);
 
+  // Keep the SFTP browser aligned with the active remote shell when the
+  // persisted setting is enabled.  The key includes the exact workspace,
+  // SSH attempt generation, and cwd so a late OSC notification can never
+  // navigate a newer tab or re-capture a directory the user browsed to.
+  const followedTerminalCwdRef = useRef<string | null>(null);
+  useEffect(() => {
+    const workspaceId = activeSshSession?.id ?? null;
+    const operationGeneration = workspaceId
+      ? sshTerminals.operationGenerationFor(workspaceId)
+      : undefined;
+    const cwd = activeSshTerminalCwd;
+    if (
+      !rendererSettings.sftp.followTerminalCwd
+      || !sftpOpen
+      || !workspaceId
+      || operationGeneration === undefined
+      || !cwd
+      || activeSshSession?.state !== "connected"
+    ) {
+      if (!workspaceId || !rendererSettings.sftp.followTerminalCwd) {
+        followedTerminalCwdRef.current = null;
+      }
+      return;
+    }
+    const owner = captureCurrentSftpOwner();
+    if (!owner || owner.workspaceId !== workspaceId) return;
+    const followKey = `${workspaceId}:${operationGeneration}:${cwd}`;
+    if (followedTerminalCwdRef.current === followKey) return;
+    followedTerminalCwdRef.current = followKey;
+    if (sftpPath === cwd) return;
+    void loadSftpPath(cwd, owner);
+  }, [
+    activeSshSession?.id,
+    activeSshSession?.state,
+    activeSshTerminalCwd,
+    captureCurrentSftpOwner,
+    loadSftpPath,
+    rendererSettings.sftp.followTerminalCwd,
+    sftpOpen,
+    sftpPath,
+    sshTerminals,
+  ]);
+
   const updateTransfer = useCallback((
     id: string,
     owner: WorkspaceSftpSessionOwner,
@@ -3042,6 +3088,14 @@ export function TerminalWorkspace() {
     fit,
     localTerminals.fitActive,
     sshTerminals.fitActive,
+    // Opening or resizing the right-hand tool panel changes the xterm's
+    // actual cell width even when the window itself stays the same size.
+    // Schedule a fit for that transition as well; otherwise a freshly opened
+    // AI/SFTP panel can leave the remote shell at its old column count and
+    // wrap ordinary output one character at a time.
+    terminalSidePanelVisible,
+    terminalSidePanelTab,
+    terminalSidePanelWidth,
     sftpOpen,
   ]);
 
@@ -8992,7 +9046,7 @@ export function TerminalWorkspace() {
         />
       ) : null}
       {hostKeyPrompt && (
-        <div className="dialog-backdrop" role="presentation">
+        <div className="dialog-backdrop live-terminal-dialog-backdrop" role="presentation">
           <div className="trust-dialog" role="dialog" aria-modal="true" aria-labelledby="host-key-title">
             <p className="eyebrow">{t("hostKey.kicker")}</p>
             <h2 id="host-key-title">
@@ -9020,7 +9074,7 @@ export function TerminalWorkspace() {
       )}
 
       {interactivePrompt && (
-        <div className="dialog-backdrop" role="presentation">
+        <div className="dialog-backdrop live-terminal-dialog-backdrop" role="presentation">
           <form className="trust-dialog" role="dialog" aria-modal="true" aria-labelledby="interactive-auth-title" onSubmit={(event) => void answerInteractive(event)}>
             <p className="eyebrow">{t("interactiveAuth.kicker")}</p>
             <h2 id="interactive-auth-title">{interactivePrompt.name || t("interactiveAuth.title")}</h2>

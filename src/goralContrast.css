@@ -23,7 +23,10 @@
   --ld-danger-soft: #f8e6e5;
   --ld-sidebar: #e8e9ec;
   --ld-chrome: rgba(250, 250, 250, .92);
-  --ld-overlay: rgba(245, 245, 247, .82);
+  /* Dialogs should dim the live workbench without washing it out.  A light
+     neutral scrim keeps the underlying context legible and avoids the
+     full-window white flash that the old 82% surface overlay produced. */
+  --ld-overlay: rgba(31, 38, 49, .28);
 }
 
 :root[data-goral-mode="light"] .workspace-navigation .connection-tabs button.active,
@@ -80,7 +83,7 @@
   --ld-danger-soft: #552630;
   --ld-sidebar: #111421;
   --ld-chrome: rgba(18, 21, 32, .92);
-  --ld-overlay: rgba(7, 10, 17, .82);
+  --ld-overlay: rgba(7, 10, 17, .56);
   color-scheme: dark;
 }
 
@@ -137,7 +140,7 @@
     --ld-danger-soft: #552630;
     --ld-sidebar: #111421;
     --ld-chrome: rgba(18, 21, 32, .92);
-    --ld-overlay: rgba(7, 10, 17, .82);
+    --ld-overlay: rgba(7, 10, 17, .56);
     color-scheme: dark;
   }
 

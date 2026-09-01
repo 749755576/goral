@@ -30,7 +30,9 @@
   --ld-danger-soft: #ffe4e5;
   --ld-chrome: rgba(249, 251, 253, .86);
   --ld-sidebar: rgba(234, 239, 247, .9);
-  --ld-overlay: rgba(238, 242, 247, .72);
+  /* Keep transient dialog scrims subtle enough that the live workbench does
+     not flash to an opaque white while a modal mounts. */
+  --ld-overlay: rgba(31, 38, 49, .28);
 }
 
 :root[data-goral-mode="dark"] {
@@ -59,7 +61,7 @@
   --ld-danger-soft: #502629;
   --ld-chrome: rgba(24, 30, 40, .86);
   --ld-sidebar: rgba(20, 25, 34, .88);
-  --ld-overlay: rgba(10, 14, 22, .72);
+  --ld-overlay: rgba(10, 14, 22, .56);
   color-scheme: dark;
 }
 
@@ -90,7 +92,7 @@
     --ld-danger-soft: #502629;
     --ld-chrome: rgba(24, 30, 40, .86);
     --ld-sidebar: rgba(20, 25, 34, .88);
-    --ld-overlay: rgba(10, 14, 22, .72);
+    --ld-overlay: rgba(10, 14, 22, .56);
     color-scheme: dark;
   }
 }
@@ -733,7 +735,9 @@ summary:focus-visible {
 :root[data-goral-mode="dark"] .surface-vault .panel-title h2,
 :root[data-goral-mode="dark"] .surface-vault .saved-hosts-heading h2 {
   color: var(--ld-text);
-  background: var(--ld-surface);
+  /* Headings share the Vault canvas; a filled strip reads as an accidental
+     full-width panel in dark mode. */
+  background: transparent;
 }
 
 :root[data-goral-mode="dark"] .surface-vault .connection-panel input,

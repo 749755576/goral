@@ -535,7 +535,6 @@ export const ConnectionLogsWorkspace = ({
   const [openLogId, setOpenLogId] = useState<string | null>(null);
   const [replayState, setReplayState] = useState<ReplayViewState | null>(null);
   const [exportingLogId, setExportingLogId] = useState<string | null>(null);
-  const [clearConfirmationOpen, setClearConfirmationOpen] = useState(false);
   const [rendererSettings, setRendererSettings] = useState(
     () => createDefaultRendererSafeSettings(),
   );
@@ -741,13 +740,12 @@ export const ConnectionLogsWorkspace = ({
   ), [mutateCatalog, t]);
 
   const clearUnsaved = useCallback(async () => {
-    const changed = await mutateCatalog(
+    return mutateCatalog(
       (logs) => logs.filter((log) => log.saved),
       t("connectionLogs.notice.cleared"),
       ({ expectedInventoryRevision }) => adapter.clearUnsaved({ expectedInventoryRevision }),
       t("connectionLogs.clearing"),
     );
-    if (changed && mounted.current) setClearConfirmationOpen(false);
   }, [adapter, mutateCatalog, t]);
 
   const updateFontSize = useCallback((id: string, fontSize: number | undefined) => mutateCatalog(
@@ -838,8 +836,10 @@ export const ConnectionLogsWorkspace = ({
           <button
             type="button"
             className="connection-logs-clear-button"
+            aria-label={t("connectionLogs.clearUnsaved")}
+            title={t("connectionLogs.clearUnsaved")}
             disabled={disabled || mutationPending || unsavedCount === 0 || !nativeRuntimeAvailable}
-            onClick={() => setClearConfirmationOpen(true)}
+            onClick={() => void clearUnsaved()}
           ><ConnectionLogGlyph name="trash" />{t("connectionLogs.clearUnsaved")}</button>
         </div>
       </header>
@@ -958,39 +958,6 @@ export const ConnectionLogsWorkspace = ({
         )}
       </div>
 
-      {clearConfirmationOpen ? (
-        <div className="connection-logs-dialog-backdrop" role="presentation">
-          <section className="connection-logs-dialog" role="dialog" aria-modal="true" aria-labelledby="clear-connection-logs-title">
-            <h2 id="clear-connection-logs-title">{t("connectionLogs.clearTitle")}</h2>
-            <p>{t(
-              unsavedCount === 1
-                ? "connectionLogs.clearDescriptionOne"
-                : "connectionLogs.clearDescription",
-              { count: unsavedCount },
-            )}</p>
-            <div>
-              <button type="button" disabled={mutationPending} onClick={() => setClearConfirmationOpen(false)}>
-                {t("connectionLogs.cancel")}
-              </button>
-              <button
-                type="button"
-                className="danger"
-                disabled={mutationPending}
-                onClick={() => {
-                  // Dismiss the modal before entering the native transaction.
-                  // Native Vault/replay cleanup can involve disk/keyring I/O;
-                  // keeping the backdrop mounted makes the whole page look
-                  // frozen while that work is in flight.
-                  setClearConfirmationOpen(false);
-                  void clearUnsaved();
-                }}
-              >
-                {mutationPending ? t("connectionLogs.clearing") : t("connectionLogs.clearUnsaved")}
-              </button>
-            </div>
-          </section>
-        </div>
-      ) : null}
     </section>
   );
 };

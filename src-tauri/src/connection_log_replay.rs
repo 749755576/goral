@@ -487,6 +487,20 @@ impl ConnectionLogReplayManager {
         run_blocking(move || store.reconcile(&logs)).await
     }
 
+    /// Schedules replay retention reconciliation without making a metadata
+    /// mutation wait on the replay filesystem.  The Vault catalog is the
+    /// authoritative source of truth: once it has been durably published,
+    /// replay cleanup is safe to finish asynchronously (and startup
+    /// reconciliation will retry it after an interrupted process).  This is
+    /// intentionally fire-and-forget so a stale file lock can never leave a
+    /// renderer mutation spinner/overlay stuck indefinitely.
+    pub(crate) fn reconcile_catalog_background(&self, logs: Vec<SavedConnectionLog>) {
+        let store = self.store.clone();
+        tokio::spawn(async move {
+            let _ = run_blocking(move || store.reconcile(&logs)).await;
+        });
+    }
+
     fn lock_active(
         &self,
     ) -> Result<

@@ -670,6 +670,16 @@ test("AI provider actions wait until endpoint-bound key discovery finishes", asy
   );
 });
 
+test("AI provider browser preview never sends a key to native storage", async () => {
+  const component = await readFile(componentUrl, "utf8");
+  const card = componentSlice(component, "function AiProviderCard(", "function AiSettingsPage(");
+  const persistence = componentSlice(card, "const persistDraftKey", "const connectAndFetchModels");
+  const previewGuard = persistence.indexOf("if (!isTauri()) return true;");
+  const nativeWrite = persistence.indexOf("await saveAiApiKey(");
+  assert.ok(previewGuard >= 0, "preview must short-circuit before native credential storage");
+  assert.ok(nativeWrite > previewGuard, "native key storage must remain desktop-only");
+});
+
 test("connect-and-fetch serializes profile, key, and model discovery without closing the editor", async () => {
   const component = await readFile(componentUrl, "utf8");
   const card = componentSlice(component, "function AiProviderCard(", "function AiSettingsPage(");
@@ -836,4 +846,12 @@ test("the main shell opens a reusable native Settings window and renders its ded
   assert.match(api, /__GORAL_SETTINGS_WINDOW__/);
   assert.match(nativeWindow, /center_on_source_monitor/);
   assert.equal(JSON.parse(capability).windows.includes("settings"), true);
+});
+
+test("browser Settings preview can open and close without invoking the native bridge", async () => {
+  const api = await readFile(new URL("../../src/settingsWindowApi.ts", import.meta.url), "utf8");
+  assert.match(api, /if \(!isTauri\(\)\) \{[\s\S]*?searchParams\.set\("window", "settings"\)/);
+  assert.match(api, /if \(!isTauri\(\)\) \{[\s\S]*?searchParams\.delete\("window"\)/);
+  assert.match(api, /window\.location\.assign\(url\.toString\(\)\)/);
+  assert.match(api, /new URLSearchParams\(window\.location\.search\)\.get\("target"\)/);
 });

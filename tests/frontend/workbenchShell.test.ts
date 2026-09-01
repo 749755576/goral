@@ -5,6 +5,7 @@ import test from "node:test";
 const appUrl = new URL("../../src/App.tsx", import.meta.url);
 const workspaceUrl = new URL("../../src/TerminalWorkspace.tsx", import.meta.url);
 const stylesUrl = new URL("../../src/styles.css", import.meta.url);
+const frameStylesUrl = new URL("../../src/mainWorkspaceFrame.css", import.meta.url);
 const indexUrl = new URL("../../index.html", import.meta.url);
 const tauriConfigUrl = new URL("../../src-tauri/tauri.conf.json", import.meta.url);
 
@@ -185,6 +186,13 @@ test("plain-browser visual previews fall back to an empty Vault without invoke e
   assert.match(source, /if \(!NATIVE_DESKTOP_RUNTIME_AVAILABLE\) \{[\s\S]*?setSavedHosts\(\[\]\);[\s\S]*?setSavedHostsError\(null\);[\s\S]*?setSavedHostsLoading\(false\);/);
   assert.match(source, /if \(!NATIVE_DESKTOP_RUNTIME_AVAILABLE\) return;[\s\S]*?subscribeHostKeyPrompts/);
   assert.match(source, /className="runtime-preview-placeholder"/);
+});
+
+test("browser-sized workbench releases the native guard width and stacks onboarding actions", async () => {
+  const styles = await readFile(frameStylesUrl, "utf8");
+  assert.match(styles, /@media \(max-width: 979px\)[\s\S]*?body\s*\{[\s\S]*?min-width:\s*0/);
+  assert.match(styles, /@media \(max-width: 700px\)[\s\S]*?\.surface-vault \.vault-onboarding-paths\s*\{[\s\S]*?grid-template-columns:\s*1fr/);
+  assert.match(styles, /\.surface-vault \.vault-onboarding-path,\s*\.surface-vault \.vault-onboarding-paths > \.primary-button\[data-onboarding-path="primary"\][\s\S]*?min-height:\s*132px/);
 });
 
 test("SSH prompt subscriptions and queue authority are retired on a real window unmount", async () => {
