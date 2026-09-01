@@ -18,6 +18,7 @@ test("compact Vault catalogs keep headers and controls inside their grid cell", 
   assert.match(compact, /port-forward-page-heading[\s\S]*?grid-template-areas:[\s\S]*?"new new"[\s\S]*?"search refresh"/);
   assert.match(compact, /port-forward-filter-bar[\s\S]*?grid-template-columns:\s*repeat\(4, minmax\(0, 1fr\)\)/);
   assert.match(compact, /known-hosts-search[\s\S]*?min-width:\s*0[\s\S]*?flex-basis:\s*100%/);
+  assert.match(css, /notes-scripts-view \.notes-scripts-workspace[\s\S]*?grid-template-rows:\s*auto auto auto minmax\(0, 1fr\)/);
   assert.match(knownHostsCss, /\.known-hosts-menu:not\(\[open\]\)\s*>\s*\.known-hosts-menu-popover\s*\{[\s\S]*?display:\s*none/);
   assert.match(knownHostsCss, /@media \(max-width: 720px\)[\s\S]*?\.known-hosts-menu-popover\s*\{[\s\S]*?right:\s*auto[\s\S]*?left:\s*0/);
 });

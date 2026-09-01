@@ -1678,7 +1678,11 @@ body {
   display: grid;
   width: 100%;
   min-height: 100%;
-  grid-template-rows: auto minmax(0, 1fr);
+  /* The browser/native-runtime notice and validation error are real grid
+     rows.  Keeping only the historical two-row template makes the second
+     row collapse to 0px and paints the layout over the notice at narrow
+     widths.  Empty optional rows collapse harmlessly when no message exists. */
+  grid-template-rows: auto auto auto minmax(0, 1fr);
   border: 0;
   border-radius: 0;
   color: var(--ld-frame-ink);
