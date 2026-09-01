@@ -343,11 +343,8 @@ mod tests {
             TrustedMoshClient::from_native_path(PathBuf::from("mosh-client")).unwrap_err(),
             MoshConfigError::InvalidNativeClientPath
         );
-        let wrong = native_client_path().with_file_name(if cfg!(windows) {
-            "cmd.exe"
-        } else {
-            "sh"
-        });
+        let wrong =
+            native_client_path().with_file_name(if cfg!(windows) { "cmd.exe" } else { "sh" });
         assert_eq!(
             TrustedMoshClient::from_native_path(wrong).unwrap_err(),
             MoshConfigError::InvalidNativeClientPath
