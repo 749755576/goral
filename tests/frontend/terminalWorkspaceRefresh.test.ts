@@ -4,6 +4,10 @@ import test from "node:test";
 
 const workspaceUrl = new URL("../../src/TerminalWorkspace.tsx", import.meta.url);
 
+// Keep source-structure checks stable when Git checks out TSX with CRLF.
+const readSource = (url: URL): Promise<string> => readFile(url, "utf8")
+  .then((source) => source.replace(/\r\n/g, "\n"));
+
 const functionBlock = (
   source: string,
   startMarker: string,
@@ -17,7 +21,7 @@ const functionBlock = (
 };
 
 test("initial catalog hydration does not fan out refreshes to the Hosts surface", async () => {
-  const workspace = await readFile(workspaceUrl, "utf8");
+  const workspace = await readSource(workspaceUrl);
   const callbacks = [
     ["const observeManagedInventoryRevision", "const refreshManagedSshKeys"],
     ["const handlePasswordIdentityCatalogChange", "const handleProxyProfileCatalogChange"],
@@ -36,7 +40,7 @@ test("initial catalog hydration does not fan out refreshes to the Hosts surface"
 });
 
 test("opening Connection Logs does not refresh unrelated Vault catalogs", async () => {
-  const workspace = await readFile(workspaceUrl, "utf8");
+  const workspace = await readSource(workspaceUrl);
   const logsPanel = functionBlock(
     workspace,
     '{sidebarView === "logs" && (',
@@ -49,7 +53,7 @@ test("opening Connection Logs does not refresh unrelated Vault catalogs", async 
 });
 
 test("real host-key mutations still refresh Known Hosts and dependent catalogs", async () => {
-  const workspace = await readFile(workspaceUrl, "utf8");
+  const workspace = await readSource(workspaceUrl);
   const refresh = functionBlock(
     workspace,
     "const refreshCatalogsAfterKnownHostsMutation",
