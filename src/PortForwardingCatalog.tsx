@@ -32,6 +32,7 @@ import {
   type PortForwardDraft,
 } from "./portForwardingUi";
 import { useI18n, type Locale, type Translate } from "./i18n";
+import { WindowControlGlyph } from "./WindowControlGlyph";
 
 type PortForwardEditor = PortForwardDraft & {
   mode: "create" | "update";
@@ -690,7 +691,7 @@ export const PortForwardingCatalog = ({
                   aria-label={t("portForward.cancel")}
                   title={t("portForward.cancel")}
                   onClick={() => { setEditor(null); setError(null); }}
-                >×</button>
+                ><WindowControlGlyph name="close" /></button>
                 <button
                   className="saved-host-header-save"
                   type="submit"

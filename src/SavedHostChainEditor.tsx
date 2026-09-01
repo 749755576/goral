@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import type { SavedHost } from "./backend";
 import { createTranslator, type Locale } from "./i18n";
 import { savedHostEffectiveUsername } from "./savedHostAuth";
+import { WindowControlGlyph } from "./WindowControlGlyph";
 
 export type SavedHostNetworkProtocol = "ssh" | "telnet";
 
@@ -131,7 +132,7 @@ export function SavedHostChainEditor({
                           itemIndex !== index
                         )),
                       }))}
-                    >×</button>
+                    ><WindowControlGlyph name="close" /></button>
                   </span>
                 </li>
               );

@@ -7084,7 +7084,7 @@ export function TerminalWorkspace() {
                     }).catch(() => setError(t("terminal.runtime.disconnectFailed")));
                   }}
                 >
-                  ×
+                  <WindowControlGlyph name="close" />
                 </button>
               </div>
             );
@@ -7450,7 +7450,7 @@ export function TerminalWorkspace() {
                   title={t("workspace.clearSearch")}
                   onClick={() => setSavedHostSearch("")}
                 >
-                  ×
+                  <WindowControlGlyph name="close" />
                 </button>
               )}
               <button

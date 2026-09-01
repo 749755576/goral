@@ -6,6 +6,7 @@ import {
   type DiscoveredLocalShell,
 } from "./backend";
 import { useI18n, type Locale, type Translate } from "./i18n";
+import { WindowControlGlyph } from "./WindowControlGlyph";
 import "./localTerminal.css";
 
 export type LocalTerminalSubmission = {
@@ -153,7 +154,7 @@ export function LocalTerminalPanel({
           disabled={submitting}
           onClick={onCancel}
         >
-          ×
+          <WindowControlGlyph name="close" />
         </button>
       </header>
 

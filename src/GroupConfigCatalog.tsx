@@ -37,6 +37,7 @@ import {
   resolveEffectiveGroupDefaults,
 } from "./groupConfigUi";
 import { createTranslator, type Locale, type Translate, useI18n } from "./i18n";
+import { WindowControlGlyph } from "./WindowControlGlyph";
 
 type CredentialAction = "keep" | "remove" | "replace";
 type ProxyCommandAction = "keep" | "replace";
@@ -685,7 +686,9 @@ export const GroupConfigCatalog = ({
             <button className="primary-button" type="button" disabled={actionsDisabled || !catalog || !nativeRuntimeAvailable} onClick={() => openCreate()}>
               {t("groupConfig.newGroup")}
             </button>
-            <button type="button" aria-label={t("groupConfig.close")} disabled={mutationPending} onClick={onClose}>×</button>
+            <button type="button" aria-label={t("groupConfig.close")} disabled={mutationPending} onClick={onClose}>
+              <WindowControlGlyph name="close" />
+            </button>
           </div>
         </header>
 

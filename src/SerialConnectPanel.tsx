@@ -20,6 +20,7 @@ import {
   type SerialPortInfo,
 } from "./backend";
 import { type Locale, type Translate, useI18n } from "./i18n";
+import { WindowControlGlyph } from "./WindowControlGlyph";
 import "./serial.css";
 
 export const SERIAL_BAUD_RATES = [
@@ -516,7 +517,7 @@ export const SerialConnectPanel = (props: SerialConnectPanelProps) => {
             disabled={submitting}
             onClick={props.onCancel}
           >
-            ×
+            <WindowControlGlyph name="close" />
           </button>
         )}
       </header>
