@@ -835,19 +835,20 @@ fn bytes_len_of_last(actions: &VecDeque<MoshAction>) -> usize {
 
 #[cfg(test)]
 mod tests {
-    use std::path::PathBuf;
-
     use super::*;
     use crate::{MoshStartRequest, TrustedMoshClient};
 
     const KEY: &str = "ABCDEFGHIJKLMNOPQRSTUV==";
 
     fn config() -> MoshSessionConfig {
-        let path = if cfg!(windows) {
-            PathBuf::from(r"D:\Netcatty\resources\mosh-client.exe")
-        } else {
-            PathBuf::from("/opt/netcatty/resources/mosh-client")
-        };
+        let path = std::env::temp_dir()
+            .join("Goral")
+            .join("resources")
+            .join(if cfg!(windows) {
+                "mosh-client.exe"
+            } else {
+                "mosh-client"
+            });
         MoshSessionConfig::resolve(
             TrustedMoshClient::from_native_path(path).unwrap(),
             MoshStartRequest::new("origin.example".to_owned(), 80, 24),

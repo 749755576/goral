@@ -317,11 +317,14 @@ mod tests {
     use super::*;
 
     fn native_client_path() -> PathBuf {
-        if cfg!(windows) {
-            PathBuf::from(r"D:\Netcatty\resources\mosh-client.exe")
-        } else {
-            PathBuf::from("/opt/netcatty/resources/mosh-client")
-        }
+        std::env::temp_dir()
+            .join("Goral")
+            .join("resources")
+            .join(if cfg!(windows) {
+                "mosh-client.exe"
+            } else {
+                "mosh-client"
+            })
     }
 
     #[test]
@@ -340,11 +343,11 @@ mod tests {
             TrustedMoshClient::from_native_path(PathBuf::from("mosh-client")).unwrap_err(),
             MoshConfigError::InvalidNativeClientPath
         );
-        let wrong = if cfg!(windows) {
-            PathBuf::from(r"D:\Netcatty\resources\cmd.exe")
+        let wrong = native_client_path().with_file_name(if cfg!(windows) {
+            "cmd.exe"
         } else {
-            PathBuf::from("/opt/netcatty/resources/sh")
-        };
+            "sh"
+        });
         assert_eq!(
             TrustedMoshClient::from_native_path(wrong).unwrap_err(),
             MoshConfigError::InvalidNativeClientPath
